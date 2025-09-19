@@ -45,39 +45,13 @@ export const Header = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      {/* Top bar */}
-      <div className="bg-primary text-primary-foreground py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
-          <p>🎨 Authentic Handcrafted Kalamkari Art Since 1984</p>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground/10"
-              onClick={onWhatsAppClick}
-            >
-              <MessageCircle className="h-4 w-4 mr-1" />
-              WhatsApp
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <Phone className="h-4 w-4 mr-1" />
-              Contact
-            </Button>
-          </div>
-        </div>
-      </div>
-
+    <header className="sticky top-0 z-50 bg-blue-900 backdrop-blur">
       {/* Main header */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary">
+            <h1 className="text-2xl text-white font-bold text-primary">
               Kailash Kalamkari
             </h1>
             <Badge variant="secondary" className="ml-2 hidden sm:inline">
@@ -91,7 +65,7 @@ export const Header = ({
               <a
                 key={item.label}
                 href={item.href}
-                className="text-foreground hover:text-primary transition-colors font-medium"
+                className="text-white text-foreground hover:text-grey-400 transition-colors font-medium"
               >
                 {item.label}
               </a>
@@ -112,18 +86,18 @@ export const Header = ({
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center text-white space-x-2">
               <Button variant="ghost" size="icon" className="hidden sm:flex">
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5 text-white" />
               </Button>
 
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative"
+                className="relative text-white"
                 onClick={onWishlistClick}
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5 " />
                 {wishlistCount > 0 && (
                   <Badge
                     variant="destructive"
@@ -137,7 +111,7 @@ export const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative"
+                className="relative text-white"
                 onClick={onCartClick}
               >
                 <ShoppingCart className="h-5 w-5" />
@@ -172,7 +146,7 @@ export const Header = ({
                     </div>
 
                     {/* Mobile navigation */}
-                    <nav className="flex flex-col space-y-4">
+                    <nav className="flex  flex-col space-y-4">
                       {navItems.map((item) => (
                         <a
                           key={item.label}
