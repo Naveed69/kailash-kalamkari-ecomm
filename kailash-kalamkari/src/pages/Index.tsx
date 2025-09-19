@@ -1,0 +1,353 @@
+import { useState, useMemo } from "react";
+import { Header } from "@/components/Header";
+import { ProductCard } from "@/components/ProductCard";
+import { ProductFilters, FilterState } from "@/components/ProductFilters";
+import { WhatsAppPopup } from "@/components/WhatsAppPopup";
+import { ReviewsSection } from "@/components/ReviewsSection";
+import { OurJourneySection } from "@/components/OurJourneySection";
+import { FeaturesProcessSection } from "@/components/FeaturesProcessSection";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { sampleProducts, categories, colors, maxPrice } from "@/data/products";
+import kalamkariHero from "@/assets/kalamkari-hero.jpg";
+import kalamkariProducts from "@/assets/kalamkari-products.jpg";
+
+const Index = () => {
+  const { toast } = useToast();
+  const [cartItems, setCartItems] = useState<string[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">(
+    "name"
+  );
+  const [filters, setFilters] = useState<FilterState>({
+    categories: [],
+    priceRange: [0, maxPrice],
+    colors: [],
+    inStock: false,
+  });
+
+  const filteredProducts = useMemo(() => {
+    let filtered = sampleProducts.filter((product) => {
+      // Search filter
+      if (
+        searchQuery &&
+        !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+
+      // Category filter
+      if (
+        filters.categories.length > 0 &&
+        !filters.categories.includes(product.category)
+      ) {
+        return false;
+      }
+
+      // Price filter
+      const price = product.originalPrice || product.price;
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+        return false;
+      }
+
+      // Color filter
+      if (
+        filters.colors.length > 0 &&
+        !filters.colors.some((color) => product.colors.includes(color))
+      ) {
+        return false;
+      }
+
+      // Stock filter
+      if (filters.inStock && !product.inStock) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Sort products
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "name":
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+
+    return filtered;
+  }, [sampleProducts, searchQuery, filters, sortBy]);
+
+  const handleAddToCart = (product: any) => {
+    setCartItems((prev) => [...prev, product.id]);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const handleToggleWishlist = (productId: string) => {
+    setWishlistItems((prev) => {
+      const isInWishlist = prev.includes(productId);
+      const product = sampleProducts.find((p) => p.id === productId);
+
+      toast({
+        title: isInWishlist ? "Removed from wishlist" : "Added to wishlist",
+        description: `${product?.name} ${
+          isInWishlist ? "removed from" : "added to"
+        } your wishlist.`,
+      });
+
+      return isInWishlist
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId];
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header
+        cartCount={cartItems.length}
+        wishlistCount={wishlistItems.length}
+        onCartClick={() =>
+          toast({
+            title: "Cart",
+            description: "Cart functionality coming soon!",
+          })
+        }
+        onWishlistClick={() =>
+          toast({
+            title: "Wishlist",
+            description: "Wishlist functionality coming soon!",
+          })
+        }
+        onWhatsAppClick={() => setIsWhatsAppOpen(true)}
+        onSearchChange={setSearchQuery}
+      />
+
+      {/* Hero Section */}
+      <section className="relative h-[60vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${kalamkariHero})` }}
+        />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-2xl">
+            <h1 className="text-5xl font-bold text-foreground mb-4">
+              Authentic Kalamkari Art
+            </h1>
+            <p className="text-xl text-muted-foreground mb-6">
+              Discover the timeless beauty of hand-painted Kalamkari textiles.
+              Traditional craftsmanship passed down through generations since
+              1984.
+            </p>
+            <div className="flex gap-4">
+              <Button
+                size="lg"
+                onClick={() =>
+                  document
+                    .getElementById("products")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                Shop Collection
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setIsWhatsAppOpen(true)}
+              >
+                Contact Us
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section id="products" className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-2">
+              Our Collection
+            </h2>
+            <p className="text-muted-foreground">
+              Handcrafted with love, each piece tells a story of tradition and
+              artistry.
+            </p>
+          </div>
+
+          <div className="flex gap-8">
+            {/* Filters Sidebar */}
+            <div className="w-80 flex-shrink-0 hidden lg:block">
+              <ProductFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                categories={categories}
+                colors={colors}
+                maxPrice={maxPrice}
+              />
+            </div>
+
+            {/* Products Grid */}
+            <div className="flex-1">
+              {/* Sort and Results Info */}
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground">
+                    {filteredProducts.length} products found
+                  </span>
+                  {searchQuery && (
+                    <Badge variant="secondary">Search: "{searchQuery}"</Badge>
+                  )}
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="text-sm border border-border rounded-md px-3 py-2 bg-background"
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+              </div>
+
+              {/* Products Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    onToggleWishlist={handleToggleWishlist}
+                    isWishlisted={wishlistItems.includes(product.id)}
+                  />
+                ))}
+              </div>
+
+              {filteredProducts.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    No products found matching your criteria.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => {
+                      setFilters({
+                        categories: [],
+                        priceRange: [0, maxPrice],
+                        colors: [],
+                        inStock: false,
+                      });
+                      setSearchQuery("");
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="animate-slide-in-left">
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Heritage of Kalamkari Art
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Since 1984, Kailash Kalamkari has been preserving the ancient
+                art of hand-painted textiles. Our skilled artisans use
+                traditional techniques and natural dyes to create unique pieces
+                that celebrate Indian heritage.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                Each piece is meticulously crafted using organic cotton and
+                natural dyes extracted from plants, making our products
+                eco-friendly and sustainable.
+              </p>
+              <Button onClick={() => setIsWhatsAppOpen(true)}>
+                Learn More About Our Process
+              </Button>
+            </div>
+            <div className="relative animate-slide-in-right">
+              <img
+                src={kalamkariProducts}
+                alt="Kalamkari craftsmanship"
+                className="rounded-lg shadow-lg w-full h-[400px] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Journey Section */}
+      <OurJourneySection />
+
+      {/* Features & Process Section */}
+      <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} />
+
+      {/* Reviews Section */}
+      <ReviewsSection />
+
+      {/* Call to Action Section */}
+      <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">
+        <div className="container mx-auto px-4 text-center animate-fade-in">
+          <h2 className="text-4xl font-bold mb-4">
+            Ready to Own a Piece of History?
+          </h2>
+          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            Join thousands of art lovers who have made kalamkari a part of their
+            lives. Each purchase supports traditional artisans and preserves
+            cultural heritage.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() =>
+                document
+                  .getElementById("products")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="bg-background text-foreground hover:bg-background/90"
+            >
+              Browse Collection
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => setIsWhatsAppOpen(true)}
+              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+            >
+              Contact Expert
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* WhatsApp Popup */}
+      <WhatsAppPopup
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        onOpen={() => setIsWhatsAppOpen(true)}
+      />
+    </div>
+  );
+};
+
+export default Index;

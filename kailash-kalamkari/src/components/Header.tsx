@@ -1,0 +1,196 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  ShoppingCart,
+  Heart,
+  Search,
+  User,
+  Menu,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+interface HeaderProps {
+  cartCount: number;
+  wishlistCount: number;
+  onCartClick: () => void;
+  onWishlistClick: () => void;
+  onWhatsAppClick: () => void;
+  onSearchChange: (query: string) => void;
+}
+
+export const Header = ({
+  cartCount,
+  wishlistCount,
+  onCartClick,
+  onWishlistClick,
+  onWhatsAppClick,
+  onSearchChange,
+}: HeaderProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    onSearchChange(value);
+  };
+
+  const navItems = [
+    { label: "Home", href: "#" },
+    { label: "Products", href: "#Products" },
+    { label: "About Us", href: "#about" },
+  ];
+
+  return (
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+      {/* Top bar */}
+      <div className="bg-primary text-primary-foreground py-2">
+        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
+          <p>🎨 Authentic Handcrafted Kalamkari Art Since 1984</p>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground/10"
+              onClick={onWhatsAppClick}
+            >
+              <MessageCircle className="h-4 w-4 mr-1" />
+              WhatsApp
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              <Phone className="h-4 w-4 mr-1" />
+              Contact
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main header */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold text-primary">
+              Kailash Kalamkari
+            </h1>
+            <Badge variant="secondary" className="ml-2 hidden sm:inline">
+              Est. 1984
+            </Badge>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-foreground hover:text-primary transition-colors font-medium"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Search and Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="relative hidden sm:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="icon" className="hidden sm:flex">
+                <User className="h-5 w-5" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={onWishlistClick}
+              >
+                <Heart className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {wishlistCount}
+                  </Badge>
+                )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={onCartClick}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+
+              {/* Mobile menu */}
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="md:hidden">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px]">
+                  <div className="space-y-4 mt-6">
+                    {/* Mobile search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Mobile navigation */}
+                    <nav className="flex flex-col space-y-4">
+                      {navItems.map((item) => (
+                        <a
+                          key={item.label}
+                          href={item.href}
+                          className="text-foreground hover:text-primary transition-colors font-medium"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </a>
+                      ))}
+                    </nav>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
