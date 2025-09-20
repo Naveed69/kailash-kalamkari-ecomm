@@ -158,7 +158,7 @@ const Index = () => {
           <img
             src={sampleImages[current]}
             alt="carousel"
-            className="w-full h-[400px] object-cover transition-all duration-500"
+            className="w-full h-[400px] object-cover transition-all duration-100"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
           {/* Overlay content */}
@@ -352,10 +352,10 @@ const Index = () => {
       <OurJourneySection />
 
       {/* Features & Process Section */}
-      <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} />
+      {/* <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} /> */}
 
       {/* Reviews Section */}
-      <ReviewsSection />
+      {/* <ReviewsSection /> */}
 
       {/* Call to Action Section */}
       <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">
