@@ -300,42 +300,44 @@ const Index = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-in-left">
-              <h2 className="text-3xl font-bold text-foreground mb-4">
-                Heritage of Kalamkari Art
-              </h2>
-              <p className="text-muted-foreground mb-4">
-                Since 1984, Kailash Kalamkari has been preserving the ancient
-                art of hand-painted textiles. Our skilled artisans use
-                traditional techniques and natural dyes to create unique pieces
-                that celebrate Indian heritage.
-              </p>
-              <p className="text-muted-foreground mb-6">
-                Each piece is meticulously crafted using organic cotton and
-                natural dyes extracted from plants, making our products
-                eco-friendly and sustainable.
-              </p>
-              <Button onClick={() => setIsWhatsAppOpen(true)}>
-                Learn More About Our Process
-              </Button>
-            </div>
-            <div className="relative animate-slide-in-right">
-              <img
-                src={kalamkariProducts}
-                alt="Kalamkari craftsmanship"
-                className="rounded-lg shadow-lg w-full h-[400px] object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+      {!isProductActive && (
+        <section id="about" className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="animate-slide-in-left">
+                <h2 className="text-3xl font-bold text-foreground mb-4">
+                  Heritage of Kalamkari Art
+                </h2>
+                <p className="text-muted-foreground mb-4">
+                  Since 1984, Kailash Kalamkari has been preserving the ancient
+                  art of hand-painted textiles. Our skilled artisans use
+                  traditional techniques and natural dyes to create unique
+                  pieces that celebrate Indian heritage.
+                </p>
+                <p className="text-muted-foreground mb-6">
+                  Each piece is meticulously crafted using organic cotton and
+                  natural dyes extracted from plants, making our products
+                  eco-friendly and sustainable.
+                </p>
+                <Button onClick={() => setIsWhatsAppOpen(true)}>
+                  Learn More About Our Process
+                </Button>
+              </div>
+              <div className="relative animate-slide-in-right">
+                <img
+                  src={kalamkariProducts}
+                  alt="Kalamkari craftsmanship"
+                  className="rounded-lg shadow-lg w-full h-[400px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Our Journey Section */}
-      <OurJourneySection />
+      {!isProductActive && <OurJourneySection />}
 
       {/* Features & Process Section */}
       {/* <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} /> */}
