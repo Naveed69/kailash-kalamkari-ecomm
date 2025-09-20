@@ -29,6 +29,10 @@ const Index = () => {
     colors: [],
     inStock: false,
   });
+
+  //navbar product click
+  const [isProductActive, setProductActive] = useState(false);
+  console.log(isProductActive);
   //crousel
   const sampleImages = [
     "https://picsum.photos/id/1015/800/400",
@@ -149,81 +153,86 @@ const Index = () => {
         }
         onWhatsAppClick={() => setIsWhatsAppOpen(true)}
         onSearchChange={setSearchQuery}
+        setProductActive={setProductActive}
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
-        <div className="relative flex w-full overflow-hidden">
-          {/* Images */}
-          <img
-            src={sampleImages[current]}
-            alt="carousel"
-            className="w-full h-[400px] object-cover transition-all duration-100"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-          {/* Overlay content */}
-          <div className="absolute top-0 left-0 w-full h-full flex items-center">
-            <div className="mx-auto px-6 max-w-2xl text-left">
-              <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
-                Authentic Kalamkari Art
-              </h1>
-              <p className="text-white text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
-                Discover the timeless beauty of hand-painted Kalamkari textiles.
-                Traditional craftsmanship passed down through generations since
-                1984.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button
-                  size="lg"
-                  onClick={() =>
-                    document
-                      .getElementById("products")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                >
-                  Shop Collection
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setIsWhatsAppOpen(true)}
-                >
-                  Contact Us
-                </Button>
+      {!isProductActive ? (
+        <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
+          <div className="relative flex w-full overflow-hidden">
+            {/* Images */}
+            <img
+              src={sampleImages[current]}
+              alt="carousel"
+              className="w-full h-[400px] object-cover transition-all duration-100"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+            {/* Overlay content */}
+            <div className="absolute top-0 left-0 w-full h-full flex items-center">
+              <div className="mx-auto px-6 max-w-2xl text-left">
+                <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
+                  Authentic Kalamkari Art
+                </h1>
+                <p className="text-white text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
+                  Discover the timeless beauty of hand-painted Kalamkari
+                  textiles. Traditional craftsmanship passed down through
+                  generations since 1984.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Button
+                    size="lg"
+                    onClick={() =>
+                      document
+                        .getElementById("products")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  >
+                    Shop Collection
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setIsWhatsAppOpen(true)}
+                  >
+                    Contact Us
+                  </Button>
+                </div>
               </div>
             </div>
+
+            {/* Left Button */}
+            <button
+              onClick={prevSlide}
+              className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+            >
+              {"<"}
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={nextSlide}
+              className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+            >
+              {">"}
+            </button>
+
+            {/* Dots */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+              {sampleImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrent(index)}
+                  className={`w-3 h-3 rounded-full ${
+                    current === index ? "bg-white" : "bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-
-          {/* Left Button */}
-          <button
-            onClick={prevSlide}
-            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
-          >
-            {"<"}
-          </button>
-
-          {/* Right Button */}
-          <button
-            onClick={nextSlide}
-            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
-          >
-            {">"}
-          </button>
-
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-            {sampleImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrent(index)}
-                className={`w-3 h-3 rounded-full ${
-                  current === index ? "bg-white" : "bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        <></>
+      )}
 
       {/* Products Section */}
       <section id="products" className="py-12">
@@ -285,29 +294,6 @@ const Index = () => {
                   />
                 ))}
               </div>
-
-              {filteredProducts.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground text-lg">
-                    No products found matching your criteria.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => {
-                      setFilters({
-                        categories: [],
-                        priceRange: [0, maxPrice],
-                        colors: [],
-                        inStock: false,
-                      });
-                      setSearchQuery("");
-                    }}
-                  >
-                    Clear all filters
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>

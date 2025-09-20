@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { useState } from "react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Heart, ShoppingCart } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -11,6 +11,7 @@ export interface Product {
   originalPrice?: number;
   image: string;
   category: string;
+  subCategory: string;
   description: string;
   colors: string[];
   inStock: boolean;
@@ -23,11 +24,16 @@ interface ProductCardProps {
   isWishlisted: boolean;
 }
 
-export const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  onAddToCart,
+  onToggleWishlist,
+  isWishlisted,
+}: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Card 
+    <Card
       className="group overflow-hidden border-border hover:shadow-lg transition-all duration-300 bg-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -45,12 +51,23 @@ export const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlist
             className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
             onClick={() => onToggleWishlist(product.id)}
           >
-            <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+            <Heart
+              className={`h-4 w-4 ${
+                isWishlisted
+                  ? "fill-red-500 text-red-500"
+                  : "text-muted-foreground"
+              }`}
+            />
           </Button>
         </div>
         {product.originalPrice && (
           <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
-            {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+            {Math.round(
+              ((product.originalPrice - product.price) /
+                product.originalPrice) *
+                100
+            )}
+            % OFF
           </Badge>
         )}
         {!product.inStock && (
@@ -59,7 +76,7 @@ export const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlist
           </div>
         )}
       </div>
-      
+
       <CardContent className="p-4">
         <div className="space-y-2">
           <Badge variant="secondary" className="text-xs">
@@ -90,12 +107,14 @@ export const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlist
               />
             ))}
             {product.colors.length > 4 && (
-              <span className="text-xs text-muted-foreground">+{product.colors.length - 4}</span>
+              <span className="text-xs text-muted-foreground">
+                +{product.colors.length - 4}
+              </span>
             )}
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="p-4 pt-0">
         <Button
           className="w-full"
@@ -103,7 +122,7 @@ export const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlist
           disabled={!product.inStock}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+          {product.inStock ? "Add to Cart" : "Out of Stock"}
         </Button>
       </CardFooter>
     </Card>

@@ -20,6 +20,7 @@ interface HeaderProps {
   onWishlistClick: () => void;
   onWhatsAppClick: () => void;
   onSearchChange: (query: string) => void;
+  setProductActive?: (active: boolean) => void;
 }
 
 export const Header = ({
@@ -29,6 +30,7 @@ export const Header = ({
   onWishlistClick,
   onWhatsAppClick,
   onSearchChange,
+  setProductActive,
 }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -61,15 +63,42 @@ export const Header = ({
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-white text-foreground hover:text-grey-400 transition-colors font-medium"
-              >
-                {item.label}
-              </a>
-            ))}
+            {navItems.map((item) => {
+              if (item.label === "Products") {
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => setProductActive(true)}
+                    className="text-white hover:text-gray-300 transition-colors font-medium"
+                  >
+                    {item.label}
+                  </button>
+                );
+              }
+
+              if (item.label === "Home") {
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setProductActive(false)}
+                    className="text-white hover:text-gray-300 transition-colors font-medium"
+                  >
+                    {item.label}
+                  </a>
+                );
+              }
+
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-white hover:text-gray-300 transition-colors font-medium"
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </nav>
 
           {/* Search and Actions */}
