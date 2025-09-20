@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter } from "lucide-react";
+import { Radio, RadioGroup } from "@/components/ui/Radio";
 
 export interface FilterState {
   categories: string[];
