@@ -66,13 +66,14 @@ export const Header = ({
             {navItems.map((item) => {
               if (item.label === "Products") {
                 return (
-                  <button
+                  <a
                     key={item.label}
+                    href={item.href}
                     onClick={() => setProductActive(true)}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
                     {item.label}
-                  </button>
+                  </a>
                 );
               }
 
@@ -176,16 +177,49 @@ export const Header = ({
 
                     {/* Mobile navigation */}
                     <nav className="flex  flex-col space-y-4">
-                      {navItems.map((item) => (
-                        <a
-                          key={item.label}
-                          href={item.href}
-                          className="text-foreground hover:text-primary transition-colors font-medium"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {item.label}
-                        </a>
-                      ))}
+                      {navItems.map((item) => {
+                        if (item.label === "Products") {
+                          return (
+                            <a
+                              key={item.label}
+                              onClick={() => {
+                                setProductActive(true);
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="text-foreground hover:text-primary transition-colors font-medium"
+                            >
+                              {item.label}
+                            </a>
+                          );
+                        }
+
+                        if (item.label === "Home") {
+                          return (
+                            <a
+                              key={item.label}
+                              href={item.href}
+                              onClick={() => {
+                                setProductActive(false);
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="text-foreground hover:text-primary transition-colors font-medium"
+                            >
+                              {item.label}
+                            </a>
+                          );
+                        }
+
+                        return (
+                          <a
+                            key={item.label}
+                            href={item.href}
+                            className="text-foreground hover:text-primary transition-colors font-medium"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {item.label}
+                          </a>
+                        );
+                      })}
                     </nav>
                   </div>
                 </SheetContent>
