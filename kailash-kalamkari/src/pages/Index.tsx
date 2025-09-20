@@ -23,6 +23,11 @@ const Index = () => {
     "name"
   );
 
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(
+    null
+  );
+
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     priceRange: [0, maxPrice],
@@ -256,10 +261,11 @@ const Index = () => {
                 categories={categories}
                 colors={colors}
                 maxPrice={maxPrice}
+                setActiveCategory={setActiveCategory}
               />
             </div>
 
-            {/* Products Grid */}
+            {/* Products Grid container*/}
             <div className="flex-1">
               {/* Sort and Results Info */}
               <div className="flex justify-between items-center mb-6">
@@ -282,8 +288,30 @@ const Index = () => {
                 </select>
               </div>
 
+              {/* Categories */}
+              {activeCategory && (
+                <div className="flex gap-4 mb-6">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      className={`px-4 py-2 rounded ${
+                        activeCategory === cat
+                          ? "bg-primary text-white"
+                          : "bg-gray-200"
+                      }`}
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setActiveSubcategory(null); // reset subcategory when category changes
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Products Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -293,7 +321,7 @@ const Index = () => {
                     isWishlisted={wishlistItems.includes(product.id)}
                   />
                 ))}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

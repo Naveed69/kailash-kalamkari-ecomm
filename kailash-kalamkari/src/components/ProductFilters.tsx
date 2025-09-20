@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,7 @@ interface ProductFiltersProps {
   categories: string[];
   colors: string[];
   maxPrice: number;
+  setActiveCategory?: (active: string | null) => void;
 }
 
 export const ProductFilters = ({
@@ -28,6 +29,7 @@ export const ProductFilters = ({
   categories,
   colors,
   maxPrice,
+  setActiveCategory,
 }: ProductFiltersProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -50,8 +52,16 @@ export const ProductFilters = ({
     (filters.inStock ? 1 : 0) +
     (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice ? 1 : 0);
 
+  useEffect(() => {
+    if (activeFilterCount > 0) {
+      setActiveCategory("category"); // safely update state when activeFilterCount changes
+    } else {
+      setActiveCategory(null); // safely update state when activeFilterCount changes
+    }
+  }, [activeFilterCount]);
+
   return (
-    <Card className="sticky top-4">
+    <Card className="sticky top-4 top-[90px]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
