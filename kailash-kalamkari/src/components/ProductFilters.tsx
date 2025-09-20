@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { X, Filter } from 'lucide-react';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { X, Filter } from "lucide-react";
 
 export interface FilterState {
   categories: string[];
@@ -22,12 +22,12 @@ interface ProductFiltersProps {
   maxPrice: number;
 }
 
-export const ProductFilters = ({ 
-  filters, 
-  onFiltersChange, 
-  categories, 
-  colors, 
-  maxPrice 
+export const ProductFilters = ({
+  filters,
+  onFiltersChange,
+  categories,
+  colors,
+  maxPrice,
 }: ProductFiltersProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -44,9 +44,9 @@ export const ProductFilters = ({
     });
   };
 
-  const activeFilterCount = 
-    filters.categories.length + 
-    filters.colors.length + 
+  const activeFilterCount =
+    filters.categories.length +
+    filters.colors.length +
     (filters.inStock ? 1 : 0) +
     (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice ? 1 : 0);
 
@@ -63,12 +63,8 @@ export const ProductFilters = ({
               </Badge>
             )}
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? 'Hide' : 'Show'}
+          <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? "Hide" : "Show"}
           </Button>
         </div>
         {activeFilterCount > 0 && (
@@ -97,9 +93,15 @@ export const ProductFilters = ({
                     checked={filters.categories.includes(category)}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        updateFilter('categories', [...filters.categories, category]);
+                        updateFilter("categories", [
+                          ...filters.categories,
+                          category,
+                        ]);
                       } else {
-                        updateFilter('categories', filters.categories.filter(c => c !== category));
+                        updateFilter(
+                          "categories",
+                          filters.categories.filter((c) => c !== category)
+                        );
                       }
                     }}
                   />
@@ -117,11 +119,14 @@ export const ProductFilters = ({
           {/* Price Range */}
           <div>
             <Label className="text-sm font-medium mb-3 block">
-              Price Range: ₹{filters.priceRange[0].toLocaleString()} - ₹{filters.priceRange[1].toLocaleString()}
+              Price Range: ₹{filters.priceRange[0].toLocaleString()} - ₹
+              {filters.priceRange[1].toLocaleString()}
             </Label>
             <Slider
               value={filters.priceRange}
-              onValueChange={(value) => updateFilter('priceRange', value as [number, number])}
+              onValueChange={(value) =>
+                updateFilter("priceRange", value as [number, number])
+              }
               max={maxPrice}
               min={0}
               step={500}
@@ -130,7 +135,7 @@ export const ProductFilters = ({
           </div>
 
           {/* Colors */}
-          <div>
+          {/* <div>
             <Label className="text-sm font-medium mb-3 block">Colors</Label>
             <div className="grid grid-cols-4 gap-2">
               {colors.map((color) => (
@@ -153,19 +158,22 @@ export const ProductFilters = ({
                 />
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* In Stock */}
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Checkbox
               id="inStock"
               checked={filters.inStock}
-              onCheckedChange={(checked) => updateFilter('inStock', checked)}
+              onCheckedChange={(checked) => updateFilter("inStock", checked)}
             />
-            <Label htmlFor="inStock" className="text-sm font-normal cursor-pointer">
+            <Label
+              htmlFor="inStock"
+              className="text-sm font-normal cursor-pointer"
+            >
               In Stock Only
             </Label>
-          </div>
+          </div> */}
         </CardContent>
       )}
     </Card>
