@@ -32,6 +32,8 @@ const Index = () => {
   );
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [issubcategoryactiveCategory, setSubCategoryActiveCategory] =
+    useState(false);
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(
     null
   );
@@ -72,6 +74,22 @@ const Index = () => {
     if (cat) return cat.subCategories;
     return null;
   }, [filters.selectedCategories]);
+
+  const subCategoryData = useMemo(() => {
+    let cat = fashionProducts.find(
+      (item) => item.category === filters.selectedCategories
+    );
+    if (cat)
+      for (let i = 0; i < cat.subCategories.length; i++)
+        if (cat.subCategories[i].name === activeSubcategory) {
+          return cat.subCategories[i].products;
+        }
+
+    return null;
+  }, [activeSubcategory]);
+
+  console.log(categoryData);
+  console.log(activeSubcategory);
   const filteredProducts = useMemo(() => {
     let filtered = sampleProducts.filter((product) => {
       // Search filter
@@ -285,6 +303,7 @@ const Index = () => {
                 onFiltersChange={setFilters}
                 mainCategories={mainCategories}
                 setActiveCategory={setActiveCategory}
+                setSubCategoryActiveCategory={setSubCategoryActiveCategory}
               />
             </div>
 
@@ -314,23 +333,46 @@ const Index = () => {
               )}
 
               {/* Categories */}
-              {activeCategory && (
+              {activeCategory && !issubcategoryactiveCategory && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categoryData.map((categoryItem) => (
-                    <CatogaryCard
+                    <span
                       key={categoryItem.name}
-                      category={filters.selectedCategories}
-                      name={categoryItem.name}
-                      image={categoryItem.subCategoriesImage}
+                      onClick={() => {
+                        setActiveSubcategory(categoryItem.name);
+                        setSubCategoryActiveCategory(true);
+                      }}
+                    >
+                      <CatogaryCard
+                        key={categoryItem.name}
+                        category={filters.selectedCategories}
+                        name={categoryItem.name}
+                        image={categoryItem.subCategoriesImage}
+                      />
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* on loadpage Products Grid */}
+              {!activeCategory && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                      onToggleWishlist={handleToggleWishlist}
+                      isWishlisted={wishlistItems.includes(product.id)}
                     />
                   ))}
                 </div>
               )}
 
-              {/* Products Grid */}
-              {!activeCategory && (
+              {/* products grid on sub category */}
+              {issubcategoryactiveCategory && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.map((product) => (
+                  {subCategoryData.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -390,7 +432,7 @@ const Index = () => {
       {/* <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} /> */}
 
       {/* Reviews Section */}
-      {/* <ReviewsSection /> */}
+      <ReviewsSection />
 
       {/* Call to Action Section */}
       <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">

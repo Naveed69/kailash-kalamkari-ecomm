@@ -10,10 +10,16 @@ export interface Category {
 }
 
 interface CatogaryCardProps {
-  category: Category;
+  discription: Category;
+  name: Category;
+  image: Category;
 }
 
-export const CatogaryCard = ({ category, name, image }: CatogaryCardProps) => {
+export const CatogaryCard = ({
+  discription,
+  name,
+  image,
+}: CatogaryCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -28,7 +34,7 @@ export const CatogaryCard = ({ category, name, image }: CatogaryCardProps) => {
       <CardContent className="p-4">
         <div className="space-y-2">
           <h3 className="font-semibold text-card-foreground line-clamp-2">
-            {name}
+            {discription}
           </h3>
           <p className="text-sm text-muted-foreground line-clamp-3">{name}</p>
         </div>
