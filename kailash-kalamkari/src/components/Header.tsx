@@ -31,6 +31,7 @@ export const Header = ({
   onWhatsAppClick,
   onSearchChange,
   setProductActive,
+  setIsAboutUsActive,
 }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -69,7 +70,10 @@ export const Header = ({
                   <a
                     key={item.label}
                     href={item.href}
-                    onClick={() => setProductActive(true)}
+                    onClick={() => {
+                      setProductActive(true);
+                      setIsAboutUsActive(false);
+                    }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
                     {item.label}
@@ -82,7 +86,10 @@ export const Header = ({
                   <a
                     key={item.label}
                     href={item.href}
-                    onClick={() => setProductActive(false)}
+                    onClick={() => {
+                      setProductActive(false);
+                      setIsAboutUsActive(false);
+                    }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
                     {item.label}
@@ -94,6 +101,10 @@ export const Header = ({
                 <a
                   key={item.label}
                   href={item.href}
+                  onClick={() => {
+                    setProductActive(false);
+                    setIsAboutUsActive(true);
+                  }}
                   className="text-white hover:text-gray-300 transition-colors font-medium"
                 >
                   {item.label}

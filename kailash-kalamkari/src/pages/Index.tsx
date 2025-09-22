@@ -37,6 +37,7 @@ const Index = () => {
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(
     null
   );
+  const [isAboutUsActive, setIsAboutUsActive] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
@@ -88,8 +89,6 @@ const Index = () => {
     return null;
   }, [activeSubcategory]);
 
-  console.log(categoryData);
-  console.log(activeSubcategory);
   const filteredProducts = useMemo(() => {
     let filtered = sampleProducts.filter((product) => {
       // Search filter
@@ -193,10 +192,11 @@ const Index = () => {
         onWhatsAppClick={() => setIsWhatsAppOpen(true)}
         onSearchChange={setSearchQuery}
         setProductActive={setProductActive}
+        setIsAboutUsActive={setIsAboutUsActive}
       />
 
       {/* Hero Section */}
-      {!isProductActive ? (
+      {!isProductActive && !isAboutUsActive ? (
         <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
           <div className="relative flex w-full overflow-hidden">
             {/* Images */}
@@ -274,22 +274,23 @@ const Index = () => {
       )}
 
       {/* Products Section */}
-      <section id="products" className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-2">
-              Our Collection
-            </h2>
-            <p className="text-muted-foreground">
-              Handcrafted with love, each piece tells a story of tradition and
-              artistry.
-            </p>
-          </div>
+      {!isAboutUsActive && (
+        <section id="products" className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
+                Our Collection
+              </h2>
+              <p className="text-muted-foreground">
+                Handcrafted with love, each piece tells a story of tradition and
+                artistry.
+              </p>
+            </div>
 
-          <div className="flex gap-8">
-            {/* Filters Sidebar */}
-            <div className="w-80 flex-shrink-0 hidden lg:block">
-              {/* <ProductFilters
+            <div className="flex gap-8">
+              {/* Filters Sidebar */}
+              <div className="w-80 flex-shrink-0 hidden lg:block">
+                {/* <ProductFilters
                 filters={filters}
                 onFiltersChange={setFilters}
                 categories={categories}
@@ -298,95 +299,98 @@ const Index = () => {
                 maxPrice={maxPrice}
                 setActiveCategory={setActiveCategory}
               /> */}
-              <MainCategories
-                filters={filters}
-                onFiltersChange={setFilters}
-                mainCategories={mainCategories}
-                setActiveCategory={setActiveCategory}
-                setSubCategoryActiveCategory={setSubCategoryActiveCategory}
-              />
-            </div>
+                <MainCategories
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  mainCategories={mainCategories}
+                  setActiveCategory={setActiveCategory}
+                  setSubCategoryActiveCategory={setSubCategoryActiveCategory}
+                />
+              </div>
 
-            {/* Products Grid container*/}
-            <div className="flex-1">
-              {/* Sort and Results Info */}
-              {!activeCategory && (
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-muted-foreground">
-                      {filteredProducts.length} products found
-                    </span>
-                    {searchQuery && (
-                      <Badge variant="secondary">Search: "{searchQuery}"</Badge>
-                    )}
-                  </div>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                    className="text-sm border border-border rounded-md px-3 py-2 bg-background"
-                  >
-                    <option value="name">Sort by Name</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                  </select>
-                </div>
-              )}
-
-              {/* Categories */}
-              {activeCategory && !issubcategoryactiveCategory && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {categoryData.map((categoryItem) => (
-                    <span
-                      key={categoryItem.name}
-                      onClick={() => {
-                        setActiveSubcategory(categoryItem.name);
-                        setSubCategoryActiveCategory(true);
-                      }}
+              {/* Products Grid container*/}
+              <div className="flex-1">
+                {/* Sort and Results Info */}
+                {!activeCategory && (
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-muted-foreground">
+                        {filteredProducts.length} products found
+                      </span>
+                      {searchQuery && (
+                        <Badge variant="secondary">
+                          Search: "{searchQuery}"
+                        </Badge>
+                      )}
+                    </div>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as any)}
+                      className="text-sm border border-border rounded-md px-3 py-2 bg-background"
                     >
-                      <CatogaryCard
+                      <option value="name">Sort by Name</option>
+                      <option value="price-low">Price: Low to High</option>
+                      <option value="price-high">Price: High to Low</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Categories */}
+                {activeCategory && !issubcategoryactiveCategory && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {categoryData.map((categoryItem) => (
+                      <span
                         key={categoryItem.name}
-                        category={filters.selectedCategories}
-                        name={categoryItem.name}
-                        image={categoryItem.subCategoriesImage}
+                        onClick={() => {
+                          setActiveSubcategory(categoryItem.name);
+                          setSubCategoryActiveCategory(true);
+                        }}
+                      >
+                        <CatogaryCard
+                          key={categoryItem.name}
+                          category={filters.selectedCategories}
+                          name={categoryItem.name}
+                          image={categoryItem.subCategoriesImage}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* on loadpage Products Grid */}
+                {!activeCategory && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddToCart={handleAddToCart}
+                        onToggleWishlist={handleToggleWishlist}
+                        isWishlisted={wishlistItems.includes(product.id)}
                       />
-                    </span>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
 
-              {/* on loadpage Products Grid */}
-              {!activeCategory && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                      onToggleWishlist={handleToggleWishlist}
-                      isWishlisted={wishlistItems.includes(product.id)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* products grid on sub category */}
-              {issubcategoryactiveCategory && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {subCategoryData.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                      onToggleWishlist={handleToggleWishlist}
-                      isWishlisted={wishlistItems.includes(product.id)}
-                    />
-                  ))}
-                </div>
-              )}
+                {/* products grid on sub category */}
+                {issubcategoryactiveCategory && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {subCategoryData.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddToCart={handleAddToCart}
+                        onToggleWishlist={handleToggleWishlist}
+                        isWishlisted={wishlistItems.includes(product.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* About Section */}
       {!isProductActive && (
@@ -432,7 +436,7 @@ const Index = () => {
       {/* <FeaturesProcessSection onWhatsAppClick={() => setIsWhatsAppOpen(true)} /> */}
 
       {/* Reviews Section */}
-      <ReviewsSection />
+      {!isProductActive && !isAboutUsActive && <ReviewsSection />}
 
       {/* Call to Action Section */}
       <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">
