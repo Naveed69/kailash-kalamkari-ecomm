@@ -13,9 +13,8 @@ interface CatogaryCardProps {
   category: Category;
 }
 
-export const CatogaryCard = ({ category }: CatogaryCardProps) => {
+export const CatogaryCard = ({ category, name, image }: CatogaryCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-
 
   return (
     <Card
@@ -25,15 +24,15 @@ export const CatogaryCard = ({ category }: CatogaryCardProps) => {
     >
       <div className="relative overflow-hidden">
         <img
-          src={category.image}
-          alt={category.name}
+          src={image}
+          alt={name}
           className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute top-3 right-3 z-10">
           <CardContent className="p-4">
             <div className="space-y-2">
               <h3 className="font-semibold text-card-foreground line-clamp-2">
-                {category.name}
+                {name}
               </h3>
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {category.description}

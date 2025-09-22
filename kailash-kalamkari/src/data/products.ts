@@ -9,7 +9,7 @@ export const fashionProducts = [
     subCategories: [
       {
         name: "Silk Sarees",
-        subCategoriesImage: "banarasi-silk.jpg",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "silk-001",
@@ -49,7 +49,7 @@ export const fashionProducts = [
       },
       {
         name: "Cotton Sarees",
-        subCategoriesImage: "handloom-cotton.jpg",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "cotton-001",
@@ -89,7 +89,7 @@ export const fashionProducts = [
       },
       {
         name: "Designer Sarees",
-        subCategoriesImage: "georgette-designer.jpg",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "designer-001",
@@ -113,7 +113,7 @@ export const fashionProducts = [
     subCategories: [
       {
         name: "Silk Dupattas",
-        subCategoriesImage: "banarasi-dupatta.jpg",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "dupatta-silk-001",
@@ -130,7 +130,7 @@ export const fashionProducts = [
       },
       {
         name: "Cotton Dupattas",
-        subCategoriesImage: "handblock-dupatta.jpg",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "dupatta-cotton-001",
@@ -148,7 +148,24 @@ export const fashionProducts = [
       },
       {
         name: "Embroidered Dupattas",
-        subCategoriesImage: "phulkari-dupatta.jpg",
+        subCategoriesImage: kalamkariHero,
+        products: [
+          {
+            id: "dupatta-embroidered-001",
+            name: "Phulkari Dupatta",
+            price: 3200,
+            originalPrice: 4500,
+            image: "phulkari-dupatta.jpg",
+            description: "Traditional Punjabi Phulkari embroidery dupatta",
+            colors: ["#DC143C", "#FFD700", "#228B22"],
+            inStock: true,
+            rating: 4.8,
+          },
+        ],
+      },
+      {
+        name: "Embroidered Dupattass",
+        subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "dupatta-embroidered-001",

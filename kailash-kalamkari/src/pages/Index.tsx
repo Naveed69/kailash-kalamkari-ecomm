@@ -66,9 +66,13 @@ const Index = () => {
   };
 
   const categoryData = useMemo(() => {
-    
+    let cat = fashionProducts.find(
+      (item) => item.category === filters.selectedCategories
+    );
+    if (cat) return cat.subCategories;
+    return null;
   }, [filters.selectedCategories]);
-
+  console.log(categoryData);
   const filteredProducts = useMemo(() => {
     let filtered = sampleProducts.filter((product) => {
       // Search filter
@@ -313,7 +317,14 @@ const Index = () => {
               {/* Categories */}
               {activeCategory && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <CatogaryCard key={1} category={filters.selectedCategories} />
+                  {categoryData.map((categoryItem) => (
+                    <CatogaryCard
+                      key={categoryItem.name}
+                      category={filters.selectedCategories}
+                      name={categoryItem.name}
+                      image={categoryItem.subCategoriesImage}
+                    />
+                  ))}
                 </div>
               )}
 
