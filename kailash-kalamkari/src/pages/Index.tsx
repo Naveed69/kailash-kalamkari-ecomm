@@ -20,7 +20,7 @@ import {
 } from "@/data/products";
 import kalamkariHero from "@/assets/kalamkari-hero.jpg";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
-import { CatogaryCard } from "@/components/ui/categorycard";
+import { CatogaryCard } from "@/components/ui/categoryCard";
 const Index = () => {
   const { toast } = useToast();
   const [cartItems, setCartItems] = useState<string[]>([]);
