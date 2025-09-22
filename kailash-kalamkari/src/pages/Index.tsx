@@ -72,7 +72,6 @@ const Index = () => {
     if (cat) return cat.subCategories;
     return null;
   }, [filters.selectedCategories]);
-  console.log(categoryData);
   const filteredProducts = useMemo(() => {
     let filtered = sampleProducts.filter((product) => {
       // Search filter
