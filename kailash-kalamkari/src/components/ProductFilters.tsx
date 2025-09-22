@@ -6,10 +6,10 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter } from "lucide-react";
-import { Radio, RadioGroup } from "@/components/ui/Radio";
 
 export interface FilterState {
   categories: string[];
+  mainCategories: string;
   priceRange: [number, number];
   colors: string[];
   inStock: boolean;
@@ -19,6 +19,7 @@ interface ProductFiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   categories: string[];
+  mainCategories: string[];
   colors: string[];
   maxPrice: number;
   setActiveCategory?: (active: string | null) => void;
@@ -28,6 +29,7 @@ export const ProductFilters = ({
   filters,
   onFiltersChange,
   categories,
+  mainCategories,
   colors,
   maxPrice,
   setActiveCategory,
@@ -41,6 +43,7 @@ export const ProductFilters = ({
   const clearFilters = () => {
     onFiltersChange({
       categories: [],
+      mainCategories: "",
       priceRange: [0, maxPrice],
       colors: [],
       inStock: false,

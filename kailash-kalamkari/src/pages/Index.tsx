@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductFilters, FilterState } from "@/components/ProductFilters";
@@ -9,10 +9,18 @@ import { FeaturesProcessSection } from "@/components/FeaturesProcessSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { sampleProducts, categories, colors, maxPrice } from "@/data/products";
+import { MainCategories } from "@/components/ui/categoryFilter";
+import { fashionProducts } from "@/data/products";
+import {
+  sampleProducts,
+  categories,
+  mainCategories,
+  colors,
+  maxPrice,
+} from "@/data/products";
 import kalamkariHero from "@/assets/kalamkari-hero.jpg";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
-
+import { CatogaryCard } from "@/components/ui/categorycard";
 const Index = () => {
   const { toast } = useToast();
   const [cartItems, setCartItems] = useState<string[]>([]);
@@ -30,6 +38,8 @@ const Index = () => {
 
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
+    mainCategories: [],
+    selectedCategories: "",
     priceRange: [0, maxPrice],
     colors: [],
     inStock: false,
@@ -37,7 +47,6 @@ const Index = () => {
 
   //navbar product click
   const [isProductActive, setProductActive] = useState(false);
-  console.log(isProductActive);
   //crousel
   const sampleImages = [
     "https://picsum.photos/id/1015/800/400",
@@ -55,6 +64,10 @@ const Index = () => {
       (prev) => (prev - 1 + sampleImages.length) % sampleImages.length
     );
   };
+
+  const categoryData = useMemo(() => {
+    
+  }, [filters.selectedCategories]);
 
   const filteredProducts = useMemo(() => {
     let filtered = sampleProducts.filter((product) => {
@@ -255,12 +268,19 @@ const Index = () => {
           <div className="flex gap-8">
             {/* Filters Sidebar */}
             <div className="w-80 flex-shrink-0 hidden lg:block">
-              <ProductFilters
+              {/* <ProductFilters
                 filters={filters}
                 onFiltersChange={setFilters}
                 categories={categories}
+                category={category}
                 colors={colors}
                 maxPrice={maxPrice}
+                setActiveCategory={setActiveCategory}
+              /> */}
+              <MainCategories
+                filters={filters}
+                onFiltersChange={setFilters}
+                mainCategories={mainCategories}
                 setActiveCategory={setActiveCategory}
               />
             </div>
@@ -268,60 +288,49 @@ const Index = () => {
             {/* Products Grid container*/}
             <div className="flex-1">
               {/* Sort and Results Info */}
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">
-                    {filteredProducts.length} products found
-                  </span>
-                  {searchQuery && (
-                    <Badge variant="secondary">Search: "{searchQuery}"</Badge>
-                  )}
+              {!activeCategory && (
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      {filteredProducts.length} products found
+                    </span>
+                    {searchQuery && (
+                      <Badge variant="secondary">Search: "{searchQuery}"</Badge>
+                    )}
+                  </div>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="text-sm border border-border rounded-md px-3 py-2 bg-background"
+                  >
+                    <option value="name">Sort by Name</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                  </select>
                 </div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="text-sm border border-border rounded-md px-3 py-2 bg-background"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
-              </div>
+              )}
 
               {/* Categories */}
               {activeCategory && (
-                <div className="flex gap-4 mb-6">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      className={`px-4 py-2 rounded ${
-                        activeCategory === cat
-                          ? "bg-primary text-white"
-                          : "bg-gray-200"
-                      }`}
-                      onClick={() => {
-                        setActiveCategory(cat);
-                        setActiveSubcategory(null); // reset subcategory when category changes
-                      }}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <CatogaryCard key={1} category={filters.selectedCategories} />
                 </div>
               )}
 
               {/* Products Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={handleAddToCart}
-                    onToggleWishlist={handleToggleWishlist}
-                    isWishlisted={wishlistItems.includes(product.id)}
-                  />
-                ))}
-              </div>
+              {!activeCategory && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                      onToggleWishlist={handleToggleWishlist}
+                      isWishlisted={wishlistItems.includes(product.id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

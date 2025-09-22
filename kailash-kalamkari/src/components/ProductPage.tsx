@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ProductCard, Product } from "@/components/ProductCard";
-import { SubcategoryList } from "@/components/SubcategoryList";
+import { SubcategoryList } from "@/components/categoryList";
 import { sampleProducts } from "@/data/products"; // your file
 
 export const ProductPage = () => {
