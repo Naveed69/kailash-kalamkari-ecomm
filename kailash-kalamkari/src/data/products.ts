@@ -113,7 +113,6 @@ export const fashionProducts = [
       },
     ],
   },
-
   // DUPATTA OBJECT (Second Object)
   {
     category: "Dupattas",
