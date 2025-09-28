@@ -57,10 +57,10 @@ const Index = () => {
   const [isProductActive, setProductActive] = useState(false);
   //crousel
   const sampleImages = [
-    carouselImage1,
-    carouselImage2,
     carouselImage3,
     carouselImage4,
+    carouselImage1,
+    carouselImage2,
   ];
   const [current, setCurrent] = useState(0);
 
