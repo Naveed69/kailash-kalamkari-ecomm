@@ -1,11 +1,15 @@
 import { Product } from "@/components/ProductCard";
+import { FashionProductCategory } from "@/types";
 import kalamkariHero from "@/assets/kalamkari-hero.jpg";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
 
-export const fashionProducts = [
+export const fashionProducts: FashionProductCategory[] = [
   // SAREE OBJECT (First Object)
   {
+    id: "cat-1",
+    name: "Sarees",
     category: "Sarees",
+    image: kalamkariHero,
     subCategories: [
       {
         name: "Silk Sarees",
@@ -115,7 +119,10 @@ export const fashionProducts = [
   },
   // DUPATTA OBJECT (Second Object)
   {
+    id: "cat-2",
+    name: "Dupattas",
     category: "Dupattas",
+    image: kalamkariProducts,
     subCategories: [
       {
         name: "Silk Dupattas",
@@ -248,7 +255,10 @@ export const fashionProducts = [
   },
   // HOME DECOR OBJECT (Fourth Object)
   {
+    id: "cat-3",
+    name: "Home Decor",
     category: "Home Decor",
+    image: kalamkariHero,
     subCategories: [
       {
         name: "Wall Hangings",

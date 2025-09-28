@@ -18,14 +18,25 @@ export const MainCategories = ({
   const [isOpen, setIsOpen] = useState(true);
 
   const clearFilters = () => {
-    onFiltersChange({
+    // Reset all filter states
+    const resetFilters = {
       categories: [],
-      selectedCategories: "", // clear selected main category
+      mainCategories: [],
+      selectedCategories: "",
       priceRange: [0, maxPrice],
       colors: [],
       inStock: false,
-    });
-    setActiveCategory(false);
+    };
+    
+    // Update the filters in the parent component
+    onFiltersChange(resetFilters);
+    
+    // Reset any active category states
+    if (setActiveCategory) setActiveCategory(null);
+    if (setSubCategoryActiveCategory) setSubCategoryActiveCategory(null);
+    
+    // Force a re-render by resetting the isOpen state
+    setIsOpen(true);
   };
   const updateFilter = (key, value) => {
     onFiltersChange({ ...filters, [key]: value });
