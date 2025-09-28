@@ -580,7 +580,7 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "Semi Kanchi Silk ( Black and white )",
+        name: "CHENNORI Silk Sarees( Black and white )",
         subCategoriesImage: kalamkariHero,
         products: [
           {
