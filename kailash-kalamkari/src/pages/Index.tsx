@@ -11,6 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { MainCategories } from "@/components/ui/categoryFilter";
 import { fashionProducts } from "@/data/products";
+import carouselImage1 from "@/assets/carousel/KANCHIPURAM PATTU SAREES.png";
+import carouselImage2 from "@/assets/carousel/KANCHIPURAM PATTU SAREES2.png";
+import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png";
+import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
+
 import {
   sampleProducts,
   categories,
@@ -52,9 +57,10 @@ const Index = () => {
   const [isProductActive, setProductActive] = useState(false);
   //crousel
   const sampleImages = [
-    "https://picsum.photos/id/1015/800/400",
-    "https://picsum.photos/id/1016/800/400",
-    "https://picsum.photos/id/1018/800/400",
+    carouselImage1,
+    carouselImage2,
+    carouselImage3,
+    carouselImage4,
   ];
   const [current, setCurrent] = useState(0);
 
@@ -466,7 +472,7 @@ const Index = () => {
               size="lg"
               variant="outline"
               onClick={() => setIsWhatsAppOpen(true)}
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              className="border-primary-foreground text-foreground hover:bg-primary-foreground hover:text-primary"
             >
               Contact Expert
             </Button>
