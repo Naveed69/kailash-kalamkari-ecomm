@@ -59,6 +59,15 @@ import chennorisilkBlackandWhite10 from "@/assets/Saree/Chennori Silk black and 
 import chennorisilkBlackandWhite11 from "@/assets/Saree/Chennori Silk black and white/Chinnori Silk black and white11.png";
 import chennorisilkBlackandWhite12 from "@/assets/Saree/Chennori Silk black and white/Chinnori Silk black and white12.png";
 
+import chennorisilkColor1 from "@/assets/Saree/Chennori Silk color/Chennori Silk.png";
+import chennorisilkColor2 from "@/assets/Saree/Chennori Silk color/Chennori Silk1.png";
+import chennorisilkColor3 from "@/assets/Saree/Chennori Silk color/Chennori Silk2.png";
+import chennorisilkColor4 from "@/assets/Saree/Chennori Silk color/Chennori Silk3.png";
+import chennorisilkColor5 from "@/assets/Saree/Chennori Silk color/Chennori Silk4.png";
+import chennorisilkColor6 from "@/assets/Saree/Chennori Silk color/Chennori Silk5.png";
+import chennorisilkColor7 from "@/assets/Saree/Chennori Silk color/Chennori Silk6.png";
+import chennorisilkColor8 from "@/assets/Saree/Chennori Silk color/Chennori Silk7.png";
+
 export const fashionProducts = [
   // SAREE OBJECT (First Object)
   {
@@ -593,7 +602,7 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "CHENNORI Silk Sarees( Black and white )",
+        name: "Chennori Silk Sarees( Black and white )",
         subCategoriesImage: chennorisilkBlackandWhite10,
         products: [
           {
@@ -743,15 +752,99 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "Semi Kanchi silk (All Colours )",
-        subCategoriesImage: kalamkariHero,
+        name: "Chennori Silk Sarees (All Colours )",
+        subCategoriesImage: chennorisilkColor5,
         products: [
           {
             id: "designer-001",
             name: "Embroidered Georgette Saree",
             price: 5500,
             originalPrice: 8000,
-            image: kalamkariProducts,
+            image: chennorisilkColor1,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor2,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor3,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor4,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor5,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor6,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor7,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Embroidered Georgette Saree",
+            price: 5500,
+            originalPrice: 8000,
+            image: chennorisilkColor8,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
             inStock: true,
@@ -761,7 +854,7 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "Chenoori Silk ( Black and white )",
+        name: "Pochampally Ikkat pure Silk Saree",
         subCategoriesImage: kalamkariHero,
         products: [
           {
@@ -1639,7 +1732,7 @@ export const sampleProducts: Product[] = [
     name: "Embroidered Georgette Saree",
     price: 5500,
     originalPrice: 8000,
-    image: chennorisilkBlackandWhite7,
+    image: chennorisilkColor6,
     description: "Elegant georgette saree with intricate embroidery",
     colors: ["#6D214F", "#182C61", "#BDC581"],
     inStock: true,
