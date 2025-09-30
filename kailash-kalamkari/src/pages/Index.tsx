@@ -15,7 +15,7 @@ import carouselImage1 from "@/assets/carousel/KANCHIPURAM PATTU SAREES.png";
 import carouselImage2 from "@/assets/carousel/KANCHIPURAM PATTU SAREES2.png";
 import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png";
 import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
-
+import { MobileNavbar } from "../components/ui/MobileNavbar";
 import {
   sampleProducts,
   categories,
@@ -293,8 +293,9 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="flex gap-8">
+            <div className="flex flex-col lg:flex-row gap-8">
               {/* Filters Sidebar */}
+              {/* Desktop View Side Bar */}
               <div className="w-80 flex-shrink-0 hidden lg:block">
                 {/* <ProductFilters
                 filters={filters}
@@ -314,6 +315,16 @@ const Index = () => {
                 />
               </div>
 
+              {/* Mobile View Nav Bar */}
+              <div className="block lg:hidden w-full sticky top-[90px] z-40">
+                <MobileNavbar
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  mainCategories={mainCategories}
+                  setActiveCategory={setActiveCategory}
+                  setSubCategoryActiveCategory={setSubCategoryActiveCategory}
+                />
+              </div>
               {/* Products Grid container*/}
               <div className="flex-1">
                 {/* Sort and Results Info */}

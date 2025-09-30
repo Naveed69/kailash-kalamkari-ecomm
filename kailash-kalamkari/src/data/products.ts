@@ -148,6 +148,23 @@ import KacchipuramPattuSareeWithButtas8 from "@/assets/Saree/Kacchipuram Pattu S
 import KacchipuramPattuSareeWithButtas9 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas8.png";
 import KacchipuramPattuSareeWithButtas10 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas9.png";
 
+import BangaloreSilkDupattaBlackandWhite1 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta.png";
+import BangaloreSilkDupattaBlackandWhite2 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta1.png";
+import BangaloreSilkDupattaBlackandWhite3 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta2.png";
+import BangaloreSilkDupattaBlackandWhite4 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta3.png";
+import BangaloreSilkDupattaBlackandWhite5 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta4.png";
+import BangaloreSilkDupattaBlackandWhite6 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta5.png";
+import BangaloreSilkDupattaBlackandWhite7 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta6.png";
+import BangaloreSilkDupattaBlackandWhite8 from "@/assets/Dupattas/Bangalore Silk Dupatta/Bangalore Silk Dupatta7.png";
+
+import BangaloreSilkDupattaColor1 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color.png";
+import BangaloreSilkDupattaColor2 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color1.png";
+import BangaloreSilkDupattaColor3 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color2.png";
+import BangaloreSilkDupattaColor4 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color3.png";
+import BangaloreSilkDupattaColor5 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color4.png";
+import BangaloreSilkDupattaColor6 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color5.png";
+import BangaloreSilkDupattaColor7 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color6.png";
+
 export const fashionProducts = [
   // SAREE OBJECT (First Object)
   {
@@ -1852,15 +1869,92 @@ export const fashionProducts = [
     category: "Dupattas",
     subCategories: [
       {
-        name: "Mangalagiri Cotton Duppata (Black and white)",
-        subCategoriesImage: kalamkariHero,
+        name: "Bangalore Silk Dupatta (Black and White)",
+        subCategoriesImage: BangaloreSilkDupattaBlackandWhite5,
         products: [
           {
             id: "dupatta-silk-001",
-            name: "Banarasi Silk Dupatta",
+            name: "Bangalore Silk Dupatta (Black and White)",
             price: 2500,
             originalPrice: 3800,
-            image: "banarasi-dupatta.jpg",
+            image: BangaloreSilkDupattaBlackandWhite1,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite2,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite3,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite4,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite5,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite6,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite7,
+            description: "Heavy Banarasi silk dupatta with gold zari work",
+            colors: ["#FFD700", "#800020", "#000080"],
+            inStock: true,
+            rating: 4.7,
+          },
+          {
+            id: "dupatta-silk-001",
+            name: "Bangalore Silk Dupatta (Black and White)",
+            price: 2500,
+            originalPrice: 3800,
+            image: BangaloreSilkDupattaBlackandWhite8,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
             inStock: true,
@@ -1869,15 +1963,87 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "Mangalagiri Cotton Duppata (multi color)",
-        subCategoriesImage: kalamkariHero,
+        name: "Bangalore Silk Dupatta Multi color",
+        subCategoriesImage: BangaloreSilkDupattaColor4,
         products: [
           {
             id: "dupatta-cotton-001",
-            name: "Handblock Print Dupatta",
-            price: 1200,
-            originalPrice: 1800,
-            image: "handblock-dupatta.jpg",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor1,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor2,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor3,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor4,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor5,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor6,
+            description:
+              "Soft cotton dupatta with traditional handblock prints",
+            colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+            inStock: true,
+            rating: 4.4,
+          },
+          {
+            id: "dupatta-cotton-001",
+            name: "Bangalore Silk Dupatta Multi color",
+            price: 2200,
+            originalPrice: 2800,
+            image: BangaloreSilkDupattaColor7,
             description:
               "Soft cotton dupatta with traditional handblock prints",
             colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
