@@ -120,6 +120,34 @@ import TussarSaree9 from "@/assets/Saree/Tussar Saree/Tussar Saree8.png";
 import TussarSaree10 from "@/assets/Saree/Tussar Saree/Tussar Saree9.png";
 import TussarSaree11 from "@/assets/Saree/Tussar Saree/Tussar Saree10.png";
 
+import PureCrapeSilkAllColours1 from "@/assets/Saree/Pure Crape Silk ( All Colours )/Pure Crape Silk color.png";
+import PureCrapeSilkAllColours2 from "@/assets/Saree/Pure Crape Silk ( All Colours )/Pure Crape Silk color1.png";
+import PureCrapeSilkAllColours3 from "@/assets/Saree/Pure Crape Silk ( All Colours )/Pure Crape Silk color2.png";
+import PureCrapeSilkAllColours4 from "@/assets/Saree/Pure Crape Silk ( All Colours )/Pure Crape Silk color3.png";
+import PureCrapeSilkAllColours5 from "@/assets/Saree/Pure Crape Silk ( All Colours )/Pure Crape Silk color4.png";
+
+import KacchipuramPattuSareeStory1 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story.png";
+import KacchipuramPattuSareeStory2 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story1.png";
+import KacchipuramPattuSareeStory3 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story2.png";
+import KacchipuramPattuSareeStory4 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story3.png";
+import KacchipuramPattuSareeStory5 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story4.png";
+import KacchipuramPattuSareeStory6 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story5.png";
+import KacchipuramPattuSareeStory7 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story6.png";
+import KacchipuramPattuSareeStory8 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story7.png";
+import KacchipuramPattuSareeStory9 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story8.png";
+import KacchipuramPattuSareeStory10 from "@/assets/Saree/Kacchipuram Pattu Saree Story/Kacchipuram Pattu Saree Story9.png";
+
+import KacchipuramPattuSareeWithButtas1 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas.png";
+import KacchipuramPattuSareeWithButtas2 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas1.png";
+import KacchipuramPattuSareeWithButtas3 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas2.png";
+import KacchipuramPattuSareeWithButtas4 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas3.png";
+import KacchipuramPattuSareeWithButtas5 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas4.png";
+import KacchipuramPattuSareeWithButtas6 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas5.png";
+import KacchipuramPattuSareeWithButtas7 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas6.png";
+import KacchipuramPattuSareeWithButtas8 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas7.png";
+import KacchipuramPattuSareeWithButtas9 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas8.png";
+import KacchipuramPattuSareeWithButtas10 from "@/assets/Saree/Kacchipuram Pattu Saree With Buttas/Kacchipuram Pattu Saree With Buttas9.png";
+
 export const fashionProducts = [
   // SAREE OBJECT (First Object)
   {
@@ -131,7 +159,7 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite1,
@@ -143,7 +171,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 4500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite2,
@@ -155,7 +183,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 2500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite3,
@@ -167,7 +195,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5000,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite4,
@@ -179,7 +207,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 3500,
             originalPrice: 6000,
             image: bangaloreSilkBlackandWhite5,
@@ -191,7 +219,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite6,
@@ -203,7 +231,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 4500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite7,
@@ -215,7 +243,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 3200,
             originalPrice: 7000,
             image: bangaloreSilkBlackandWhite8,
@@ -227,7 +255,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite9,
@@ -239,7 +267,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite10,
@@ -251,7 +279,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite11,
@@ -263,7 +291,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite12,
@@ -275,7 +303,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite13,
@@ -287,7 +315,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite14,
@@ -299,7 +327,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite15,
@@ -311,7 +339,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite16,
@@ -323,7 +351,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite17,
@@ -335,7 +363,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite18,
@@ -347,7 +375,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite19,
@@ -359,7 +387,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite20,
@@ -371,7 +399,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite21,
@@ -383,7 +411,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite22,
@@ -395,7 +423,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite23,
@@ -407,7 +435,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite24,
@@ -419,7 +447,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite25,
@@ -431,7 +459,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite26,
@@ -443,7 +471,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite27,
@@ -455,7 +483,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite28,
@@ -473,7 +501,7 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor1,
@@ -485,7 +513,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor2,
@@ -497,7 +525,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor3,
@@ -509,7 +537,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor4,
@@ -521,7 +549,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor5,
@@ -533,7 +561,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor6,
@@ -545,7 +573,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor7,
@@ -557,7 +585,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor8,
@@ -569,7 +597,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor9,
@@ -581,7 +609,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor10,
@@ -593,7 +621,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor11,
@@ -605,7 +633,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor12,
@@ -617,7 +645,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor13,
@@ -629,7 +657,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor14,
@@ -641,7 +669,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Bangalore Silk Saree (All Color)",
             price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkColor15,
@@ -659,9 +687,9 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite1,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -671,9 +699,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite2,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -683,9 +711,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite3,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -695,9 +723,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite4,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -707,9 +735,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite5,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -719,9 +747,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite6,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -731,9 +759,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite7,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -743,9 +771,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite8,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -755,9 +783,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite9,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -767,9 +795,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite10,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -779,9 +807,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite11,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -791,9 +819,9 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
+            name: "Chennori Silk Sarees( Black and white )",
+            price: 3500,
+            originalPrice: 6000,
             image: chennorisilkBlackandWhite12,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581"],
@@ -809,8 +837,8 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor1,
             description: "Elegant georgette saree with intricate embroidery",
@@ -821,8 +849,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor2,
             description: "Elegant georgette saree with intricate embroidery",
@@ -833,8 +861,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor3,
             description: "Elegant georgette saree with intricate embroidery",
@@ -845,8 +873,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor4,
             description: "Elegant georgette saree with intricate embroidery",
@@ -857,8 +885,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor5,
             description: "Elegant georgette saree with intricate embroidery",
@@ -869,8 +897,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor6,
             description: "Elegant georgette saree with intricate embroidery",
@@ -881,8 +909,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor7,
             description: "Elegant georgette saree with intricate embroidery",
@@ -893,8 +921,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
+            name: "Chennori Silk Sarees (All Colours )",
+            price: 6500,
             originalPrice: 8000,
             image: chennorisilkColor8,
             description: "Elegant georgette saree with intricate embroidery",
@@ -911,7 +939,7 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk1,
@@ -923,7 +951,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk2,
@@ -935,7 +963,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk3,
@@ -947,7 +975,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk4,
@@ -959,7 +987,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk5,
@@ -971,7 +999,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk6,
@@ -983,7 +1011,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk7,
@@ -995,7 +1023,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk8,
@@ -1007,7 +1035,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk9,
@@ -1019,7 +1047,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Pochampally Ikkat pure Silk Saree",
             price: 5500,
             originalPrice: 8000,
             image: PochampallyIkkatSilk10,
@@ -1037,7 +1065,7 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk1,
@@ -1049,7 +1077,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk2,
@@ -1061,7 +1089,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk3,
@@ -1073,7 +1101,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk4,
@@ -1085,7 +1113,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk5,
@@ -1097,7 +1125,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Kalamkari semi Kanchi Silk (Black and white)",
             price: 5500,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk6,
@@ -1115,8 +1143,8 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree1,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1127,8 +1155,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree2,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1139,8 +1167,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree3,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1151,8 +1179,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree4,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1163,8 +1191,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree5,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1175,8 +1203,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree6,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1187,8 +1215,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree7,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1199,8 +1227,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree8,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1211,8 +1239,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree9,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1223,8 +1251,8 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 25500,
+            name: "Kacchipuram Pattu Saree",
+            price: 33000,
             originalPrice: 38000,
             image: KacchipuramPattuSaree10,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1236,12 +1264,12 @@ export const fashionProducts = [
         ],
       },
       {
-        name: "Tussar Silk ( Story )",
+        name: "Tussar Silk Saree( Story )",
         subCategoriesImage: TussarSilkStory7,
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory1,
@@ -1253,7 +1281,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory2,
@@ -1265,7 +1293,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory3,
@@ -1277,7 +1305,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory4,
@@ -1289,7 +1317,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory5,
@@ -1301,7 +1329,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory6,
@@ -1313,7 +1341,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory7,
@@ -1325,7 +1353,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory8,
@@ -1337,7 +1365,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory9,
@@ -1349,7 +1377,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Silk Saree( Story )",
             price: 18500,
             originalPrice: 23000,
             image: TussarSilkStory10,
@@ -1367,7 +1395,7 @@ export const fashionProducts = [
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree1,
@@ -1379,7 +1407,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree2,
@@ -1391,7 +1419,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree3,
@@ -1403,7 +1431,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree4,
@@ -1415,7 +1443,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree5,
@@ -1427,7 +1455,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree6,
@@ -1439,7 +1467,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree7,
@@ -1451,7 +1479,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree8,
@@ -1463,7 +1491,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree9,
@@ -1475,7 +1503,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree10,
@@ -1487,7 +1515,7 @@ export const fashionProducts = [
           },
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
+            name: "Tussar Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree11,
@@ -1501,14 +1529,314 @@ export const fashionProducts = [
       },
       {
         name: "Pure Crape Silk ( All Colours )",
-        subCategoriesImage: kalamkariHero,
+        subCategoriesImage: PureCrapeSilkAllColours4,
         products: [
           {
             id: "designer-001",
-            name: "Embroidered Georgette Saree",
-            price: 5500,
-            originalPrice: 8000,
-            image: kalamkariProducts,
+            name: "Pure Crape Silk ( All Colours )",
+            price: 26500,
+            originalPrice: 29500,
+            image: PureCrapeSilkAllColours1,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Pure Crape Silk ( All Colours )",
+            price: 26500,
+            originalPrice: 29500,
+            image: PureCrapeSilkAllColours2,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Pure Crape Silk ( All Colours )",
+            price: 26500,
+            originalPrice: 29500,
+            image: PureCrapeSilkAllColours3,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Pure Crape Silk ( All Colours )",
+            price: 26500,
+            originalPrice: 29500,
+            image: PureCrapeSilkAllColours4,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Pure Crape Silk ( All Colours )",
+            price: 26500,
+            originalPrice: 29500,
+            image: PureCrapeSilkAllColours5,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+        ],
+      },
+      {
+        name: "Kacchipuram Pattu Saree Story",
+        subCategoriesImage: KacchipuramPattuSareeStory8,
+        products: [
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory1,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory2,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory3,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory4,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory5,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory6,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory7,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory8,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory9,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree Story",
+            price: 34500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeStory10,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+        ],
+      },
+      {
+        name: "Kacchipuram Pattu Saree With Buttas",
+        subCategoriesImage: KacchipuramPattuSareeWithButtas7,
+        products: [
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas1,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas2,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas3,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas4,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas5,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas6,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas7,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas8,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas9,
+            description: "Elegant georgette saree with intricate embroidery",
+            colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
+            inStock: true,
+            rating: 4.6,
+            category: "Designer Sarees",
+          },
+          {
+            id: "designer-001",
+            name: "Kacchipuram Pattu Saree With Buttas",
+            price: 32500,
+            originalPrice: 39500,
+            image: KacchipuramPattuSareeWithButtas10,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
             inStock: true,
