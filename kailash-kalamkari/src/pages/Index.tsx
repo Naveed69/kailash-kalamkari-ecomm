@@ -316,7 +316,7 @@ const Index = () => {
               </div>
 
               {/* Mobile View Nav Bar */}
-              <div className="block lg:hidden w-full sticky top-[90px] z-40">
+              <div className="block lg:hidden w-full sticky top-[70px] z-40">
                 <MobileNavbar
                   filters={filters}
                   onFiltersChange={setFilters}
