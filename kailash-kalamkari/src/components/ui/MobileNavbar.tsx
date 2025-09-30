@@ -36,7 +36,7 @@ export const MobileNavbar = ({
     (filters.selectedCategories && filters.selectedCategories !== "" ? 1 : 0);
 
   // Navbar categories
-  const navCategories = ["Sarees", "Dupattas", "Fabrics", "Home Decore"];
+  const navCategories = ["Sarees", "Dupattas", "Fabrics", "Home Decor"];
 
   return (
     <>
