@@ -48,9 +48,9 @@ export const Header = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-blue-900 backdrop-blur">
+    <header className="sticky top-0 w-full z-50 bg-blue-900 backdrop-blur">
       {/* Main header */}
-      <div className="container mx-auto px-4 py-4">
+      <div className="container w-full px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
@@ -63,7 +63,7 @@ export const Header = ({
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-6">
             {navItems.map((item) => {
               if (item.label === "Products") {
                 return (
@@ -119,7 +119,7 @@ export const Header = ({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 w-64"
+                className="pl-10 w-full sm:w-64 max-w-xs"
               />
             </div>
 
@@ -166,11 +166,11 @@ export const Header = ({
               {/* Mobile menu */}
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden">
+                  <Button variant="ghost" size="icon" className="lg:hidden ">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[280px]">
+                <SheetContent side="right" className="w-[85vw] max-w-sm">
                   <div className="space-y-4 mt-6">
                     {/* Mobile search */}
                     <div className="relative">
@@ -179,7 +179,7 @@ export const Header = ({
                         placeholder="Search products..."
                         value={searchQuery}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 w-40 sm:w-48 md:w-56 lg:w-64"
                       />
                     </div>
 
