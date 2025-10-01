@@ -398,7 +398,7 @@ const Index = () => {
                   onFiltersChange={setFilters}
                   mainCategories={mainCategories}
                   setActiveCategory={setActiveCategory}
-                  setSubCategoryActiveCategory={setSubCategoryActiveCategory}
+                  setSubCategoryActiveCategory={setSubCategoryActive}
                 />
               </div>
               {/* Products Grid */}
