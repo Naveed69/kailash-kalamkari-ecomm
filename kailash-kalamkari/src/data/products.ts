@@ -1,4 +1,5 @@
 import { Product } from "@/components/ProductCard";
+import { FashionProductCategory } from "@/types";
 import kalamkariHero from "@/assets/kalamkari-hero.jpg";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
 import bangaloreSilkBlackandWhite1 from "@/assets/Saree/bangalore silk Back and white/saree black and white.png";
@@ -165,10 +166,13 @@ import BangaloreSilkDupattaColor5 from "@/assets/Dupattas/Bangalore Silk Dupatta
 import BangaloreSilkDupattaColor6 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color5.png";
 import BangaloreSilkDupattaColor7 from "@/assets/Dupattas/Bangalore Silk Dupatta Multi color/Bangalore Silk Dupatta Multi color6.png";
 
-export const fashionProducts = [
+export const fashionProducts: FashionProductCategory[] = [
   // SAREE OBJECT (First Object)
   {
+    id: "cat-1",
+    name: "Sarees",
     category: "Sarees",
+    image: kalamkariHero,
     subCategories: [
       {
         name: "Bangalore Silk ( Black and white )",
@@ -1866,7 +1870,10 @@ export const fashionProducts = [
   },
   // DUPATTA OBJECT (Second Object)
   {
+    id: "cat-2",
+    name: "Dupattas",
     category: "Dupattas",
+    image: kalamkariProducts,
     subCategories: [
       {
         name: "Bangalore Silk Dupatta (Black and White)",
@@ -2286,7 +2293,10 @@ export const fashionProducts = [
   },
   // HOME DECOR OBJECT (Fourth Object)
   {
+    id: "cat-3",
+    name: "Home Decor",
     category: "Home Decor",
+    image: kalamkariHero,
     subCategories: [
       {
         name: "Wall Hangings",

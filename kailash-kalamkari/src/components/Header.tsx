@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -8,31 +9,30 @@ import {
   Search,
   User,
   Menu,
-  Phone,
-  MessageCircle,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 interface HeaderProps {
-  cartCount: number;
-  wishlistCount: number;
-  onCartClick: () => void;
-  onWishlistClick: () => void;
-  onWhatsAppClick: () => void;
-  onSearchChange: (query: string) => void;
+  cartCount?: number;
+  wishlistCount?: number;
+  onCartClick?: () => void;
+  onWishlistClick?: () => void;
+  onWhatsAppClick?: () => void;
+  onSearchChange?: (query: string) => void;
   setProductActive?: (active: boolean) => void;
 }
 
 export const Header = ({
-  cartCount,
-  wishlistCount,
-  onCartClick,
-  onWishlistClick,
-  onWhatsAppClick,
-  onSearchChange,
-  setProductActive,
-  setIsAboutUsActive,
-}: HeaderProps) => {
+  cartCount = 0,
+  onCartClick = () => {},
+  onWhatsAppClick = () => {},
+  onSearchChange = () => {},
+  setProductActive = () => {},
+}: HeaderProps = {}) => {
+  const { wishlist } = useWishlist();
+  const navigate = useNavigate();
+  const wishlistCount = wishlist.length;
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -72,7 +72,6 @@ export const Header = ({
                     href={item.href}
                     onClick={() => {
                       setProductActive(true);
-                      setIsAboutUsActive(false);
                     }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
@@ -88,7 +87,6 @@ export const Header = ({
                     href={item.href}
                     onClick={() => {
                       setProductActive(false);
-                      setIsAboutUsActive(false);
                     }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
@@ -103,7 +101,6 @@ export const Header = ({
                   href={item.href}
                   onClick={() => {
                     setProductActive(false);
-                    setIsAboutUsActive(true);
                   }}
                   className="text-white hover:text-gray-300 transition-colors font-medium"
                 >
@@ -136,9 +133,9 @@ export const Header = ({
                 variant="ghost"
                 size="icon"
                 className="relative text-white"
-                onClick={onWishlistClick}
+                onClick={() => navigate('/wishlist')}
               >
-                <Heart className="h-5 w-5 " />
+                <Heart className="h-5 w-5" />
                 {wishlistCount > 0 && (
                   <Badge
                     variant="destructive"

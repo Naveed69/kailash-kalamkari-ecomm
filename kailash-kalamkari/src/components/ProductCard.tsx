@@ -10,11 +10,14 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
-  category: string;
-  subCategory: string;
+  category?: string;   // Made optional since it's inferred from parent
+  subCategory?: string; // Made optional
   description: string;
   colors: string[];
   inStock: boolean;
+  rating?: number;
+  dimensions?: string; // Added for home decor products
+  material?: string;   // Added for home decor products
 }
 
 interface ProductCardProps {
@@ -22,6 +25,7 @@ interface ProductCardProps {
   onAddToCart: (product: Product) => void;
   onToggleWishlist: (productId: string) => void;
   isWishlisted: boolean;
+  isInCart: boolean;
 }
 
 export const ProductCard = ({
@@ -29,6 +33,7 @@ export const ProductCard = ({
   onAddToCart,
   onToggleWishlist,
   isWishlisted,
+  isInCart = false,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -120,9 +125,14 @@ export const ProductCard = ({
           className="w-full"
           onClick={() => onAddToCart(product)}
           disabled={!product.inStock}
+          variant={isInCart ? "outline" : "default"}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          {product.inStock ? "Add to Cart" : "Out of Stock"}
+          {!product.inStock 
+            ? "Out of Stock" 
+            : isInCart 
+              ? "Added to Cart" 
+              : "Add to Cart"}
         </Button>
       </CardFooter>
     </Card>
