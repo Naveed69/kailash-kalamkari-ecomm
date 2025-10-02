@@ -3,15 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  ShoppingCart,
-  Heart,
-  Search,
-  User,
-  Menu,
-} from "lucide-react";
+import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWishlist } from "@/contexts/WishlistContext";
+import logo from "@/assets/Logo/Logo.png";
 
 interface HeaderProps {
   cartCount?: number;
@@ -54,7 +49,8 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl text-white font-bold text-primary">
+            <img src={logo} alt="Logo" className="w-10 h-10" />
+            <h1 className="text-2xl text-white font-bold text-primary hidden lg:block">
               Kailash Kalamkari
             </h1>
             <Badge variant="secondary" className="ml-2 hidden sm:inline">
@@ -133,7 +129,7 @@ export const Header = ({
                 variant="ghost"
                 size="icon"
                 className="relative text-white"
-                onClick={() => navigate('/wishlist')}
+                onClick={() => navigate("/wishlist")}
               >
                 <Heart className="h-5 w-5" />
                 {wishlistCount > 0 && (
