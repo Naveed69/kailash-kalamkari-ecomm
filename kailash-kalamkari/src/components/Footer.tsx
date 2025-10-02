@@ -1,0 +1,155 @@
+import { MapPin, Phone, Mail, MessageCircle, Plane } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import logo from "../assets/Logo/Logo.png";
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const quickLinks = [
+    { name: "Home", path: "/" },
+    { name: "About Us", path: "/about" },
+    { name: "Services", path: "/services" },
+    { name: "Contact", path: "/contact" },
+  ];
+
+  const services = ["Sarees", "Dupattas", "Fabrics", "Home Decor"];
+
+  const handleWhatsAppClick = () => {
+    window.open(
+      "https://wa.me/9951821516?text=Hello Kailash Kalamkari! I would like to inquire about your Products.",
+      "_blank"
+    );
+  };
+
+  return (
+    <footer className="bg-gradient-to-r from-blue-900 to-blue-950 text-primary-foreground">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className=" rounded-lg">
+                <img
+                  src={logo}
+                  alt="Your Logo"
+                  className="h-14 w-16 object-contain"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Kailash Kalamkari</h3>
+                <p className="text-sm text-primary-foreground/70">
+                  Authentic Kalamkari Art
+                </p>
+              </div>
+            </div>
+            <p className="text-primary-foreground/80 mb-4">
+              Each piece is meticulously crafted <br />
+              using organic cotton and natural dyes extracted from plants,
+              making our products eco-friendly and sustainable.
+            </p>
+            <Button
+              onClick={handleWhatsAppClick}
+              className="bg-travel-gold hover:bg-travel-gold-light text-white shadow-gold"
+            >
+              <MessageCircle className="mr-2 h-4 w-4" />
+              WhatsApp
+            </Button>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Location </h4>
+
+            <div className="container mx-auto">
+              <div className="max-w-xs mx-auto">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.785282606641!2d79.68492557579845!3d17.7496996833361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a334f1a5c0b5c3d%3A0x8d5ef5e5a5e5e5e5!2sKailash%20Kalamkari%201984!5e0!3m2!1sen!2sin!4v1234567890"
+                  width="100%"
+                  height="150"
+                  style={{ border: 0, borderRadius: "8px" }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-32 md:h-40"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Our Products</h4>
+            <ul className="space-y-2">
+              {services.map((service) => (
+                <li
+                  key={service}
+                  className="text-primary-foreground/80 text-sm"
+                >
+                  {service}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-2">
+                <Phone className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
+                <div>
+                  <p className="text-primary-foreground/80 text-sm">
+                    +91 9951821516
+                  </p>
+                  <p className="text-primary-foreground/60 text-xs">
+                    Available 24/7
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <Mail className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
+                <div>
+                  <p className="text-primary-foreground/80 text-sm">
+                    kailashkalamkari1984@gmail.com
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <MapPin className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
+                <div>
+                  <p className="text-primary-foreground/80 text-sm">
+                    Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="border-t border-primary-foreground/20 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-primary-foreground/70 text-sm mb-4 md:mb-0">
+              © {currentYear} Kailash Kalamkari. All rights reserved.
+            </p>
+            <div className="flex space-x-6 text-sm">
+              <a
+                href="#"
+                className="text-primary-foreground/70 hover:text-travel-gold transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#"
+                className="text-primary-foreground/70 hover:text-travel-gold transition-colors"
+              >
+                Terms & Conditions
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
