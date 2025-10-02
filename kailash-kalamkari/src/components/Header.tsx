@@ -53,7 +53,7 @@ export const Header = ({
             <h1 className="text-2xl text-white font-bold text-primary hidden lg:block">
               Kailash Kalamkari
             </h1>
-            <Badge variant="secondary" className="ml-2 hidden sm:inline">
+            <Badge variant="secondary" className="ml-2">
               Est. 1984
             </Badge>
           </div>
