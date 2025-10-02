@@ -59,8 +59,13 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Location </h4>
 
-            <div className="container mx-auto">
-              <div className="max-w-xs mx-auto">
+            <div className="container mx-auto max-w-xs">
+              <a
+                href="https://www.google.com/maps/dir//kailash_kalamkari_1984/@13.7497,79.6871,17z/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3a334f1a5c0b5c3d:0x8d5ef5e5a5e5e5e5?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block relative group"
+              >
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.785282606641!2d79.68492557579845!3d17.7496996833361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a334f1a5c0b5c3d%3A0x8d5ef5e5a5e5e5e5!2sKailash%20Kalamkari%201984!5e0!3m2!1sen!2sin!4v1234567890"
                   width="100%"
@@ -69,9 +74,25 @@ const Footer = () => {
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full h-32 md:h-40"
+                  className="opacity-90 group-hover:opacity-100 transition-opacity"
                 ></iframe>
-              </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg">
+                  <div className="bg-black bg-opacity-80 text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>Get Directions</span>
+                  </div>
+                </div>
+              </a>
             </div>
           </div>
 
