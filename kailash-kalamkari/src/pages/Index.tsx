@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ProductCard, Product } from "@/components/ProductCard";
@@ -97,11 +97,6 @@ const Index = () => {
   const [isAboutUsActive, setIsAboutUsActive] = useState(false);
   const [isProductActive, setProductActive] = useState(false);
   const [current, setCurrent] = useState(0);
-  // const sampleImages = [
-  //   "https://picsum.photos/id/1015/800/400",
-  //   "https://picsum.photos/id/1016/800/400",
-  //   "https://picsum.photos/id/1018/800/400",
-  // ];
 
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
@@ -122,38 +117,6 @@ const Index = () => {
     carouselImage1,
     carouselImage2,
   ];
-  // const [current, setCurrent] = useState(0);
-
-  // const nextSlide = () => {
-  //   setCurrent((prev) => (prev + 1) % sampleImages.length);
-  // };
-
-  // const prevSlide = () => {
-  //   setCurrent(
-  //     (prev) => (prev - 1 + sampleImages.length) % sampleImages.length
-  //   );
-  // };
-
-  // const categoryData = useMemo(() => {
-  //   let cat = fashionProducts.find(
-  //     (item) => item.category === filters.selectedCategories
-  //   );
-  //   if (cat) return cat.subCategories;
-  //   return null;
-  // }, [filters.selectedCategories]);
-
-  // const subCategoryData = useMemo(() => {
-  //   let cat = fashionProducts.find(
-  //     (item) => item.category === filters.selectedCategories
-  //   );
-  //   if (cat)
-  //     for (let i = 0; i < cat.subCategories.length; i++)
-  //       if (cat.subCategories[i].name === activeSubcategory) {
-  //         return cat.subCategories[i].products;
-  //       }
-
-  //   return null;
-  // }, [activeSubcategory]);
 
   const filteredProducts = useMemo(() => {
     // If no filters are applied and no search query, return all products
@@ -263,6 +226,16 @@ const Index = () => {
     );
   };
 
+  // Carousel auto transition
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % sampleImages.length);
+    }, 5000); // change every 3 seconds
+
+    return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
   // Get category data
   const categoryData = useMemo(() => {
     if (!filters.selectedCategories) return null;
@@ -307,11 +280,19 @@ const Index = () => {
       {!isProductActive && !isAboutUsActive && (
         <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
           <div className="relative flex w-full overflow-hidden">
-            <img
-              src={sampleImages[current]}
-              alt="carousel"
-              className="w-full h-[400px] object-cover transition-all duration-100"
-            />
+            <div className="relative w-full h-[400px] overflow-hidden">
+              {sampleImages.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`carousel-${index}`}
+                  className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    index === current ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
+            </div>
+
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
             <div className="absolute top-0 left-0 w-full h-full flex items-center">

@@ -121,7 +121,12 @@ export const Header = ({
 
             {/* Action buttons */}
             <div className="flex items-center text-white space-x-2">
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:flex"
+                onClick={() => navigate("/inventory")}
+              >
                 <User className="h-5 w-5 text-white" />
               </Button>
 

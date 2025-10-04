@@ -1,0 +1,35 @@
+.stats-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  box-shadow: none;
+}
+
+.stats-card-info h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  font-weight: normal;
+}
+
+.stats-card-info p {
+  margin: 5px 0 0;
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stats-card-percentage {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.stats-card-percentage.positive {
+  color: #28a745;
+}
+
+.stats-card-percentage.negative {
+  color: #dc3545;
+}
