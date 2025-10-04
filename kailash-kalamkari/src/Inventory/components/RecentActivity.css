@@ -1,0 +1,43 @@
+.recent-activity {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  box-shadow: none;
+}
+
+.recent-activity h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.activity-table-container {
+  overflow-x: auto;
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activity-table th,
+.activity-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  color: #555;
+}
+
+.activity-table th {
+  background-color: transparent;
+  font-weight: bold;
+  color: #333;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.activity-table tbody tr:last-child td {
+  border-bottom: none;
+}

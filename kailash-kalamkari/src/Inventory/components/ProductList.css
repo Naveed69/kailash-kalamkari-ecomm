@@ -1,0 +1,57 @@
+.product-list-container {
+    padding: 24px;
+  }
+  
+  .product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .product-list-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  
+  .status {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 500;
+  }
+  
+  .status.in-stock {
+    background-color: #C8E6C9;
+    color: #1B5E20;
+  }
+  
+  .status.out-of-stock {
+    background-color: #FFCDD2;
+    color: #C62828;
+  }
+  
+  .status.low-stock {
+    background-color: #FFECB3;
+    color: #FF6F00;
+  }
+  
+  .product-list-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .status-cell {
+    min-width: 120px;
+  }
+  
