@@ -18,6 +18,7 @@ export interface Product {
   rating?: number;
   dimensions?: string; // Added for home decor products
   material?: string;   // Added for home decor products
+  quantity:number;
 }
 
 interface ProductCardProps {

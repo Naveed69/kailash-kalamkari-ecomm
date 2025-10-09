@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWishlist } from "@/contexts/WishlistContext";
-import logo from "@/assets/Logo/Logo.png";
+import logo from "@/assets/Logo/Logo.jpeg";
 
 interface HeaderProps {
   cartCount?: number;
@@ -16,6 +16,7 @@ interface HeaderProps {
   onWhatsAppClick?: () => void;
   onSearchChange?: (query: string) => void;
   setProductActive?: (active: boolean) => void;
+  setIsAboutUsActive?: (active: boolean) => void;
 }
 
 export const Header = ({
@@ -24,6 +25,7 @@ export const Header = ({
   onWhatsAppClick = () => {},
   onSearchChange = () => {},
   setProductActive = () => {},
+  setIsAboutUsActive = () => {},
 }: HeaderProps = {}) => {
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img src={logo} alt="Logo" className="w-10 h-10" />
+            <img src={logo} alt="Logo" className="w-16 h-10" />
             <h1 className="text-2xl text-white font-bold text-primary hidden lg:block">
               Kailash Kalamkari
             </h1>
@@ -68,6 +70,7 @@ export const Header = ({
                     href={item.href}
                     onClick={() => {
                       setProductActive(true);
+                      setIsAboutUsActive(false);
                     }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
@@ -82,7 +85,8 @@ export const Header = ({
                     key={item.label}
                     href={item.href}
                     onClick={() => {
-                      setProductActive(false);
+                      setProductActive(true);
+                      setIsAboutUsActive(true);
                     }}
                     className="text-white hover:text-gray-300 transition-colors font-medium"
                   >
@@ -97,6 +101,7 @@ export const Header = ({
                   href={item.href}
                   onClick={() => {
                     setProductActive(false);
+                    setIsAboutUsActive(true);
                   }}
                   className="text-white hover:text-gray-300 transition-colors font-medium"
                 >
@@ -124,7 +129,6 @@ export const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:flex"
                 onClick={() => navigate("/inventory")}
               >
                 <User className="h-5 w-5 text-white" />
