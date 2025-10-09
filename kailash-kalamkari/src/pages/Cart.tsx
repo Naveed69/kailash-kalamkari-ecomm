@@ -96,7 +96,7 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
 
   //whatsapp message sending button
   const handlePlaceOrder = () => {
-    const WHATSAPP_NUMBER = "+919743462496";
+    const WHATSAPP_NUMBER = "+919951821516";
     const message = formatWhatsAppMessage();
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(
