@@ -117,7 +117,7 @@ const AddProduct = ({ allProducts, setAllProducts }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Price"
+                label="₹ Price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 fullWidth

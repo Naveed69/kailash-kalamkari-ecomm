@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -18,22 +18,33 @@ import { Search } from "@mui/icons-material";
 import EditProductModal from "./EditProductModal";
 import ConfirmationDialog from "./ConfirmationDialog";
 import "./ProductList.css";
+import { fashionProducts } from "../../data/products";
+import { useInventory } from "../../contexts/InventoryContext";
+const ProductList = () => {
+  const { categories, updateProduct, deleteProduct } = useInventory();
 
-const ProductList = ({ allProducts, setAllProducts }) => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProduct, setDeletingProduct] = useState(null);
+  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
-
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   useEffect(() => {
-    let tempProducts = allProducts;
+    console.log("all product updated");
+    let tempProducts = [];
+ 
+    for (let i = 0; i < fashionProducts.length; i++)
+      for (let j = 0; j < fashionProducts[i].subCategories.length; j++) {
+        tempProducts.push(...fashionProducts[i].subCategories[j].products);
+      }
 
     if (selectedCategory !== "All Categories") {
       tempProducts = tempProducts.filter(
-        (product) => product.category === selectedCategory
+        (product) =>
+          product.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
@@ -47,7 +58,7 @@ const ProductList = ({ allProducts, setAllProducts }) => {
 
     setFilteredProducts(tempProducts);
     setPage(1);
-  }, [selectedCategory, searchTerm, allProducts]);
+  }, [selectedCategory, searchTerm, categories]);
 
   const getStatus = (quantity) => {
     if (quantity === 0) {
@@ -63,14 +74,8 @@ const ProductList = ({ allProducts, setAllProducts }) => {
     setEditingProduct(product);
   };
 
-  const handleCloseModal = () => {
-    setEditingProduct(null);
-  };
-
-  const handleSave = (editedProduct) => {
-    setAllProducts((prevProducts) =>
-      prevProducts.map((p) => (p.id === editedProduct.id ? editedProduct : p))
-    );
+  const handleSave = (updatedProductData) => {
+    updateProduct(updatedProductData.id, updatedProductData);
     handleCloseModal();
   };
 
@@ -79,9 +84,8 @@ const ProductList = ({ allProducts, setAllProducts }) => {
   };
 
   const confirmDelete = () => {
-    setAllProducts((prevProducts) =>
-      prevProducts.filter((p) => p.id !== deletingProduct.id)
-    );
+    console.log(deletingProduct);
+    deleteProduct(deletingProduct.id);
     setDeletingProduct(null);
   };
 
@@ -89,14 +93,26 @@ const ProductList = ({ allProducts, setAllProducts }) => {
     navigate("/inventory/add-product");
   };
 
-  const itemsPerPage = 5;
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  const handleCloseModal = () => {
+    setEditingProduct(null);
+  };
+
+  //pagination items per page code below
+  let paginatedProducts = [];
+  {
+    filteredProducts &&
+      (paginatedProducts = filteredProducts.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+      ));
+  }
 
   const handlePagechange = (event, value) => {
     setPage(value);
+  };
+
+  const handleChange = (items) => {
+    setItemsPerPage(items.target.value);
   };
 
   return (
@@ -125,7 +141,7 @@ const ProductList = ({ allProducts, setAllProducts }) => {
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <MenuItem value="All Categories">All Categories</MenuItem>
-          <MenuItem value="Saree">Saree</MenuItem>
+          <MenuItem value="Sarees">Saree</MenuItem>
           <MenuItem value="Fabric">Fabric</MenuItem>
           <MenuItem value="Home Decor">Home Decor</MenuItem>
           <MenuItem value="Dupatta">Dupatta</MenuItem>
@@ -183,6 +199,11 @@ const ProductList = ({ allProducts, setAllProducts }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      {paginatedProducts.length <= 0 && (
+        <div style={{ marginTop: "10px", textAlign: "center" }}>
+          <div>No Products Found</div>
+        </div>
+      )}
       <div className="product-list-footer">
         <span>
           Showing {paginatedProducts.length} of {filteredProducts.length}{" "}
@@ -193,7 +214,17 @@ const ProductList = ({ allProducts, setAllProducts }) => {
           page={page}
           onChange={handlePagechange}
         />
+        <div>
+          Items per page
+          <select value={itemsPerPage} onChange={handleChange}>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
       </div>
+
       <EditProductModal
         product={editingProduct}
         open={!!editingProduct}

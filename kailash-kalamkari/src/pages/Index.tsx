@@ -16,11 +16,11 @@ import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png";
 import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
 
-import kalamkariHero from "@/assets/kalamkari-hero.jpg";
+import { useInventory } from "@/contexts/InventoryContext";
 import {
-  fashionProducts,
   sampleProducts,
   mainCategories,
+  fashionProducts,
 } from "@/data/products";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
 import { CatogaryCard } from "@/components/ui/categoryCard";
@@ -94,8 +94,8 @@ const Index = () => {
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(
     null
   );
-  const [isAboutUsActive, setIsAboutUsActive] = useState(false);
-  const [isProductActive, setProductActive] = useState(false);
+  const [isAboutUsActive, setIsAboutUsActive] = useState(true);
+  const [isProductActive, setProductActive] = useState(true);
   const [current, setCurrent] = useState(0);
 
   // Filter state
@@ -108,9 +108,7 @@ const Index = () => {
     inStock: false,
   });
 
-  //navbar product click
-  // const [isProductActive, setProductActive] = useState(false);
-  //crousel
+  //crousel images
   const sampleImages = [
     carouselImage3,
     carouselImage4,
@@ -191,7 +189,6 @@ const Index = () => {
 
     return filtered;
   }, [sampleProducts, searchQuery, filters, sortBy]);
-  console.log("filtered Products", filteredProducts);
   // Handle cart and wishlist actions
   const handleAddToCart = (product: Product) => {
     addToCart(product);
@@ -274,10 +271,11 @@ const Index = () => {
         onWhatsAppClick={() => setIsWhatsAppOpen(true)}
         onSearchChange={setSearchQuery}
         setProductActive={setProductActive}
+        setIsAboutUsActive={setIsAboutUsActive}
       />
 
       {/* Hero Section */}
-      {!isProductActive && !isAboutUsActive && (
+      {isProductActive && isAboutUsActive && (
         <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
           <div className="relative flex w-full overflow-hidden">
             <div className="relative w-full h-[400px] overflow-hidden">
@@ -357,7 +355,7 @@ const Index = () => {
       )}
 
       {/* Products Section */}
-      {!isAboutUsActive && (
+      {isProductActive && (
         <section id="products" className="py-12">
           <div className="container mx-auto px-4">
             <div className="mb-8">
@@ -508,7 +506,7 @@ const Index = () => {
       )}
 
       {/* About Section */}
-      {!isProductActive && (
+      {isAboutUsActive && (
         <section id="about" className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -545,10 +543,10 @@ const Index = () => {
       )}
 
       {/* Our Journey Section */}
-      {!isProductActive && <OurJourneySection />}
+      {isAboutUsActive && <OurJourneySection />}
 
       {/* Reviews Section */}
-      {!isProductActive && !isAboutUsActive && <ReviewsSection />}
+      {isAboutUsActive && <ReviewsSection />}
 
       {/* Call to Action Section */}
       {/* <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">

@@ -25,14 +25,14 @@ export const MainCategories = ({
       colors: [],
       inStock: false,
     };
-    
+
     // Update the filters in the parent component
     onFiltersChange(resetFilters);
-    
+
     // Reset any active category states
     if (setActiveCategory) setActiveCategory(null);
     if (setSubCategoryActiveCategory) setSubCategoryActiveCategory(null);
-    
+
     // Force a re-render by resetting the isOpen state
     setIsOpen(true);
   };
@@ -87,28 +87,32 @@ export const MainCategories = ({
             Main Categories
           </Label>
           <div className="space-y-2">
-            {mainCategories.map((category) => (
-              <label
-                key={category}
-                className="flex items-center gap-3 cursor-pointer group p-2 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="mainCategory"
-                  value={category}
-                  checked={filters.selectedCategories === category}
-                  onChange={() => {
-                    updateFilter("selectedCategories", category);
-                    setActiveCategory(true);
-                    setSubCategoryActiveCategory(false);
-                  }}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="text-gray-700 group-hover:text-gray-900">
-                  {category}
-                </span>
-              </label>
-            ))}
+            {mainCategories.length > 0 ? (
+              mainCategories.map((category) => (
+                <label
+                  key={category}
+                  className="flex items-center gap-3 cursor-pointer group p-2 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <input
+                    type="radio"
+                    name="mainCategory"
+                    value={category}
+                    checked={filters.selectedCategories === category}
+                    onChange={() => {
+                      updateFilter("selectedCategories", category);
+                      setActiveCategory(true);
+                      setSubCategoryActiveCategory(false);
+                    }}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="text-gray-700 group-hover:text-gray-900">
+                    {category}
+                  </span>
+                </label>
+              ))
+            ) : (
+              <div>No Categories Available right now</div>
+            )}
           </div>
         </div>
       </CardContent>

@@ -44,7 +44,7 @@ const BarcodeGenerator = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Price"
+              label="₹ Price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               fullWidth
@@ -78,7 +78,7 @@ const BarcodeGenerator = () => {
               {productName && price && category && (
                 <>
                   <Typography variant="h6">{productName}</Typography>
-                  <Typography variant="body1">Price: ${price}</Typography>
+                  <Typography variant="body1">Price: ₹{price} </Typography>
                   <Typography variant="body2">Category: {category}</Typography>
                   <Barcode value={barcodeValue} />
                 </>

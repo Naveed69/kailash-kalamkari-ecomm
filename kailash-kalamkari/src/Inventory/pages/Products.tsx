@@ -1,9 +1,7 @@
 import ProductList from "../components/ProductList";
 
-const Products = ({ allProducts, setAllProducts }) => {
-  return (
-    <ProductList allProducts={allProducts} setAllProducts={setAllProducts} />
-  );
+const Products = () => {
+  return <ProductList />;
 };
 
 export default Products;
