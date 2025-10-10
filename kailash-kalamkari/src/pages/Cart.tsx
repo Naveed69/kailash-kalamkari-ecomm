@@ -79,7 +79,7 @@ export default function CartPage() {
       return sum + item.price;
     }, 0);
 
-    return `🛍️ *New Order from Kailash Kalamkari*
+    return `🛍️ *New Order from ${orderDetails.name} to Kailash Kalamkari*
 
 📋 *Order Details:*
 ${orderItems}
@@ -96,6 +96,14 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
 
   //whatsapp message sending button
   const handlePlaceOrder = () => {
+    if (
+      orderDetails.name === "" ||
+      orderDetails.phone === "" ||
+      orderDetails.address === ""
+    ) {
+      alert("please add the details to place order");
+      return;
+    }
     const WHATSAPP_NUMBER = "+919951821516";
     const message = formatWhatsAppMessage();
     const encodedMessage = encodeURIComponent(message);

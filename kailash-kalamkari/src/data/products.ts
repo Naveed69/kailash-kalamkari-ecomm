@@ -195,7 +195,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-002",
             name: "Bangalore Silk",
-            price: 4500,
+            price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite2,
             description: "Elegant georgette saree with intricate embroidery",
@@ -208,7 +208,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-003",
             name: "Bangalore Silk",
-            price: 2500,
+            price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite3,
             description: "Elegant georgette saree with intricate embroidery",
@@ -221,7 +221,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-004",
             name: "Bangalore Silk",
-            price: 5000,
+            price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite4,
             description: "Elegant georgette saree with intricate embroidery",
@@ -234,7 +234,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-005",
             name: "Bangalore Silk",
-            price: 3500,
+            price: 5500,
             originalPrice: 6000,
             image: bangaloreSilkBlackandWhite5,
             description: "Elegant georgette saree with intricate embroidery",
@@ -260,7 +260,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-007",
             name: "Bangalore Silk",
-            price: 4500,
+            price: 5500,
             originalPrice: 8000,
             image: bangaloreSilkBlackandWhite7,
             description: "Elegant georgette saree with intricate embroidery",
@@ -273,7 +273,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-bw-008",
             name: "Bangalore Silk",
-            price: 3200,
+            price: 5500,
             originalPrice: 7000,
             image: bangaloreSilkBlackandWhite8,
             description: "Elegant georgette saree with intricate embroidery",
@@ -553,8 +553,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-001",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor1,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -566,8 +566,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-002",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor2,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -579,8 +579,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-003",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor3,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -592,8 +592,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-004",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor4,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -605,8 +605,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-005",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor5,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -618,8 +618,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-006",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor6,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -631,8 +631,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-007",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor7,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -644,8 +644,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-008",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor8,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -657,8 +657,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-009",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor9,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -670,8 +670,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-010",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor10,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -683,8 +683,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-011",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor11,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -696,8 +696,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-012",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor12,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -709,8 +709,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-013",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor13,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -722,8 +722,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-014",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 8500,
+            originalPrice: 12000,
             image: bangaloreSilkColor14,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -735,8 +735,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-bs-color-015",
             name: "Bangalore Silk Saree (All Color)",
-            price: 5500,
-            originalPrice: 8000,
+            price: 9500,
+            originalPrice: 12000,
             image: bangaloreSilkColor15,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1029,8 +1029,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-001",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk1,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1042,8 +1042,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-002",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk2,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1055,8 +1055,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-003",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk3,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1068,8 +1068,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-004",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk4,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1081,8 +1081,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-005",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk5,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1094,8 +1094,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-006",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk6,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1107,8 +1107,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-007",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk7,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1120,8 +1120,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-008",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk8,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1133,8 +1133,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-009",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk9,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1146,8 +1146,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-pis-010",
             name: "Pochampally Ikkat pure Silk Saree",
-            price: 5500,
-            originalPrice: 8000,
+            price: 29500,
+            originalPrice: 35000,
             image: PochampallyIkkatSilk10,
             description: "Elegant georgette saree with intricate embroidery",
             colors: ["#6D214F", "#182C61", "#BDC581", "#EAB543"],
@@ -1166,7 +1166,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-001",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk1,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1179,7 +1179,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-002",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk2,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1192,7 +1192,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-003",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk3,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1205,7 +1205,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-004",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk4,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1218,7 +1218,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-005",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk5,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1231,7 +1231,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "saree-ksks-bw-006",
             name: "Kalamkari semi Kanchi Silk (Black and white)",
-            price: 5500,
+            price: 6000,
             originalPrice: 8000,
             image: KalamkariSemiKanchiSilk6,
             description: "Elegant georgette saree with intricate embroidery",
@@ -1519,12 +1519,12 @@ export const fashionProducts: FashionProductCategory[] = [
       },
       {
         id: "subcat-1-9",
-        name: "Tussar Saree",
+        name: "Tussar Silk Saree",
         subCategoriesImage: TussarSaree7,
         products: [
           {
             id: "saree-ts-001",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree1,
@@ -1537,7 +1537,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-002",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree2,
@@ -1550,7 +1550,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-003",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree3,
@@ -1563,7 +1563,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-004",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree4,
@@ -1576,7 +1576,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-005",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree5,
@@ -1589,7 +1589,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-006",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree6,
@@ -1602,7 +1602,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-007",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree7,
@@ -1615,7 +1615,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-008",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree8,
@@ -1628,7 +1628,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-009",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree9,
@@ -1641,7 +1641,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-010",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree10,
@@ -1654,7 +1654,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
           {
             id: "saree-ts-011",
-            name: "Tussar Saree",
+            name: "Tussar Silk Saree",
             price: 13500,
             originalPrice: 18000,
             image: TussarSaree11,
@@ -2031,8 +2031,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-001",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite1,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2044,8 +2044,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-002",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite2,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2057,8 +2057,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-003",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite3,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2070,8 +2070,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-004",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite4,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2083,8 +2083,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-005",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite5,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2096,8 +2096,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-006",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite6,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2109,8 +2109,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-007",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite7,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2122,8 +2122,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-bw-008",
             name: "Bangalore Silk Dupatta (Black and White)",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1050,
+            originalPrice: 1800,
             image: BangaloreSilkDupattaBlackandWhite8,
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2142,8 +2142,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-001",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor1,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2156,8 +2156,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-002",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor2,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2170,8 +2170,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-003",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor3,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2184,8 +2184,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-004",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor4,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2198,8 +2198,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-005",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor5,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2212,8 +2212,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-006",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor6,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2226,8 +2226,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-color-007",
             name: "Bangalore Silk Dupatta Multi color",
-            price: 2200,
-            originalPrice: 2800,
+            price: 1500,
+            originalPrice: 2100,
             image: BangaloreSilkDupattaColor7,
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2241,14 +2241,14 @@ export const fashionProducts: FashionProductCategory[] = [
       },
       {
         id: "subcat-2-3",
-        name: "Bangaloresilk Duppata (Black and White)",
+        name: "Bangalore silk Duppata (Black and White)",
         subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "dupatta-bs-bw2-001",
             name: "Bangaloresilk Duppata (Black and White)",
-            price: 3200,
-            originalPrice: 4500,
+            price: 1100,
+            originalPrice: 1700,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2267,8 +2267,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-floral-001",
             name: "Bangaloresilk Duppata (mukti colors) floral",
-            price: 3200,
-            originalPrice: 4500,
+            price: 1800,
+            originalPrice: 2300,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2279,6 +2279,7 @@ export const fashionProducts: FashionProductCategory[] = [
           },
         ],
       },
+
       {
         id: "subcat-2-5",
         name: "Bangaloresilk Duppata (Black and White) story",
@@ -2287,8 +2288,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-bs-story-001",
             name: "Bangaloresilk Duppata (Black and White) story",
-            price: 2500,
-            originalPrice: 3800,
+            price: 1800,
+            originalPrice: 2500,
             image: "banarasi-dupatta.jpg",
             description: "Heavy Banarasi silk dupatta with gold zari work",
             colors: ["#FFD700", "#800020", "#000080"],
@@ -2301,14 +2302,14 @@ export const fashionProducts: FashionProductCategory[] = [
       },
       {
         id: "subcat-2-6",
-        name: "Bangaloresilk Half Saree Duppatas (Multi Color)",
+        name: "Bangalore silk Half Saree Duppatas (Multi Color)",
         subCategoriesImage: kalamkariHero,
         products: [
           {
             id: "dupatta-bs-halfsaree-001",
             name: "Bangaloresilk Half Saree Duppatas (Multi Color)",
-            price: 1200,
-            originalPrice: 1800,
+            price: 2500,
+            originalPrice: 2800,
             image: "handblock-dupatta.jpg",
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2328,8 +2329,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-cs-color-001",
             name: "Chenderi Silk Duppatas (Multi Color)",
-            price: 3200,
-            originalPrice: 4500,
+            price: 2400,
+            originalPrice: 2700,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2348,8 +2349,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-ts-color-001",
             name: "Tussar Silk duppatas (Multi Color)",
-            price: 3200,
-            originalPrice: 4500,
+            price: 3500,
+            originalPrice: 3800,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2368,7 +2369,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-is-color-001",
             name: "Ikkat Silk duppatas (Multi Color)",
-            price: 2500,
+            price: 3500,
             originalPrice: 3800,
             image: "banarasi-dupatta.jpg",
             description: "Heavy Banarasi silk dupatta with gold zari work",
@@ -2388,8 +2389,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-kp-floral-001",
             name: "Kanchipuram Pattu Duppatas (Multi color) floral",
-            price: 1200,
-            originalPrice: 1800,
+            price: 10700,
+            originalPrice: 11800,
             image: "handblock-dupatta.jpg",
             description:
               "Soft cotton dupatta with traditional handblock prints",
@@ -2409,8 +2410,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-kp-story-001",
             name: "Kanchipuram Pattu Duppatas (Multi color) story",
-            price: 3200,
-            originalPrice: 4500,
+            price: 13500,
+            originalPrice: 14500,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2429,8 +2430,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "dupatta-pd-color-001",
             name: "Paithani Duppatas (multi color)",
-            price: 3200,
-            originalPrice: 4500,
+            price: 10900,
+            originalPrice: 14500,
             image: "phulkari-dupatta.jpg",
             description: "Traditional Punjabi Phulkari embroidery dupatta",
             colors: ["#DC143C", "#FFD700", "#228B22"],
@@ -2459,8 +2460,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "fabric-bs-running-001",
             name: "BangloreSilk Running Fabric - 1 Meter",
-            price: 4200,
-            originalPrice: 6000,
+            price: 1200,
+            originalPrice: 2000,
             image: "pure-silk-fabric.jpg",
             description: "High quality pure silk fabric for custom stitching",
             colors: ["#FFD700", "#800020", "#000080", "#228B22"],
@@ -2479,7 +2480,7 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "fabric-ts-running-001",
             name: "Tussar Silk Running Fabric - 1 Meter",
-            price: 1800,
+            price: 2350,
             originalPrice: 2500,
             image: "handloom-cotton-fabric.jpg",
             description: "Breathable handloom cotton fabric for daily wear",
@@ -2499,8 +2500,8 @@ export const fashionProducts: FashionProductCategory[] = [
           {
             id: "fabric-cs-running-001",
             name: "Crape Silk Running Fabric - 1 Meter",
-            price: 3500,
-            originalPrice: 4800,
+            price: 2350,
+            originalPrice: 2800,
             image: "linen-fabric.jpg",
             description: "Eco-friendly linen fabric for summer clothing",
             colors: ["#F5DEB3", "#696969", "#2F4F4F"],
@@ -2725,12 +2726,12 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 15,
   },
   {
     id: "saree-bs-bw-002",
     name: "Bangalore Silk",
-    price: 4500,
+    price: 5500,
     originalPrice: 8000,
     image: bangaloreSilkBlackandWhite2,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2738,12 +2739,64 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 8,
+  },
+  {
+    id: "dupatta-bs-color-003",
+    name: "Bangalore Silk Dupatta Multi color",
+    price: 1500,
+    originalPrice: 2100,
+    image: BangaloreSilkDupattaColor3,
+    description: "Soft cotton dupatta with traditional handblock prints",
+    colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+    inStock: true,
+    rating: 4.4,
+    category: "dupatta",
+    quantity: 30,
+  },
+  {
+    id: "dupatta-bs-color-004",
+    name: "Bangalore Silk Dupatta Multi color",
+    price: 1500,
+    originalPrice: 2100,
+    image: BangaloreSilkDupattaColor4,
+    description: "Soft cotton dupatta with traditional handblock prints",
+    colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+    inStock: true,
+    rating: 4.4,
+    category: "dupatta",
+    quantity: 26,
+  },
+  {
+    id: "dupatta-bs-color-005",
+    name: "Bangalore Silk Dupatta Multi color",
+    price: 1500,
+    originalPrice: 2100,
+    image: BangaloreSilkDupattaColor5,
+    description: "Soft cotton dupatta with traditional handblock prints",
+    colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+    inStock: true,
+    rating: 4.4,
+    category: "dupatta",
+    quantity: 29,
+  },
+  {
+    id: "dupatta-bs-color-006",
+    name: "Bangalore Silk Dupatta Multi color",
+    price: 1500,
+    originalPrice: 2100,
+    image: BangaloreSilkDupattaColor6,
+    description: "Soft cotton dupatta with traditional handblock prints",
+    colors: ["#FF6B6B", "#48DBFB", "#1DD1A1"],
+    inStock: true,
+    rating: 4.4,
+    category: "dupatta",
+    quantity: 27,
   },
   {
     id: "saree-bs-bw-003",
     name: "Bangalore Silk",
-    price: 2500,
+    price: 5500,
     originalPrice: 8000,
     image: bangaloreSilkBlackandWhite3,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2756,7 +2809,7 @@ export const sampleProducts: Product[] = [
   {
     id: "saree-bs-bw-004",
     name: "Bangalore Silk",
-    price: 5000,
+    price: 5500,
     originalPrice: 8000,
     image: bangaloreSilkBlackandWhite4,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2764,12 +2817,12 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 18,
   },
   {
     id: "saree-bs-bw-005",
     name: "Bangalore Silk",
-    price: 3500,
+    price: 5500,
     originalPrice: 6000,
     image: bangaloreSilkBlackandWhite5,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2777,7 +2830,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 7,
   },
   {
     id: "saree-bs-bw-006",
@@ -2790,12 +2843,12 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 14,
   },
   {
     id: "saree-bs-bw-007",
     name: "Bangalore Silk",
-    price: 4500,
+    price: 5500,
     originalPrice: 8000,
     image: bangaloreSilkBlackandWhite7,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2803,12 +2856,12 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 9,
   },
   {
     id: "saree-bs-bw-008",
     name: "Bangalore Silk",
-    price: 3200,
+    price: 5500,
     originalPrice: 7000,
     image: bangaloreSilkBlackandWhite8,
     description: "Elegant georgette saree with intricate embroidery",
@@ -2816,7 +2869,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 11,
   },
   {
     id: "saree-bs-bw-009",
@@ -2829,7 +2882,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 16,
   },
   {
     id: "saree-bs-bw-010",
@@ -2842,7 +2895,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 6,
   },
   {
     id: "saree-bs-bw-011",
@@ -2855,7 +2908,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 13,
   },
   {
     id: "saree-bs-bw-012",
@@ -2868,7 +2921,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 10,
   },
   {
     id: "saree-bs-bw-013",
@@ -2881,7 +2934,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 17,
   },
   {
     id: "saree-bs-bw-014",
@@ -2894,7 +2947,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 8,
   },
   {
     id: "saree-bs-bw-015",
@@ -2920,7 +2973,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 14,
   },
   {
     id: "saree-bs-bw-017",
@@ -2933,7 +2986,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 9,
   },
   {
     id: "saree-bs-bw-018",
@@ -2946,7 +2999,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 11,
   },
   {
     id: "saree-bs-bw-019",
@@ -2959,7 +3012,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 15,
   },
   {
     id: "saree-bs-bw-020",
@@ -2972,7 +3025,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 7,
   },
   {
     id: "saree-bs-bw-021",
@@ -2985,7 +3038,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 13,
   },
   {
     id: "saree-bs-bw-022",
@@ -2998,7 +3051,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 10,
   },
   {
     id: "saree-bs-bw-023",
@@ -3011,7 +3064,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 16,
   },
   {
     id: "saree-bs-bw-024",
@@ -3024,7 +3077,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 8,
   },
   {
     id: "saree-bs-bw-025",
@@ -3050,7 +3103,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 14,
   },
   {
     id: "saree-bs-bw-027",
@@ -3063,7 +3116,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 9,
   },
   {
     id: "saree-bs-bw-028",
@@ -3076,7 +3129,7 @@ export const sampleProducts: Product[] = [
     inStock: true,
     rating: 4.6,
     category: "Sarees",
-    quantity: 12,
+    quantity: 11,
   },
 ];
 
