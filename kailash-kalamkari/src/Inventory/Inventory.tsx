@@ -19,11 +19,7 @@ function Inventory() {
   const [allProducts, setAllProducts] = useState(
     productsInventory.categories || []
   );
-  const navigate = useNavigate();
-  if (!localStorage.getItem("isLoggedIn")) {
-    alert("you have been Logged out, please Login");
-    navigate("/adminlogin");
-  }
+
   return (
     <div className="app">
       <Sidebar />
