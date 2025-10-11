@@ -17,6 +17,7 @@ const AdminLogin = () => {
     if (email === "admin@gmail.com" && password === "admin") {
       alert("Login successful!");
       setError("");
+      localStorage.setItem("isLoggedIn", "true");
       navigate("/inventory");
     } else {
       setError("Invalid email or password.");

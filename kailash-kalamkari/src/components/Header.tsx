@@ -45,11 +45,7 @@ export const Header = ({
   ];
 
   const handleNavigation = () => {
-    // if (true) {
     navigate("/adminLogin");
-    // } else {
-    //   alert("Pease enter correct cradentials");
-    // }
   };
 
   return (

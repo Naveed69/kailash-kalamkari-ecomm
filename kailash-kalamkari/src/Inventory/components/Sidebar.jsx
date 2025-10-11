@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   FiGrid,
   FiBox,
@@ -11,6 +11,11 @@ import {
 import "./Sidebar.css";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.setItem("isLoggedIn", "false");
+    navigate("/");
+  };
   return (
     <div className="sidebar">
       <div>
@@ -53,10 +58,10 @@ const Sidebar = () => {
           </ul>
         </nav>
       </div>
-      <NavLink to="/" className="logout">
+      <div className="logout">
         <FiLogOut />
-        <span>LogOut</span>
-      </NavLink>
+        <span onClick={handleLogout}>LogOut</span>
+      </div>
     </div>
   );
 };
