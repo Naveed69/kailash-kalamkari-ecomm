@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
@@ -14,6 +19,11 @@ function Inventory() {
   const [allProducts, setAllProducts] = useState(
     productsInventory.categories || []
   );
+  const navigate = useNavigate();
+  if (!localStorage.getItem("isLoggedIn")) {
+    alert("you have been Logged out, please Login");
+    navigate("/adminlogin");
+  }
   return (
     <div className="app">
       <Sidebar />

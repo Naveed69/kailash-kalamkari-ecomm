@@ -318,6 +318,12 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
               Your order will be sent to our WhatsApp for confirmation and
               processing
             </p>
+            <div className="mt-4 text-sm text-muted-foreground text-center">
+              or{" "}
+              <Link to="/" className="text-primary hover:underline">
+                Continue Shopping
+              </Link>
+            </div>
           </div>
         </div>
       </div>

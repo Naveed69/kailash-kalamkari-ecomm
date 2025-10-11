@@ -10,6 +10,8 @@ import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import Wishlist from "./pages/Wishlist";
 import Inventory from "./Inventory/Inventory";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +28,16 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/adminLogin" element={<AdminLogin />} />
 
-                <Route path="/inventory/*" element={<Inventory />} />
+                <Route
+                  path="/inventory/*"
+                  element={
+                    <ProtectedRoute>
+                      <Inventory />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
