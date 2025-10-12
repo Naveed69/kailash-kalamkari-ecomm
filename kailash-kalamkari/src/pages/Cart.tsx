@@ -41,15 +41,29 @@ export default function CartPage() {
       </div>
     );
   }
-
+  const [error, setError] = useState<{ [key: string]: string }>({});
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
     setOrderDetails((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    //mobile number validation
+    if (name === "phone") {
+      const regex = /^[6-9]\d{9}$/; // allow typing up to 10 digits
+      if (!regex.test(value)) {
+        setError((prev) => ({
+          ...prev,
+          mobile: "Invalid number! Enter 10 digit mobile number",
+        }));
+      } else {
+        setError((prev) => ({ ...prev, mobile: "" }));
+      }
+    }
   };
 
   //whatsapp message format
@@ -284,6 +298,7 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="+91 98765 43210"
                 />
+                {error.mobile && <p style={{ color: "red" }}>{error.mobile}</p>}
               </div>
 
               <div>
@@ -309,6 +324,7 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
                 type="button"
                 onClick={handlePlaceOrder}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+                disabled={error.mobile}
               >
                 Place Order via WhatsApp
               </button>

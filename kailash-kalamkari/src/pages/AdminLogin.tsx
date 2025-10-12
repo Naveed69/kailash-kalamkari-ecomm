@@ -14,9 +14,13 @@ const AdminLogin = () => {
       return;
     }
 
-    if (email === "admin@gmail.com" && password === "admin") {
+    if (
+      email === "kailashkalamkari1984@gmail.com" &&
+      password === "9951821516"
+    ) {
       alert("Login successful!");
       setError("");
+
       localStorage.setItem("isLoggedIn", "true");
       navigate("/inventory");
     } else {

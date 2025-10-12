@@ -1,35 +1,6 @@
 import { fashionProducts } from "@/data/products";
 import React, { createContext, useState, useContext, ReactNode } from "react";
-
-// Types
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  description: string;
-  colors: string[];
-  inStock: boolean;
-  rating: number;
-  category: string;
-  quantity: number;
-}
-
-interface SubCategory {
-  id: string;
-  name: string;
-  subCategoriesImage: string;
-  products: Product[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  category: string;
-  image: string;
-  subCategories: SubCategory[];
-}
+import type { Category, SubCategory, Product } from "@/contexts/inventoryTypes";
 
 // Updated Context Type with loading states
 interface InventoryContextType {
@@ -54,9 +25,10 @@ const InventoryContext = createContext<InventoryContextType | undefined>(
 // API Service Functions (Replace with your actual API calls)
 const inventoryAPI = {
   fetchCategories: async (): Promise<Category[]> => {
-    const response = await fetch("/api/categories");
-    if (!response.ok) throw new Error("Failed to fetch categories");
-    return response.json();
+    return fashionProducts as Category[];
+    // const response = await fetch("/api/categories");
+    // if (!response.ok) throw new Error("Failed to fetch categories");
+    // return response.json();
   },
 
   updateProduct: async (
