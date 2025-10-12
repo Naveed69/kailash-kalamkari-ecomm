@@ -23,24 +23,6 @@ export default function CartPage() {
     });
   };
 
-  if (cart.items.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-          <div className="w-24 h-24 mx-auto mb-6 text-muted-foreground">
-            <ShoppingCart className="w-full h-full" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Looks like you haven't added anything to your cart yet.
-          </p>
-          <Button asChild>
-            <Link to="/">Continue Shopping</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
   const [error, setError] = useState<{ [key: string]: string }>({});
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -129,6 +111,26 @@ Thank you for choosing Kailash Kalamkari! 🙏`;
     clearCart();
     setOrderDetails({ name: "", phone: "", address: "" });
   };
+
+  if (cart.items.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <div className="w-24 h-24 mx-auto mb-6 text-muted-foreground">
+            <ShoppingCart className="w-full h-full" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
+          <p className="text-muted-foreground mb-6">
+            Looks like you haven't added anything to your cart yet.
+          </p>
+          <Button asChild>
+            <Link to="/">Continue Shopping</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">

@@ -59,7 +59,12 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img src={logo} alt="Logo" className="w-16 h-10" />
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-16 h-10"
+              onClick={() => navigate("/")}
+            />
             <h1 className="text-2xl text-white font-bold text-primary hidden lg:block">
               Kailash Kalamkari
             </h1>
