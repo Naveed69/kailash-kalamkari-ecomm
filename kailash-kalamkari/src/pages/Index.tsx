@@ -259,12 +259,6 @@ const Index = () => {
         cartCount={cart.totalItems}
         wishlistCount={wishlist.length}
         onCartClick={() => navigate("/cart")}
-        onWishlistClick={() =>
-          toast({
-            title: "Wishlist",
-            description: "Wishlist functionality coming soon!",
-          })
-        }
         onWhatsAppClick={() => setIsWhatsAppOpen(true)}
         onSearchChange={setSearchQuery}
         setProductActive={setProductActive}
