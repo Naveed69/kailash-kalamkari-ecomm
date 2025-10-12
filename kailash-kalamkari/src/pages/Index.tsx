@@ -17,11 +17,7 @@ import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
 
 import { useInventory } from "@/contexts/InventoryContext";
-import {
-  sampleProducts,
-  mainCategories,
-  fashionProducts,
-} from "@/data/products";
+import { sampleProducts } from "@/data/products";
 import kalamkariProducts from "@/assets/kalamkari-products.jpg";
 import { CatogaryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
@@ -65,13 +61,14 @@ interface FilterState {
 }
 
 const Index = () => {
+  const { categories } = useInventory();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { cart, addToCart, isInCart } = useCart();
   const { wishlist, addToWishlist, removeFromWishlist, isInWishlist } =
     useWishlist();
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
-
+  const mainCategories = categories.map((item) => item.category);
   // Function to render product cards
   const renderProductCards = (products: Product[]) => {
     return products.map((product) => (
@@ -236,7 +233,7 @@ const Index = () => {
   // Get category data
   const categoryData = useMemo(() => {
     if (!filters.selectedCategories) return null;
-    const cat = fashionProducts.find(
+    const cat = categories.find(
       (item) => item.category === filters.selectedCategories
     ) as FashionProductCategory | undefined;
     return cat?.subCategories || null;
@@ -245,7 +242,7 @@ const Index = () => {
   // Get subcategory data
   const subCategoryData = useMemo(() => {
     if (!filters.selectedCategories || !activeSubcategory) return null;
-    const cat = fashionProducts.find(
+    const cat = categories.find(
       (item) => item.category === filters.selectedCategories
     ) as FashionProductCategory | undefined;
     if (!cat) return null;

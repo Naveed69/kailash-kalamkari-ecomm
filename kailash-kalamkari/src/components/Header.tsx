@@ -45,7 +45,11 @@ export const Header = ({
   ];
 
   const handleNavigation = () => {
-    navigate("/adminLogin");
+    // JWT token based verification is required here for better security
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      navigate("/inventory");
+    } else navigate("/adminLogin");
   };
 
   return (

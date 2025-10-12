@@ -18,11 +18,11 @@ import { Search } from "@mui/icons-material";
 import EditProductModal from "./EditProductModal";
 import ConfirmationDialog from "./ConfirmationDialog";
 import "./ProductList.css";
-import { fashionProducts } from "../../data/products";
 import { useInventory } from "../../contexts/InventoryContext";
-const ProductList = () => {
-  const { categories, updateProduct, deleteProduct } = useInventory();
 
+const ProductList = () => {
+  const { categories } = useInventory();
+  console.log("this is products context data", categories);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [page, setPage] = useState(1);
@@ -35,10 +35,10 @@ const ProductList = () => {
   useEffect(() => {
     console.log("all product updated");
     let tempProducts = [];
- 
-    for (let i = 0; i < fashionProducts.length; i++)
-      for (let j = 0; j < fashionProducts[i].subCategories.length; j++) {
-        tempProducts.push(...fashionProducts[i].subCategories[j].products);
+
+    for (let i = 0; i < categories.length; i++)
+      for (let j = 0; j < categories[i].subCategories.length; j++) {
+        tempProducts.push(...categories[i].subCategories[j].products);
       }
 
     if (selectedCategory !== "All Categories") {
