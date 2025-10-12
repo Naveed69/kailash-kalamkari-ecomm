@@ -13,8 +13,7 @@ import BarcodeGenerator from "./components/BarcodeGenerator";
 import AddProduct from "./components/AddProduct";
 import "./Inventory.css";
 import { useInventory } from "@/contexts/InventoryContext";
-import { Header } from "@radix-ui/react-accordion";
-
+import logo from "@/assets/Logo/Logo.jpeg";
 function Inventory() {
   const productsInventory = useInventory();
   const [allProducts, setAllProducts] = useState(
@@ -23,7 +22,6 @@ function Inventory() {
 
   return (
     <div className="app">
-      
       <Sidebar />
       <main className="main-content">
         <Routes>
