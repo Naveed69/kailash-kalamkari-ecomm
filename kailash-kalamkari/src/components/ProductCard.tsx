@@ -10,15 +10,15 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
-  category?: string;   // Made optional since it's inferred from parent
+  category?: string; // Made optional since it's inferred from parent
   subCategory?: string; // Made optional
   description: string;
   colors: string[];
   inStock: boolean;
   rating?: number;
   dimensions?: string; // Added for home decor products
-  material?: string;   // Added for home decor products
-  quantity:number;
+  material?: string; // Added for home decor products
+  quantity: number;
 }
 
 interface ProductCardProps {
@@ -95,7 +95,7 @@ export const ProductCard = ({
             {product.description}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-primary">
+            <span className="text-lg font-bold text-[#8a5b05ff]">
               ₹{product.price.toLocaleString()}
             </span>
             {product.originalPrice && (
@@ -123,17 +123,18 @@ export const ProductCard = ({
 
       <CardFooter className="p-4 pt-0">
         <Button
-          className="w-full"
+          className="w-full bg-[#D49217] hover:bg-[#cf972fff]"
+          // style={{color:"#cf972fff"}}
           onClick={() => onAddToCart(product)}
           disabled={!product.inStock}
           variant={isInCart ? "outline" : "default"}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          {!product.inStock 
-            ? "Out of Stock" 
-            : isInCart 
-              ? "Added to Cart" 
-              : "Add to Cart"}
+          {!product.inStock
+            ? "Out of Stock"
+            : isInCart
+            ? "Added to Cart"
+            : "Add to Cart"}
         </Button>
       </CardFooter>
     </Card>

@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { MessageCircle, X, Send } from "lucide-react";
 
 interface WhatsAppPopupProps {
   isOpen: boolean;
@@ -13,25 +13,33 @@ interface WhatsAppPopupProps {
   onOpen: () => void;
 }
 
-export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState('Hi! I am interested in your Kalamkari products. Please share more details.');
+export const WhatsAppPopup = ({
+  isOpen,
+  onClose,
+  onOpen,
+}: WhatsAppPopupProps) => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState(
+    "Hi! I am interested in your Kalamkari products. Please share more details."
+  );
 
   const handleSendMessage = () => {
-    const whatsappNumber = '+919876543210'; // Replace with actual WhatsApp number
+    const whatsappNumber = "+919951821516";
     const encodedMessage = encodeURIComponent(
       `Name: ${name}\nPhone: ${phone}\n\nMessage: ${message}`
     );
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, '_blank');
+
+    window.open(whatsappUrl, "_blank");
     onClose();
-    
+
     // Reset form
-    setName('');
-    setPhone('');
-    setMessage('Hi! I am interested in your Kalamkari products. Please share more details.');
+    setName("");
+    setPhone("");
+    setMessage(
+      "Hi! I am interested in your Kalamkari products. Please share more details."
+    );
   };
 
   return (
@@ -48,7 +56,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
               <MessageCircle className="h-6 w-6 text-white" />
             </Button>
           </DialogTrigger>
-          
+
           <DialogContent className="sm:max-w-md">
             <Card className="border-0 shadow-none">
               <CardHeader className="pb-4">
@@ -70,7 +78,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
                   Send us a message and we'll respond as soon as possible!
                 </p>
               </CardHeader>
-              
+
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Your Name *</Label>
@@ -82,7 +90,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
@@ -93,7 +101,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
                     type="tel"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="message">Message *</Label>
                   <Textarea
@@ -105,7 +113,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
                     required
                   />
                 </div>
-                
+
                 <Button
                   onClick={handleSendMessage}
                   disabled={!name || !message}
@@ -114,7 +122,7 @@ export const WhatsAppPopup = ({ isOpen, onClose, onOpen }: WhatsAppPopupProps) =
                   <Send className="h-4 w-4 mr-2" />
                   Send WhatsApp Message
                 </Button>
-                
+
                 <p className="text-xs text-muted-foreground text-center">
                   By clicking send, you'll be redirected to WhatsApp
                 </p>

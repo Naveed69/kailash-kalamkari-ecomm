@@ -53,7 +53,7 @@ export const Header = ({
   };
 
   return (
-    <header className="sticky top-0 w-full z-50 bg-blue-900 backdrop-blur">
+    <header className="sticky top-0 w-full z-50 bg-[#F5E8C7] backdrop-blur">
       {/* Main header */}
       <div className="container w-full px-4 py-4">
         <div className="flex items-center justify-between">
@@ -65,10 +65,14 @@ export const Header = ({
               className="w-16 h-10"
               onClick={() => navigate("/")}
             />
-            <h1 className="text-2xl text-white font-bold text-primary hidden lg:block">
+            <h1 className="text-[#d49217ff] text-2xl font-bold text-primary hidden lg:block">
               Kailash Kalamkari
             </h1>
-            <Badge variant="secondary" className="ml-2">
+            <Badge
+              variant="secondary"
+              className="ml-2"
+              style={{ background: "#bdbdbdff" }}
+            >
               Est. 1984
             </Badge>
           </div>
@@ -85,7 +89,7 @@ export const Header = ({
                       setProductActive(true);
                       setIsAboutUsActive(false);
                     }}
-                    className="text-white hover:text-gray-300 transition-colors font-medium"
+                    className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
                   >
                     {item.label}
                   </a>
@@ -101,7 +105,7 @@ export const Header = ({
                       setProductActive(true);
                       setIsAboutUsActive(true);
                     }}
-                    className="text-white hover:text-gray-300 transition-colors font-medium"
+                    className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
                   >
                     {item.label}
                   </a>
@@ -116,7 +120,7 @@ export const Header = ({
                     setProductActive(false);
                     setIsAboutUsActive(true);
                   }}
-                  className="text-white hover:text-gray-300 transition-colors font-medium"
+                  className="text-[#d49217ff]  hover:text-[#E6B740] transition-colors font-medium"
                 >
                   {item.label}
                 </a>
@@ -140,13 +144,13 @@ export const Header = ({
             {/* Action buttons */}
             <div className="flex items-center text-white space-x-2">
               <Button variant="ghost" size="icon" onClick={handleNavigation}>
-                <User className="h-5 w-5 text-white" />
+                <User className="h-5 w-5 text-[#d49217] hover:text-[#E6B740]" />
               </Button>
 
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-white"
+                className="relative text-[#d49217] hover:text-[#E6B740]"
                 onClick={() => navigate("/wishlist")}
               >
                 <Heart className="h-5 w-5" />
@@ -163,7 +167,7 @@ export const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-white"
+                className="relative text-[#d49217] hover:text-[#E6B740]"
                 onClick={onCartClick}
               >
                 <ShoppingCart className="h-5 w-5" />
@@ -181,7 +185,7 @@ export const Header = ({
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="lg:hidden ">
-                    <Menu className="h-5 w-5" />
+                    <Menu className="h-5 w-5 text-[#d49217] hover:text-[#E6B740]" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[85vw] max-w-sm">
@@ -193,7 +197,15 @@ export const Header = ({
                         placeholder="Search products..."
                         value={searchQuery}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-10 w-40 sm:w-48 md:w-56 lg:w-64"
+                        className="pl-10 
+                                  w-40 sm:w-48 md:w-56 lg:w-64
+                                  border border-[#D4A017]
+                                  focus:border-[#D4A017]
+                                  focus:ring-transparent
+                                  focus:ring-offset-0
+                                  focus-visible:ring-0
+                                  focus-visible:ring-offset-0
+                                  outline-none"
                       />
                     </div>
 
@@ -206,9 +218,10 @@ export const Header = ({
                               key={item.label}
                               onClick={() => {
                                 setProductActive(true);
+                                setIsAboutUsActive(false);
                                 setIsMobileMenuOpen(false);
                               }}
-                              className="text-foreground hover:text-primary transition-colors font-medium"
+                              className="text-[#d49217] hover:text-[#E6B740] text-foreground hover:text-primary transition-colors font-medium"
                             >
                               {item.label}
                             </a>
@@ -221,10 +234,10 @@ export const Header = ({
                               key={item.label}
                               href={item.href}
                               onClick={() => {
-                                setProductActive(false);
-                                setIsMobileMenuOpen(false);
+                                setProductActive(true);
+                                setIsAboutUsActive(true);
                               }}
-                              className="text-foreground hover:text-primary transition-colors font-medium"
+                              className="text-[#d49217] hover:text-[#E6B740] text-foreground transition-colors font-medium"
                             >
                               {item.label}
                             </a>
@@ -235,8 +248,12 @@ export const Header = ({
                           <a
                             key={item.label}
                             href={item.href}
-                            className="text-foreground hover:text-primary transition-colors font-medium"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[#d49217] hover:text-[#E6B740] text-foreground transition-colors font-medium"
+                            onClick={() => {
+                              setProductActive(false);
+                              setIsAboutUsActive(true);
+                              setIsMobileMenuOpen(false);
+                            }}
                           >
                             {item.label}
                           </a>
