@@ -267,7 +267,7 @@ const Index = () => {
 
       {/* Hero Section */}
       {isProductActive && isAboutUsActive && (
-        <section className="relative min-h-[40vh] md:min-h-[50vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
+        <section className="relative min-h-[40vh] md:min-h-[20vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
           <div className="relative flex w-full overflow-hidden">
             <div className="relative w-full h-[400px] overflow-hidden">
               {sampleImages.map((img, index) => (
