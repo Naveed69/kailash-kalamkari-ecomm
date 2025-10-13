@@ -140,7 +140,7 @@ export const Header = ({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 w-full sm:w-64 max-w-xs"
+                className="pl-10 w-full sm:w-64 max-w-xs focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
               />
             </div>
 

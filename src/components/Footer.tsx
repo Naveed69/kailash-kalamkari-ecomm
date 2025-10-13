@@ -38,21 +38,21 @@ const Footer = () => {
                 <h3 className="text-xl text-[#d49217ff] font-bold">
                   Kailash Kalamkari
                 </h3>
-                <p className="text-sm text-[#d49217ff] text-primary-foreground/70">
+                <p className="text-sm text-[#d49217fa] ">
                   Authentic Kalamkari Art
                 </p>
               </div>
             </div>
-            <p className=" mb-4 text-[#8A7F7D]">
+            <p className=" mb-4 text-[#645C5A]">
               Each piece is meticulously crafted <br />
               using organic cotton and natural dyes extracted from plants,
               making our products eco-friendly and sustainable.
             </p>
             <Button
               onClick={handleWhatsAppClick}
-              className="bg-travel-gold hover:bg-travel-gold-light text-[#8A7F7D]"
+              className="bg-travel-gold hover:bg-travel-gold-light text-[#645C5A]"
             >
-              <MessageCircle className="mr-2 h-4 w-4 text-[#8A7F7D]" />
+              <MessageCircle className="mr-2 h-4 w-4 text-[#645C5A]" />
               WhatsApp
             </Button>
           </div>
@@ -110,7 +110,7 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2">
               {services.map((service) => (
-                <li key={service} className=" text-sm text-[#8A7F7D]">
+                <li key={service} className=" text-sm text-[#645C5A]">
                   {service}
                 </li>
               ))}
@@ -122,18 +122,18 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-[#d49217ff]">
               Contact Info
             </h4>
-            <div className="space-y-3 text-[#8A7F7D]">
+            <div className="space-y-3 text-[#645C5A]">
               <div className="flex items-start space-x-2 ">
                 <Phone className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0 " />
                 <div>
-                  <p className="text-sm text-[#8A7F7D]">+91 9951821516</p>
-                  <p className="text-xs text-[#8A7F7D]">Available 24/7</p>
+                  <p className="text-sm text-[#645C5A]">+91 9951821516</p>
+                  <p className="text-xs text-[#645C5A]">Available 24/7</p>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <Mail className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
                 <div>
-                  <p className="text-sm text-[#8A7F7D]">
+                  <p className="text-sm text-[#645C5A]">
                     kailashkalamkari1984@gmail.com
                   </p>
                 </div>
@@ -141,7 +141,7 @@ const Footer = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
                 <div>
-                  <p className="text-sm text-[#8A7F7D]">
+                  <p className="text-sm text-[#645C5A]">
                     Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India
                   </p>
                 </div>
@@ -153,19 +153,19 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-[#d49217ff] mt-8 pt-8 ">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm mb-4 md:mb-0 text-[#8A7F7D]">
+            <p className="text-sm mb-4 md:mb-0 text-[#645C5A]">
               © {currentYear} Kailash Kalamkari. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a
                 href="#"
-                className="hover:text-travel-gold transition-colors text-[#8A7F7D]"
+                className="hover:text-travel-gold transition-colors text-[#645C5A]"
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
-                className="hover:text-travel-gold transition-colors text-[#8A7F7D]"
+                className="hover:text-travel-gold transition-colors text-[#645C5A]"
               >
                 Terms & Conditions
               </a>

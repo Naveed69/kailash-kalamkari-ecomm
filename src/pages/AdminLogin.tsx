@@ -42,7 +42,7 @@ const AdminLogin = () => {
           placeholder="Admin Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
         />
 
         <input
@@ -50,12 +50,12 @@ const AdminLogin = () => {
           placeholder="Admin Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+          className="w-full bg-[#D49217] text-white py-2 rounded-lg hover:bg-[#cf972ffa] transition"
         >
           Login
         </button>
