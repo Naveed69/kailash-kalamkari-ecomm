@@ -53,7 +53,10 @@ export const Header = ({
   };
 
   return (
-    <header className="sticky top-0 w-full z-50 bg-[#F5E8C7] backdrop-blur">
+    <header
+      className="sticky top-0 w-full z-50  backdrop-blur"
+      style={{ background: "#f0ece3ff" }}
+    >
       {/* Main header */}
       <div className="container w-full px-4 py-4">
         <div className="flex items-center justify-between">
@@ -65,7 +68,7 @@ export const Header = ({
               className="w-16 h-10"
               onClick={() => navigate("/")}
             />
-            <h1 className="text-[#d49217ff] text-2xl font-bold text-primary hidden lg:block">
+            <h1 className="text-[#d49217ff] text-2xl font-bold  hidden lg:block">
               Kailash Kalamkari
             </h1>
             <Badge

@@ -518,7 +518,10 @@ const Index = () => {
                   natural dyes extracted from plants, making our products
                   eco-friendly and sustainable.
                 </p>
-                <Button onClick={() => setIsWhatsAppOpen(true)}>
+                <Button
+                  onClick={() => setIsWhatsAppOpen(true)}
+                  className="bg-[#d49217ff] hover:bg-[#d49217ff]"
+                >
                   Learn More About Our Process
                 </Button>
               </div>
