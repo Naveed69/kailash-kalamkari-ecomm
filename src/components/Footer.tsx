@@ -21,7 +21,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-r from-blue-900 to-blue-950 text-primary-foreground">
+    <footer className="bg-[#F5E8C7] text-primary-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -35,29 +35,33 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Kailash Kalamkari</h3>
-                <p className="text-sm text-primary-foreground/70">
+                <h3 className="text-xl text-[#d49217ff] font-bold">
+                  Kailash Kalamkari
+                </h3>
+                <p className="text-sm text-[#d49217ff] text-primary-foreground/70">
                   Authentic Kalamkari Art
                 </p>
               </div>
             </div>
-            <p className="text-primary-foreground/80 mb-4">
+            <p className="text-primary-foreground/80 mb-4 text-[#8A7F7D]">
               Each piece is meticulously crafted <br />
               using organic cotton and natural dyes extracted from plants,
               making our products eco-friendly and sustainable.
             </p>
             <Button
               onClick={handleWhatsAppClick}
-              className="bg-travel-gold hover:bg-travel-gold-light text-white shadow-gold"
+              className="bg-travel-gold hover:bg-travel-gold-light text-[#8A7F7D] shadow-gold"
             >
-              <MessageCircle className="mr-2 h-4 w-4" />
+              <MessageCircle className="mr-2 h-4 w-4 text-[#8A7F7D]" />
               WhatsApp
             </Button>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Location */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Location </h4>
+            <h4 className="text-lg font-semibold mb-4 text-[#d49217ff]">
+              Location{" "}
+            </h4>
 
             <div className="container mx-auto">
               <div className="max-w-xs mx-auto">
@@ -91,7 +95,7 @@ const Footer = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span>Get Directions</span>
+                      <span className="text-[#d49217ff]">Get Directions</span>
                     </div>
                   </div>
                 </a>
@@ -101,12 +105,14 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Our Products</h4>
+            <h4 className="text-lg font-semibold mb-4 text-[#d49217ff]">
+              Our Products
+            </h4>
             <ul className="space-y-2">
               {services.map((service) => (
                 <li
                   key={service}
-                  className="text-primary-foreground/80 text-sm"
+                  className="text-primary-foreground/80 text-sm text-[#8A7F7D]"
                 >
                   {service}
                 </li>
@@ -116,15 +122,17 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-2">
-                <Phone className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
+            <h4 className="text-lg font-semibold mb-4 text-[#d49217ff]">
+              Contact Info
+            </h4>
+            <div className="space-y-3 text-[#8A7F7D]">
+              <div className="flex items-start space-x-2 ">
+                <Phone className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0 " />
                 <div>
-                  <p className="text-primary-foreground/80 text-sm">
+                  <p className="text-primary-foreground/80 text-sm text-[#8A7F7D]">
                     +91 9951821516
                   </p>
-                  <p className="text-primary-foreground/60 text-xs">
+                  <p className="text-primary-foreground/60 text-xs text-[#8A7F7D]">
                     Available 24/7
                   </p>
                 </div>
@@ -132,7 +140,7 @@ const Footer = () => {
               <div className="flex items-start space-x-2">
                 <Mail className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
                 <div>
-                  <p className="text-primary-foreground/80 text-sm">
+                  <p className="text-primary-foreground/80 text-sm text-[#8A7F7D]">
                     kailashkalamkari1984@gmail.com
                   </p>
                 </div>
@@ -140,7 +148,7 @@ const Footer = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 mt-1 text-travel-gold flex-shrink-0" />
                 <div>
-                  <p className="text-primary-foreground/80 text-sm">
+                  <p className="text-primary-foreground/80 text-sm text-[#8A7F7D]">
                     Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India
                   </p>
                 </div>
@@ -150,21 +158,21 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-primary-foreground/20 mt-8 pt-8">
+        <div className="border-t border-[#8A7F7D] mt-8 pt-8 ">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-primary-foreground/70 text-sm mb-4 md:mb-0">
+            <p className="text-primary-foreground/70 text-sm mb-4 md:mb-0 text-[#8A7F7D]">
               © {currentYear} Kailash Kalamkari. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a
                 href="#"
-                className="text-primary-foreground/70 hover:text-travel-gold transition-colors"
+                className="text-primary-foreground/70 hover:text-travel-gold transition-colors text-[#8A7F7D]"
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
-                className="text-primary-foreground/70 hover:text-travel-gold transition-colors"
+                className="text-primary-foreground/70 hover:text-travel-gold transition-colors text-[#8A7F7D]"
               >
                 Terms & Conditions
               </a>

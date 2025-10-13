@@ -53,13 +53,10 @@ export const MainCategories = ({
       <CardHeader className="pb-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-            <Filter className="h-5 w-5 text-blue-600" />
+            <Filter className="h-5 w-5 text-[#cf972fff]" />
             Filters
             {activeFilterCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="ml-1 bg-blue-100 text-blue-800"
-              >
+              <Badge variant="secondary" className="ml-1 text-[#cf972fff] ">
                 {activeFilterCount}
               </Badge>
             )}
@@ -103,7 +100,7 @@ export const MainCategories = ({
                       setActiveCategory(true);
                       setSubCategoryActiveCategory(false);
                     }}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 accent-[#cf972fff] border-2 border-[#cf972fff] focus:outline-none rounded-full bg-white"
                   />
                   <span className="text-gray-700 group-hover:text-gray-900">
                     {category}
