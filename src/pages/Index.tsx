@@ -289,7 +289,7 @@ const Index = () => {
                 <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
                   Authentic Kalamkari Art
                 </h1>
-                <p className="text-[#F5E8C7] text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
+                <p className="text-white text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
                   Discover the timeless beauty of hand-painted Kalamkari
                   textiles. Traditional craftsmanship passed down through
                   generations since 1984.
