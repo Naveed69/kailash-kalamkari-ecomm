@@ -97,7 +97,7 @@ export const OurJourneySection = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardContent className="p-0">
-                <div className="flex justify-center mb-4 text-primary">
+                <div className="flex justify-center mb-4 text-[#d49217ff]">
                   {stat.icon}
                 </div>
                 <div className="text-3xl font-bold text-foreground mb-2">
@@ -129,13 +129,13 @@ export const OurJourneySection = () => {
                 <div className="flex-1 md:max-w-md">
                   <Card className="bg-card/80 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300">
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-3 mb-3 ">
                         <div
                           className={`${milestone.color} text-white p-2 rounded-full`}
                         >
                           {milestone.icon}
                         </div>
-                        <Badge variant="outline" className="text-lg px-3 py-1">
+                        <Badge variant="outline" className="text-lg px-3 py-1 ">
                           {milestone.year}
                         </Badge>
                       </div>
