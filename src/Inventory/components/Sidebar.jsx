@@ -25,7 +25,7 @@ const Sidebar = () => {
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <NavLink to="/inventory">
+              <NavLink to="/inventory/dashboard">
                 <FiGrid />
                 <span>Dashboard</span>
               </NavLink>

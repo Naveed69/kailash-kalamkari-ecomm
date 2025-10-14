@@ -14,6 +14,7 @@ import AddProduct from "./components/AddProduct";
 import "./Inventory.css";
 import { useInventory } from "@/contexts/InventoryContext";
 import logo from "@/assets/Logo/Logo.jpeg";
+import InventoryHome from "./pages/inventory_Home";
 function Inventory() {
   const productsInventory = useInventory();
   const [allProducts, setAllProducts] = useState(
@@ -25,7 +26,8 @@ function Inventory() {
       <Sidebar />
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<InventoryHome />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="/barcode" element={<BarcodeGenerator />} />
