@@ -61,7 +61,7 @@ const AdminLogin = () => {
         </button>
         <div className="mt-4 text-sm text-muted-foreground text-center">
           or{" "}
-          <Link to="/" className="text-primary hover:underline">
+          <Link to="/" className="text-[#D49217] hover:underline">
             Continue Shopping
           </Link>
         </div>

@@ -158,13 +158,18 @@ const AddProduct = ({ allProducts, setAllProducts }) => {
               align="center"
               sx={{ display: "flex", justifyContent: "center", gap: 2 }}
             >
-              <Button type="submit" variant="contained">
+              <Button
+                type="submit"
+                variant="contained"
+                // className="bg-[#D49217]"
+                style={{ background: "#D49217" }}
+              >
                 Add Product
               </Button>
               <Tooltip title="Scan Barcode">
                 <IconButton
                   onClick={() => setBarcodeDialogOpen(true)}
-                  color="primary"
+                  color="#D49217"
                 >
                   <QrCodeScannerIcon />
                 </IconButton>
