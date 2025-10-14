@@ -23,20 +23,22 @@ export const CatogaryCard = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Card className="group overflow-hidden border-border hover:shadow-lg transition-all duration-300 bg-card rounded-lg">
-      <div className="relative overflow-hidden">
+    <Card className="group overflow-hidden border-hidden  transition-all duration-300 bg-card rounded-lg flex flex-col items-center">
+      {/* Circular image */}
+      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mt-4 overflow-hidden rounded-full">
         <img
           src={image}
           alt={name}
-          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold text-card-foreground line-clamp-2">
-            {discription}
-          </h3>
-          <p className="text-sm text-muted-foreground line-clamp-3">{name}</p>
+
+      {/* Description below image */}
+      <CardContent className="p-4 text-center">
+        <div className="space-y-1">
+          <p className="text-[10px] sm:text-[12px] md:text-[14px] text-muted-foreground line-clamp-1">
+            {name}
+          </p>
         </div>
       </CardContent>
     </Card>

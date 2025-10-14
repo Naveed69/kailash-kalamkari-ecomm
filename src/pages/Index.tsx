@@ -416,7 +416,7 @@ const Index = () => {
 
                 {/* Categories */}
                 {activeCategory && !isSubcategoryActive && categoryData && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-6">
                     {categoryData.map((categoryItem) => (
                       <div
                         key={categoryItem.name}
@@ -544,41 +544,6 @@ const Index = () => {
       {/* Reviews Section */}
       {isAboutUsActive && <ReviewsSection />}
 
-      {/* Call to Action Section */}
-      {/* <section className="py-16 bg-gradient-to-r from-primary to-accent text-primary-foreground">
-        <div className="container mx-auto px-4 text-center animate-fade-in">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Own a Piece of History?
-          </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Join thousands of art lovers who have made kalamkari a part of their
-            lives. Each purchase supports traditional artisans and preserves
-            cultural heritage.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() =>
-                document
-                  .getElementById("products")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="bg-background text-foreground hover:bg-background/90"
-            >
-              Browse Collection
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => setIsWhatsAppOpen(true)}
-              className="border-primary-foreground text-foreground hover:bg-primary-foreground hover:text-primary"
-            >
-              Contact Expert
-            </Button>
-          </div>
-        </div>
-      </section> */}
       <Footer />
 
       {/* WhatsApp Popup */}
