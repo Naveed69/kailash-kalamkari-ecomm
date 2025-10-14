@@ -88,10 +88,11 @@ const BarcodeGenerator = () => {
 
           <Grid item xs={12} align="center">
             <Button
-              variant="contained"
+              // variant="contained"
               onClick={handlePrint}
               sx={{ mt: 2 }}
               disabled={!productName || !price || !category}
+              style={{ background: "#D49217", color: "white" }}
             >
               Print Barcode
             </Button>

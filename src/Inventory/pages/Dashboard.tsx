@@ -49,6 +49,7 @@ const Dashboard = () => {
           color="primary"
           onClick={handleAddProductClick}
           startIcon={<FiPlus />}
+          style={{ background: "#D49217" }}
         >
           Add Product
         </Button>

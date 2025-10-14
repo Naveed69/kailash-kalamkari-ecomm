@@ -123,15 +123,14 @@ const ProductList = () => {
     setItemsPerPage(items.target.value);
   };
 
-
   return (
     <div className="product-list-container">
       <div className="product-list-header">
         <h1>Products</h1>
         <Button
           variant="contained"
-          color="primary"
           onClick={handleAddProductClick}
+          style={{ background: "#D49217" }}
         >
           + Add Product
         </Button>
@@ -156,58 +155,7 @@ const ProductList = () => {
           <MenuItem value="Dupatta">Dupatta</MenuItem>
         </Select>
       </div>
-      {/* <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>PRODUCT</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>CATEGORY</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>PRICE</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>QUANTITY</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>STATUS</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>ACTIONS</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedProducts.map((product) => {
-              const status = getStatus(product.quantity);
-              return (
-                <TableRow key={product.id}>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.price}</TableCell>
-                  <TableCell>{product.quantity}</TableCell>
-                  <TableCell className="status-cell">
-                    <span
-                      className={`status ${status
-                        .replace(" ", "-")
-                        .toLowerCase()}`}
-                    >
-                      {status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="text"
-                      color="primary"
-                      onClick={() => handleEdit(product)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="text"
-                      color="secondary"
-                      onClick={() => handleDelete(product)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
+
       <Grid container spacing={2}>
         {paginatedProducts.map((product) => {
           const status = getStatus(product.quantity);
@@ -277,11 +225,11 @@ const ProductList = () => {
                 {/* Action Buttons */}
                 <CardContent sx={{ display: "flex", gap: 1, pt: 0 }}>
                   <Button
-                    variant="outlined"
-                    color="primary"
+                    // color="primary"
                     onClick={() => handleEdit(product)}
                     fullWidth
                     size="small"
+                    style={{ background: "#D49217", color: "white" }}
                   >
                     Edit
                   </Button>
