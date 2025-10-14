@@ -25,6 +25,8 @@ const AddProduct = ({ allProducts, setAllProducts }) => {
   const [open, setOpen] = useState(false);
   const [existingProduct, setExistingProduct] = useState(null);
   const [barcodeDialogOpen, setBarcodeDialogOpen] = useState(false);
+  const [image, setImage] = useState("");
+  const [color, setColor] = useState("");
 
   const categories = ["Saree", "Fabric", "Home Decor", "Dupatta"];
 
@@ -117,6 +119,15 @@ const AddProduct = ({ allProducts, setAllProducts }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                label="Product Description"
+                value={productName}
+                // onChange={(e) => setProductName(e.target.value)}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
                 label="₹ Price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -152,6 +163,26 @@ const AddProduct = ({ allProducts, setAllProducts }) => {
                 </Select>
               </FormControl>
             </Grid>
+            {/* image input */}
+            <Grid item xs={12} sm={6}>
+              <input
+                type="file"
+                label="Add image"
+                value={image}
+                accept="image/*"
+                onChange={(e) => setImage(e.target.value)}
+                required
+              />
+            </Grid>
+            <TextField
+              label="Select Color"
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              sx={{ width: "15%", height: 56, padding: 0 }}
+              required
+            />
+
             <Grid
               item
               xs={12}

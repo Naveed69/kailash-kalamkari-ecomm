@@ -23,6 +23,7 @@ import { CatogaryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Footer from "@/components/Footer";
+import Heritage from "@/assets/Heritage/Heritage.jpeg";
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
@@ -527,7 +528,7 @@ const Index = () => {
               </div>
               <div className="relative animate-slide-in-right">
                 <img
-                  src={kalamkariProducts}
+                  src={Heritage}
                   alt="Kalamkari craftsmanship"
                   className="rounded-lg shadow-lg w-full h-[400px] object-cover"
                 />
