@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ProductCard, Product } from "@/components/ProductCard";
@@ -22,6 +22,7 @@ import kalamkariProducts from "@/assets/kalamkari-products.jpg";
 import { CatogaryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { supabase } from '../lib/supabaseClient';
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
@@ -65,7 +66,7 @@ const Index = () => {
   const { cart, addToCart, isInCart } = useCart();
   const { wishlist, addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
-  
+
   // Function to render product cards
   const renderProductCards = (products: Product[]) => {
     return products.map((product) => (
@@ -147,12 +148,12 @@ const Index = () => {
 
   const filteredProducts = useMemo(() => {
     // If no filters are applied and no search query, return all products
-    const noFiltersApplied = 
-      filters.categories.length === 0 && 
-      filters.colors.length === 0 && 
-      !filters.inStock && 
-      filters.priceRange[0] === 0 && 
-      filters.priceRange[1] >= 10000 && 
+    const noFiltersApplied =
+      filters.categories.length === 0 &&
+      filters.colors.length === 0 &&
+      !filters.inStock &&
+      filters.priceRange[0] === 0 &&
+      filters.priceRange[1] >= 10000 &&
       !searchQuery;
 
     if (noFiltersApplied) {
@@ -172,7 +173,7 @@ const Index = () => {
       // Category filter
       if (
         filters.categories.length > 0 &&
-        !filters.categories.some(cat => 
+        !filters.categories.some(cat =>
           typeof cat === 'string' ? cat === product.category : cat.name === product.category
         )
       ) {
@@ -216,7 +217,7 @@ const Index = () => {
 
     return filtered;
   }, [sampleProducts, searchQuery, filters, sortBy]);
-  console.log("filtered Products",filteredProducts)
+  console.log("filtered Products", filteredProducts)
   // Handle cart and wishlist actions
   const handleAddToCart = (product: Product) => {
     addToCart(product);
@@ -224,7 +225,7 @@ const Index = () => {
 
   const handleToggleWishlist = (productId: string) => {
     const product = sampleProducts.find((p) => p.id === productId);
-    
+
     if (isInWishlist(productId)) {
       removeFromWishlist(productId);
       toast({
@@ -265,12 +266,35 @@ const Index = () => {
       (item) => item.category === filters.selectedCategories
     ) as FashionProductCategory | undefined;
     if (!cat) return null;
-    
+
     const subCat = cat.subCategories.find(
       (sub) => sub.name === activeSubcategory
     );
     return subCat?.products || null;
   }, [filters.selectedCategories, activeSubcategory]);
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const fetchData = async () => {
+    let data = null;
+    let error = null;
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+
+      if (error) {
+        console.error('Fetch Error:', error)
+      } else {
+        console.log('Products:', data)
+      }
+    } catch (err) {
+      error = err;
+    } finally {
+      // You can add any cleanup or logging here if needed
+    }
+    return { data, error };
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -299,7 +323,7 @@ const Index = () => {
               className="w-full h-[400px] object-cover transition-all duration-100"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-            
+
             <div className="absolute top-0 left-0 w-full h-full flex items-center">
               <div className="mx-auto px-6 max-w-2xl text-left">
                 <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
@@ -351,9 +375,8 @@ const Index = () => {
                 <button
                   key={index}
                   onClick={() => setCurrent(index)}
-                  className={`w-3 h-3 rounded-full ${
-                    current === index ? "bg-white" : "bg-gray-400"
-                  }`}
+                  className={`w-3 h-3 rounded-full ${current === index ? "bg-white" : "bg-gray-400"
+                    }`}
                 />
               ))}
             </div>
