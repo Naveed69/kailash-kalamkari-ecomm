@@ -65,7 +65,7 @@ export const Header = ({
             <img
               src={logo}
               alt="Logo"
-              className="w-16 h-10"
+              className="w-18 h-12"
               onClick={() => navigate("/")}
             />
             <h1 className="text-[#d49217ff] text-2xl font-bold  hidden lg:block">
