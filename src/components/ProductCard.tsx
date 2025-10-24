@@ -3,6 +3,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useInventory } from "@/contexts/InventoryContext";
 
 export interface Product {
   id: string;
@@ -37,20 +39,22 @@ export const ProductCard = ({
   isInCart = false,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-
+  const navigate = useNavigate();
   return (
     <Card
       className="group overflow-hidden border-border hover:shadow-lg transition-all duration-300 bg-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+     
     >
       <div className="relative overflow-hidden">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-64 object-cover transition-transform hover:cursor-pointer duration-300 group-hover:scale-105"
+           onClick={() => navigate(`/product/${product.id}`)}
         />
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute top-3 right-3 z-10" >
           <Button
             variant="ghost"
             size="icon"

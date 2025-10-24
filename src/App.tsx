@@ -12,6 +12,7 @@ import Wishlist from "./pages/Wishlist";
 import Inventory from "./Inventory/Inventory";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProductDetails from "./pages/ProductDetails";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/adminLogin" element={<AdminLogin />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
 
                 <Route
                   path="/inventory/*"

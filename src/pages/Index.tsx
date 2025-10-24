@@ -114,79 +114,7 @@ const Index = () => {
     carouselImage2,
   ];
 
-  const filteredProducts = useMemo(() => {
-    // If no filters are applied and no search query, return all products
-    const noFiltersApplied =
-      filters.categories.length === 0 &&
-      filters.colors.length === 0 &&
-      !filters.inStock &&
-      filters.priceRange[0] === 0 &&
-      filters.priceRange[1] >= 10000 &&
-      !searchQuery;
-
-    if (noFiltersApplied) {
-      return [...sampleProducts];
-    }
-
-    let filtered = sampleProducts.filter((product) => {
-      // Search filter
-      if (
-        searchQuery &&
-        !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !product.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
-
-      // Category filter
-      if (
-        filters.categories.length > 0 &&
-        !filters.categories.some((cat) =>
-          typeof cat === "string"
-            ? cat === product.category
-            : cat.name === product.category
-        )
-      ) {
-        return false;
-      }
-
-      // Price filter
-      const price = product.originalPrice || product.price;
-      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
-        return false;
-      }
-
-      // Color filter
-      if (
-        filters.colors.length > 0 &&
-        !filters.colors.some((color) => product.colors?.includes(color))
-      ) {
-        return false;
-      }
-
-      // Stock filter
-      if (filters.inStock && !product.inStock) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "name":
-        default:
-          return a.name.localeCompare(b.name);
-      }
-    });
-
-    return filtered;
-  }, [sampleProducts, searchQuery, filters, sortBy]);
+  
   // Handle cart and wishlist actions
   const handleAddToCart = (product: Product) => {
     addToCart(product);
@@ -253,6 +181,89 @@ const Index = () => {
     );
     return subCat?.products || null;
   }, [filters.selectedCategories, activeSubcategory]);
+
+const filteredProducts = useMemo(() => {
+  // If no filters are applied and no search query, return all products
+  const noFiltersApplied =
+    filters.categories.length === 0 &&
+    filters.colors.length === 0 &&
+    !filters.inStock &&
+    filters.priceRange[0] === 0 &&
+    filters.priceRange[1] >= 10000 &&
+    !searchQuery;
+
+  if (noFiltersApplied) {
+    return [...sampleProducts].sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "name":
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+  }
+
+  let filtered = sampleProducts.filter((product) => {
+    // Search filter
+    if (
+      searchQuery &&
+      !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !product.description.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+      return false;
+    }
+
+    // Category filter
+    if (
+      filters.categories.length > 0 &&
+      !filters.categories.some((cat) =>
+        typeof cat === "string"
+          ? cat === product.category
+          : cat.name === product.category
+      )
+    ) {
+      return false;
+    }
+
+    // Price filter
+    const price = product.originalPrice || product.price;
+    if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+      return false;
+    }
+
+    // Color filter
+    if (
+      filters.colors.length > 0 &&
+      !filters.colors.some((color) => product.colors?.includes(color))
+    ) {
+      return false;
+    }
+
+    // Stock filter
+    if (filters.inStock && !product.inStock) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // ✅ Apply sorting to the filtered list
+  return filtered.sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "name":
+      default:
+        return a.name.localeCompare(b.name);
+    }
+  });
+}, [sampleProducts, searchQuery, filters, sortBy]);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -391,7 +402,7 @@ const Index = () => {
               {/* Products Grid */}
               <div className="flex-1">
                 {/* Sort and Results Info */}
-                {!activeCategory && (
+                {(!activeCategory || isSubcategoryActive) && (
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">
@@ -436,6 +447,7 @@ const Index = () => {
                     ))}
                   </div>
                 )}
+
                 {/* Products Grid */}
                 {!activeCategory && !isSubcategoryActive && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
