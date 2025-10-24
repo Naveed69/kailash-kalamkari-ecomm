@@ -13,6 +13,7 @@ import Inventory from "./Inventory/Inventory";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetails from "./pages/ProductDetails";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => {
         <CartProvider>
           <WishlistProvider>
             <BrowserRouter>
+            <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/cart" element={<Cart />} />
