@@ -390,7 +390,7 @@ const filteredProducts = useMemo(() => {
               </div>
 
               {/* Mobile View Nav Bar */}
-              <div className="block lg:hidden w-full sticky top-[75px] z-40">
+              <div className="block lg:hidden w-full sticky top-[70px] z-40">
                 <MobileNavbar
                   filters={filters}
                   onFiltersChange={setFilters}
