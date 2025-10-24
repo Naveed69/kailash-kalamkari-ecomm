@@ -91,6 +91,7 @@ export const Header = ({
                     onClick={() => {
                       setProductActive(true);
                       setIsAboutUsActive(false);
+                      navigate("/")
                     }}
                     className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
                   >
@@ -107,6 +108,7 @@ export const Header = ({
                     onClick={() => {
                       setProductActive(true);
                       setIsAboutUsActive(true);
+                      navigate("/")
                     }}
                     className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
                   >
@@ -122,6 +124,7 @@ export const Header = ({
                   onClick={() => {
                     setProductActive(false);
                     setIsAboutUsActive(true);
+                    navigate("/")
                   }}
                   className="text-[#d49217ff]  hover:text-[#E6B740] transition-colors font-medium"
                 >
