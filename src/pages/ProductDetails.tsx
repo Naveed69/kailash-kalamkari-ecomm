@@ -185,7 +185,7 @@ const ProductDetails = () => {
         </div>
         {relatedProducts.length > 0 && (
           <section>
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8">
+            <h2 className="text-3xl font-serif font-bold text-[#D49217] mb-8">
               You May Also Like
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -208,10 +208,10 @@ const ProductDetails = () => {
                     </div>
                     <CardContent className="p-4">
                       <p className="text-xs text-muted-foreground mb-1">{relatedProduct.material}</p>
-                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                      <h3 className="font-semibold mb-2 group-hover:text-[#D49217] transition-colors">
                         {relatedProduct.name}
                       </h3>
-                      <p className="text-primary font-bold">
+                      <p className="text-[#D49217] font-bold">
                         ₹{relatedProduct.price.toLocaleString("en-IN")}
                         {/* {relatedProduct.priceUnit && <span className="text-sm font-normal">{relatedProduct.priceUnit}</span>} */}
                       </p>
