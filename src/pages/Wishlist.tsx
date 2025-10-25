@@ -13,8 +13,7 @@ export default function Wishlist() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Your Wishlist</h1>
@@ -69,7 +68,6 @@ export default function Wishlist() {
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }

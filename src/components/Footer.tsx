@@ -1,6 +1,6 @@
 import { MapPin, Phone, Mail, MessageCircle, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "../assets/Logo/Logo.jpeg";
+import logo from "../assets/Logo/Logo1.png";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -34,14 +34,7 @@ const Footer = () => {
                   className="h-14 w-16 object-contain"
                 />
               </div>
-              <div>
-                <h3 className="text-xl text-[#d49217ff] font-bold">
-                  Kailash Kalamkari
-                </h3>
-                <p className="text-sm text-[#d49217fa] ">
-                  Authentic Kalamkari Art
-                </p>
-              </div>
+              
             </div>
             <p className=" mb-4 text-[#645C5A]">
               Each piece is meticulously crafted <br />
@@ -76,7 +69,7 @@ const Footer = () => {
                     width="100%"
                     height="120"
                     style={{ border: 0, borderRadius: "8px" }}
-                    allowFullScreen=""
+                    allowFullScreen={true}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                     className="opacity-90 group-hover:opacity-100 transition-opacity"

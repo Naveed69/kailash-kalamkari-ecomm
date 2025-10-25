@@ -1,6 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { WhatsAppPopup } from "@/components/WhatsAppPopup";
 import { ReviewsSection } from "@/components/ReviewsSection";
@@ -17,12 +16,10 @@ import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
 
 import { useInventory } from "@/contexts/InventoryContext";
-import { sampleProducts } from "@/data/products";
-import kalamkariProducts from "@/assets/kalamkari-products.jpg";
+import { sampleProducts as defaultSampleProducts } from "@/data/products";
 import { CatogaryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-import Footer from "@/components/Footer";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
 
 // Define the shape of our fashion products from the data
@@ -61,28 +58,94 @@ interface FilterState {
   inStock: boolean;
 }
 
+// Carousel slides static data
+const carouselSlides = [
+  {
+    image: carouselImage3,
+    title: "Bangalore Silk Sarees",
+    description:
+      "Luxurious silk sarees handwoven in Bangalore, perfect for grand occasions.",
+    button: {
+      text: "Explore Bangalore Silk",
+      action: "products",
+    },
+  },
+  {
+    image: carouselImage4,
+    title: "Traditional Silks",
+    description:
+      "Celebrate traditions with elegant silk sarees featuring timeless motifs.",
+    button: {
+      text: "Shop Traditional",
+      action: "products",
+    },
+  },
+  {
+    image: carouselImage1,
+    title: "Kanchipuram Pattu Sarees",
+    description:
+      "Authentic Kanchipuram silk sarees with intricate handwoven designs.",
+    button: {
+      text: "View Kanchipuram Collection",
+      action: "products",
+    },
+  },
+  {
+    image: carouselImage2,
+    title: "Modern Kanchipuram",
+    description:
+      "Discover modern interpretations of Kanchipuram sarees with contemporary flair.",
+    button: {
+      text: "See New Arrivals",
+      action: "products",
+    },
+  },
+];
+
 const Index = () => {
-  const { categories } = useInventory();
+  const { categories = [] } = useInventory() || {};
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { cart, addToCart, isInCart } = useCart();
-  const { wishlist, addToWishlist, removeFromWishlist, isInWishlist } =
-    useWishlist();
+  const { cart = { totalItems: 0 }, addToCart, isInCart } = useCart() || {};
+  const {
+    wishlist = [],
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useWishlist() || {};
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
-  const mainCategories = categories.map((item) => item.category);
+  // If categories is array of objects with 'category' field, else fallback to []
+  const mainCategories = useMemo(
+    () =>
+      Array.isArray(categories)
+        ? categories.map((item: any) => item?.category ?? "")
+        : [],
+    [categories]
+  );
+
+  // SAFE GUARD: if sampleProducts is missing, provide empty array
+  const sampleProducts = Array.isArray(defaultSampleProducts)
+    ? defaultSampleProducts
+    : [];
+
   // Function to render product cards
-  const renderProductCards = (products: Product[]) => {
-    return products.map((product) => (
-      <ProductCard
-        key={product.id}
-        product={product}
-        onAddToCart={handleAddToCart}
-        onToggleWishlist={() => handleToggleWishlist(product.id)}
-        isWishlisted={isInWishlist(product.id)}
-        isInCart={isInCart(product.id)}
-      />
-    ));
-  };
+  const renderProductCards = useCallback(
+    (products: Product[]) => {
+      if (!Array.isArray(products)) return null;
+      return products.map((product) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          onAddToCart={handleAddToCart}
+          onToggleWishlist={() => handleToggleWishlist(product.id)}
+          isWishlisted={typeof isInWishlist === "function" && product.id ? isInWishlist(product.id) : false}
+          isInCart={typeof isInCart === "function" && product.id ? isInCart(product.id) : false}
+        />
+      ));
+    },
+    [isInWishlist, isInCart]
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">(
     "name"
@@ -106,94 +169,153 @@ const Index = () => {
     inStock: false,
   });
 
-  //crousel images
-  const sampleImages = [
-    carouselImage3,
-    carouselImage4,
-    carouselImage1,
-    carouselImage2,
-  ];
+  const sampleImages = carouselSlides.map((slide) => slide.image);
 
-  
   // Handle cart and wishlist actions
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-  };
+  const handleAddToCart = useCallback(
+    (product: Product) => {
+      if (typeof addToCart === "function") addToCart(product);
+    },
+    [addToCart]
+  );
 
-  const handleToggleWishlist = (productId: string) => {
-    const product = sampleProducts.find((p) => p.id === productId);
+  const handleToggleWishlist = useCallback(
+    (productId: string) => {
+      if (!sampleProducts || !Array.isArray(sampleProducts)) return;
+      const product = sampleProducts.find((p) => p.id === productId);
 
-    if (isInWishlist(productId)) {
-      removeFromWishlist(productId);
-      toast({
-        title: "Removed from wishlist",
-        description: `${product?.name} removed from your wishlist.`,
-      });
-    } else if (product) {
-      addToWishlist(product);
-      toast({
-        title: "Added to wishlist",
-        description: `${product.name} added to your wishlist.`,
-      });
-    }
-  };
+      if (typeof isInWishlist === "function" && isInWishlist(productId)) {
+        if (typeof removeFromWishlist === "function") removeFromWishlist(productId);
+        toast?.({
+          title: "Removed from wishlist",
+          description: `${product?.name ?? "Item"} removed from your wishlist.`,
+        });
+      } else if (product) {
+        if (typeof addToWishlist === "function") addToWishlist(product);
+        toast?.({
+          title: "Added to wishlist",
+          description: `${product.name} added to your wishlist.`,
+        });
+      }
+    },
+    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts, toast]
+  );
 
   // Carousel navigation
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % sampleImages.length);
-  };
-
-  const prevSlide = () => {
-    setCurrent(
-      (prev) => (prev - 1 + sampleImages.length) % sampleImages.length
-    );
-  };
+  const nextSlide = useCallback(() => {
+    setCurrent((prev) => (prev + 1) % carouselSlides.length);
+  }, []);
+  const prevSlide = useCallback(() => {
+    setCurrent((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  }, []);
 
   // Carousel auto transition
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % sampleImages.length);
-    }, 5000); // change every 3 seconds
+      setCurrent((prev) => (prev + 1) % carouselSlides.length);
+    }, 5000);
 
-    return () => clearInterval(interval); // cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Get category data
   const categoryData = useMemo(() => {
-    if (!filters.selectedCategories) return null;
+    if (!filters.selectedCategories || !Array.isArray(categories)) return null;
     const cat = categories.find(
-      (item) => item.category === filters.selectedCategories
+      (item: any) => item?.category === filters.selectedCategories
     ) as FashionProductCategory | undefined;
-    return cat?.subCategories || null;
-  }, [filters.selectedCategories]);
+    return Array.isArray(cat?.subCategories) ? cat.subCategories : null;
+  }, [filters.selectedCategories, categories]);
 
   // Get subcategory data
   const subCategoryData = useMemo(() => {
-    if (!filters.selectedCategories || !activeSubcategory) return null;
+    if (
+      !filters.selectedCategories ||
+      !activeSubcategory ||
+      !Array.isArray(categories)
+    )
+      return null;
     const cat = categories.find(
-      (item) => item.category === filters.selectedCategories
+      (item: any) => item?.category === filters.selectedCategories
     ) as FashionProductCategory | undefined;
-    if (!cat) return null;
+    if (!cat || !Array.isArray(cat.subCategories)) return null;
 
     const subCat = cat.subCategories.find(
-      (sub) => sub.name === activeSubcategory
+      (sub) => sub?.name === activeSubcategory
     );
-    return subCat?.products || null;
-  }, [filters.selectedCategories, activeSubcategory]);
+    return Array.isArray(subCat?.products) ? subCat.products : null;
+  }, [filters.selectedCategories, activeSubcategory, categories]);
 
-const filteredProducts = useMemo(() => {
-  // If no filters are applied and no search query, return all products
-  const noFiltersApplied =
-    filters.categories.length === 0 &&
-    filters.colors.length === 0 &&
-    !filters.inStock &&
-    filters.priceRange[0] === 0 &&
-    filters.priceRange[1] >= 10000 &&
-    !searchQuery;
+  const filteredProducts = useMemo(() => {
+    if (!Array.isArray(sampleProducts)) return [];
 
-  if (noFiltersApplied) {
-    return [...sampleProducts].sort((a, b) => {
+    // If no filters are applied and no search query, return all products
+    const noFiltersApplied =
+      filters.categories.length === 0 &&
+      filters.colors.length === 0 &&
+      !filters.inStock &&
+      filters.priceRange[0] === 0 &&
+      filters.priceRange[1] >= 10000 &&
+      !searchQuery;
+
+    let sortedProducts = [...sampleProducts];
+
+    if (noFiltersApplied) {
+      sortedProducts.sort((a, b) => {
+        switch (sortBy) {
+          case "price-low":
+            return a.price - b.price;
+          case "price-high":
+            return b.price - a.price;
+          case "name":
+          default:
+            return a.name.localeCompare(b.name);
+        }
+      });
+      return sortedProducts;
+    }
+
+    let filtered = sampleProducts.filter((product) => {
+      if (
+        searchQuery &&
+        !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+      // Category filter
+      if (
+        filters.categories.length > 0 &&
+        !filters.categories.some((cat) =>
+          typeof cat === "string"
+            ? cat === product.category
+            : (cat as any)?.name === product.category
+        )
+      ) {
+        return false;
+      }
+      // Price filter
+      const price = product.originalPrice ?? product.price;
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+        return false;
+      }
+      // Color filter
+      if (
+        filters.colors.length > 0 &&
+        !(Array.isArray(product.colors) &&
+          filters.colors.some((color) => product.colors?.includes(color)))
+      ) {
+        return false;
+      }
+      // Stock filter
+      if (filters.inStock && !product.inStock) {
+        return false;
+      }
+      return true;
+    });
+
+    filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
           return a.price - b.price;
@@ -204,154 +326,105 @@ const filteredProducts = useMemo(() => {
           return a.name.localeCompare(b.name);
       }
     });
-  }
-
-  let filtered = sampleProducts.filter((product) => {
-    // Search filter
-    if (
-      searchQuery &&
-      !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !product.description.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
-    }
-
-    // Category filter
-    if (
-      filters.categories.length > 0 &&
-      !filters.categories.some((cat) =>
-        typeof cat === "string"
-          ? cat === product.category
-          : cat.name === product.category
-      )
-    ) {
-      return false;
-    }
-
-    // Price filter
-    const price = product.originalPrice || product.price;
-    if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
-      return false;
-    }
-
-    // Color filter
-    if (
-      filters.colors.length > 0 &&
-      !filters.colors.some((color) => product.colors?.includes(color))
-    ) {
-      return false;
-    }
-
-    // Stock filter
-    if (filters.inStock && !product.inStock) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // ✅ Apply sorting to the filtered list
-  return filtered.sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "name":
-      default:
-        return a.name.localeCompare(b.name);
-    }
-  });
-}, [sampleProducts, searchQuery, filters, sortBy]);
-
+    return filtered;
+  }, [sampleProducts, searchQuery, filters, sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        cartCount={cart.totalItems}
-        wishlistCount={wishlist.length}
-        onCartClick={() => navigate("/cart")}
-        onWhatsAppClick={() => setIsWhatsAppOpen(true)}
-        onSearchChange={setSearchQuery}
-        setProductActive={setProductActive}
-        setIsAboutUsActive={setIsAboutUsActive}
-      />
 
       {/* Hero Section */}
       {isProductActive && isAboutUsActive && (
         <section className="relative min-h-[40vh] md:min-h-[20vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
           <div className="relative flex w-full overflow-hidden">
+            {/* Carousel with Content */}
             <div className="relative w-full h-[400px] overflow-hidden">
-              {sampleImages.map((img, index) => (
-                <img
+              {carouselSlides.map((slide, index) => (
+                <div
                   key={index}
-                  src={img}
-                  alt={`carousel-${index}`}
-                  className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                    index === current ? "opacity-100" : "opacity-0"
-                  }`}
-                />
+                  className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 
+                    ${index === current ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+                  `}
+                  style={{ zIndex: index === current ? 2 : 1 }}
+                >
+                  <img
+                    src={slide.image}
+                    alt={`carousel-${index}`}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                  {/* Content overlay per slide */}
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center">
+                    <div className="px-10 max-w-2xl text-left ml-0 mr-auto">
+                      <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
+                        {slide.title}
+                      </h1>
+                      <p className="text-white text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
+                        {slide.description}
+                      </p>
+                      <div className="flex flex-wrap gap-4">
+                        {slide.button && (
+                          <Button
+                            size="lg"
+                            onClick={() => {
+                              if (
+                                slide.button.action === "products" &&
+                                typeof document !== "undefined"
+                              ) {
+                                const el = document.getElementById("products");
+                                if (el) {
+                                  el.scrollIntoView({ behavior: "smooth" });
+                                }
+                              }
+                            }}
+                            className="bg-[#D49217] hover:bg-[#cf972fff]"
+                          >
+                            {slide.button.text}
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          className="hover:bg-white"
+                          size="lg"
+                          onClick={() => setIsWhatsAppOpen(true)}
+                        >
+                          Contact Us
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-            <div className="absolute top-0 left-0 w-full h-full flex items-center">
-              <div className="mx-auto px-6 max-w-2xl text-left">
-                <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
-                  Authentic Kalamkari Art
-                </h1>
-                <p className="text-white text-muted-foreground text-sm md:text-base lg:text-lg mb-6">
-                  Discover the timeless beauty of hand-painted Kalamkari
-                  textiles. Traditional craftsmanship passed down through
-                  generations since 1984.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    size="lg"
-                    onClick={() =>
-                      document
-                        .getElementById("products")
-                        ?.scrollIntoView({ behavior: "smooth" })
-                    }
-                    className="bg-[#D49217] hover:bg-[#cf972fff]"
-                  >
-                    Shop Collection
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="hover:bg-white"
-                    size="lg"
-                    onClick={() => setIsWhatsAppOpen(true)}
-                  >
-                    Contact Us
-                  </Button>
-                </div>
-              </div>
-            </div>
-
+            {/* Carousel Controls */}
             <button
               onClick={prevSlide}
-              className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+              className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20"
+              aria-label="Previous Slide"
+              type="button"
             >
               {"<"}
             </button>
-
             <button
               onClick={nextSlide}
-              className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+              className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20"
+              aria-label="Next Slide"
+              type="button"
             >
               {">"}
             </button>
-
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-              {sampleImages.map((_, index) => (
+            {/* Carousel Dots */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {carouselSlides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrent(index)}
                   className={`w-3 h-3 rounded-full ${
                     current === index ? "bg-white" : "bg-gray-400"
                   }`}
+                  aria-label={`Go to Slide ${index + 1}`}
+                  type="button"
                 />
               ))}
             </div>
@@ -380,7 +453,7 @@ const filteredProducts = useMemo(() => {
                 <MainCategories
                   filters={filters}
                   onFiltersChange={setFilters}
-                  categories={[]}
+                  categories={[]} // Intentionally left as [], provide real one if needed
                   mainCategories={mainCategories}
                   colors={[]}
                   maxPrice={10000}
@@ -406,7 +479,7 @@ const filteredProducts = useMemo(() => {
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">
-                        {filteredProducts.length} products found
+                        {filteredProducts?.length ?? 0} products found
                       </span>
                       {searchQuery && (
                         <Badge variant="secondary">
@@ -416,7 +489,12 @@ const filteredProducts = useMemo(() => {
                     </div>
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as any)}
+                      onChange={(e) =>
+                        setSortBy(
+                          (e.target.value as "price-low" | "price-high" | "name") ||
+                            "name"
+                        )
+                      }
                       className="text-sm border border-border rounded-md px-3 py-2 bg-background"
                     >
                       <option value="name">Sort by Name</option>
@@ -427,9 +505,9 @@ const filteredProducts = useMemo(() => {
                 )}
 
                 {/* Categories */}
-                {activeCategory && !isSubcategoryActive && categoryData && (
+                {activeCategory && !isSubcategoryActive && Array.isArray(categoryData) && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-6">
-                    {categoryData.map((categoryItem) => (
+                    {categoryData.map((categoryItem: any) => (
                       <div
                         key={categoryItem.name}
                         onClick={() => {
@@ -489,7 +567,7 @@ const filteredProducts = useMemo(() => {
                 )}
 
                 {/* Products in Subcategory */}
-                {isSubcategoryActive && subCategoryData && (
+                {isSubcategoryActive && Array.isArray(subCategoryData) && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {subCategoryData.map((product) => (
                       <ProductCard
@@ -499,8 +577,16 @@ const filteredProducts = useMemo(() => {
                         onToggleWishlist={() =>
                           handleToggleWishlist(product.id)
                         }
-                        isWishlisted={isInWishlist(product.id)}
-                        isInCart={isInCart(product.id)}
+                        isWishlisted={
+                          typeof isInWishlist === "function" && product.id
+                            ? isInWishlist(product.id)
+                            : false
+                        }
+                        isInCart={
+                          typeof isInCart === "function" && product.id
+                            ? isInCart(product.id)
+                            : false
+                        }
                       />
                     ))}
                   </div>
@@ -556,8 +642,6 @@ const filteredProducts = useMemo(() => {
 
       {/* Reviews Section */}
       {isAboutUsActive && <ReviewsSection />}
-
-      <Footer />
 
       {/* WhatsApp Popup */}
       <WhatsAppPopup
