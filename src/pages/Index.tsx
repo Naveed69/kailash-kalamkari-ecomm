@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { WhatsAppPopup } from "@/components/WhatsAppPopup";
-import { ReviewsSection } from "@/components/ReviewsSection";
+import ReviewsSection from "@/components/ReviewsSection";
 import { OurJourneySection } from "@/components/OurJourneySection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
