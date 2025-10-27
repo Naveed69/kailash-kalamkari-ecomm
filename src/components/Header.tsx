@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWishlist } from "@/contexts/WishlistContext";
-import logo from "@/assets/Logo/Logo1.png";
+import logo from "@/assets/Logo/kklogo.png";
 import AboutUs from "@/pages/AboutUs";
 
 interface HeaderProps {
