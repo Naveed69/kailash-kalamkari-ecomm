@@ -184,7 +184,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2 mb-4">
               <div>
                 <img
-                  src={LOGO_SRC || "/placeholder.svg"}
+                  src={LOGO_SRC}
                   alt="Kailash Kalamkari Logo"
                   className="h-20 w-auto object-contain p-1"
                   style={{ maxWidth: "110px" }}
@@ -319,6 +319,19 @@ const Footer = () => {
                 Terms & Conditions
               </a>
             </div>
+          </div>
+          <div className="mt-4 text-center">
+            <p className="text-xs text-[#645C5A]">
+              Designed and Maintained by{" "}
+              <a
+                href="https://www.exploreconsultancyservices.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#d49217] hover:text-[#b87d14] font-semibold transition-colors underline decoration-dotted"
+              >
+                Explore Consultancy Services
+              </a>
+            </p>
           </div>
         </div>
       </div>
