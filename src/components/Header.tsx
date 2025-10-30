@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWishlist } from "@/contexts/WishlistContext";
-import logo from "@/assets/Logo/Logo.jpeg";
+import logo from "@/assets/Logo/kklogo.png";
+import AboutUs from "@/pages/AboutUs";
 
 interface HeaderProps {
   cartCount?: number;
@@ -40,8 +41,8 @@ export const Header = ({
 
   const navItems = [
     { label: "Home", href: "#" },
-    { label: "Products", href: "#Products" },
-    { label: "About Us", href: "#about" },
+    { label: "Products", href: "products" },
+    { label: "About Us", href: "about" },
   ];
 
   const handleNavigation = () => {
@@ -65,19 +66,17 @@ export const Header = ({
             <img
               src={logo}
               alt="Logo"
-              className="w-18 h-10"
+              className="w-32 h-16" // Increased width and height
               onClick={() => navigate("/")}
             />
-            <h1 className="text-[#d49217ff] text-2xl font-bold  hidden lg:block">
-              Kailash Kalamkari
-            </h1>
-            <Badge
+            
+            {/* <Badge
               variant="secondary"
               className="ml-2"
               style={{ background: "#bdbdbdff" }}
             >
               Est. 1984
-            </Badge>
+            </Badge> */}
           </div>
 
           {/* Desktop Navigation */}

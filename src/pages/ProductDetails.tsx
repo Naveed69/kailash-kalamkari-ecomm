@@ -3,8 +3,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { sampleProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/Header";
-import Footer from "@/components/Footer";
 import { useInventory } from "@/contexts/InventoryContext";
 import { Heart, Shield, Sparkles, Truck } from "lucide-react";
 import { Badge, Card, CardContent } from "@mui/material";
@@ -47,8 +45,6 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-8 items-start">
           <div >
@@ -223,8 +219,6 @@ const ProductDetails = () => {
           </section>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 };
