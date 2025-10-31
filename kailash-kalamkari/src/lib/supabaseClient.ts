@@ -1,6 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = 'https://lhithcsradzkatkiaxcg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoaXRoY3NyYWR6a2F0a2lheGNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NTYzMjYsImV4cCI6MjA3NDUzMjMyNn0.yN1maPCb6cQPY7SeVP6Xl46t8NJgFcCx42IP0hslhuI';
+// Use Vite env variables (VITE_ prefix) so the client bundle can read them
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+	console.warn(
+		"VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is not set. Add them to your .env file to connect to Supabase."
+	);
+}
+
+export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");

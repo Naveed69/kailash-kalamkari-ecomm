@@ -250,6 +250,13 @@ const Index = () => {
     setCurrent((prev) => (prev - 1 + sampleImages.length) % sampleImages.length);
   };
 
+  const [categories, setCategories] = useState<Category[]>([]);
+    const [products, setProducts] = useState<Category[]>([]);
+
+
+          console.log('products here:', products)
+
+
   // Get category data
   const categoryData = useMemo(() => {
     if (!filters.selectedCategories) return null;
@@ -273,9 +280,10 @@ const Index = () => {
     return subCat?.products || null;
   }, [filters.selectedCategories, activeSubcategory]);
   useEffect(() => {
-    fetchData();
+    fetchProducts();
+    fetchCategories();
   }, []);
-  const fetchData = async () => {
+  const fetchProducts = async () => {
     let data = null;
     let error = null;
     try {
@@ -286,7 +294,29 @@ const Index = () => {
       if (error) {
         console.error('Fetch Error:', error)
       } else {
-        console.log('Products:', data)
+
+        setProducts(data || []);
+      }
+    } catch (err) {
+      error = err;
+    } finally {
+      // You can add any cleanup or logging here if needed
+    }
+    return { data, error };
+  };
+
+  const fetchCategories = async () => {
+    let data = null;
+    let error = null;
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+
+      if (error) {
+        console.error('Fetch Error:', error)
+      } else {
+        setCategories(data || []);
       }
     } catch (err) {
       error = err;
