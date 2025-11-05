@@ -3,7 +3,7 @@
 import { MapPin, Phone, Mail, MessageCircle, Facebook, Instagram, Twitter, Youtube } from "lucide-react"
 import { useRef, useEffect, useState } from "react"
 import { motion } from "framer-motion"
-
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/Logo/kklogo.png";
 const LOGO_SRC = logo;
 
@@ -164,7 +164,7 @@ const SocialMediaLinks = () => {
 const Footer = () => {
   const currentYear = new Date().getFullYear()
   const services = ["Sarees", "Dupattas", "Fabrics", "Home Decor"]
-
+  const navigate = useNavigate();
   const handleWhatsAppClick = () => {
     window.open(
       `https://wa.me/${CONTACT_INFO.whatsappNumber}?text=${encodeURIComponent(
@@ -174,6 +174,15 @@ const Footer = () => {
       "noopener,noreferrer",
     )
   }
+  const handlePrivacyPolicy = () => {
+    navigate("/privacy-policy");
+  }; 
+  
+  const handleTermsConditions = () => {
+    navigate("/terms-conditions");
+  };
+
+  
 
   return (
     <footer className="bg-[#f0ece3] text-[#645C5A] relative overflow-hidden pb-10">
@@ -312,10 +321,10 @@ const Footer = () => {
               <p className="text-sm">© {currentYear} Kailash Kalamkari. All rights reserved.</p>
             </div>
             <div className="flex space-x-6 text-sm">
-              <a href="/privacy-policy" className="hover:text-[#d49217] transition-colors">
+              <a onClick={handlePrivacyPolicy} className="hover:text-[#d49217] transition-colors cursor-pointer">
                 Privacy Policy
               </a>
-              <a href="/terms-conditions" className="hover:text-[#d49217] transition-colors">
+              <a onClick={handleTermsConditions} className="hover:text-[#d49217] transition-colors cursor-pointer">
                 Terms & Conditions
               </a>
             </div>

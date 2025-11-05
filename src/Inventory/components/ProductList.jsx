@@ -106,21 +106,21 @@ const ProductList = () => {
   };
 
   //pagination items per page code below
-  let paginatedProducts = [];
-  {
-    filteredProducts &&
-      (paginatedProducts = filteredProducts.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage
-      ));
-  }
+  const paginatedProducts = useMemo(() => {
+  return filteredProducts.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+}, [filteredProducts, page, itemsPerPage]);
+
 
   const handlePagechange = (event, value) => {
     setPage(value);
   };
 
   const handleChange = (items) => {
-    setItemsPerPage(items.target.value);
+    setItemsPerPage(Number(items.target.value));
+    setPage(1);
   };
 
   return (

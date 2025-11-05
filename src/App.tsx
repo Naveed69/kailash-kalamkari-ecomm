@@ -20,6 +20,8 @@ import { Header } from "./components/Header";
 import Footer from "./components/Footer";
 import { useCart } from "./contexts/CartContext";
 import { useLocation } from "react-router-dom";
+import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
+import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,8 @@ const AppContent = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
 
         <Route
           path="/inventory/*"

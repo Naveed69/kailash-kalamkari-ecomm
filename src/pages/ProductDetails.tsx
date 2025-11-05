@@ -14,6 +14,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { addToCart, isInCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const [modalOpen, setModalOpen] = useState(false);
   const { categories } = useInventory();
   const products= categories.flatMap((cat) => cat.subCategories.flatMap((sub) => sub.products));
    const [selectedImage, setSelectedImage] = useState(0);
@@ -42,6 +43,11 @@ const ProductDetails = () => {
       </div>
     );
   }
+
+  const handleReplacePolicy = () => {
+    setModalOpen(true);
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -147,6 +153,15 @@ const ProductDetails = () => {
                       </p>
                     </div>
                   </div>
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-[#D49217] mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Replace/Return</p>
+                      <p className="text-sm text-muted-foreground">
+                        7 Days Replacement/Return<a onClick={handleReplacePolicy} className="text-blue-400 cursor-pointer"> Policy</a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -219,6 +234,22 @@ const ProductDetails = () => {
           </section>
         )}
       </div>
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full"> 
+            <h2 className="text-2xl font-bold mb-4">Replace/Return Policy</h2>
+            <p className="mb-4">
+              We offer a 7-day replacement and return policy on all our products. If you are not satisfied with your purchase, you can request a replacement or return within 7 days of receiving the product.
+              </p>
+              <p className="mb-4">
+                To initiate a replacement or return, please contact our customer support team with your order details. The product must be in its original condition and packaging.
+                </p>
+                <Button variant="primary" onClick={() => setModalOpen(false)}>
+                  Close
+                </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
