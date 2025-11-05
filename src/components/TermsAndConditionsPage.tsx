@@ -137,7 +137,7 @@ export default function TermsAndConditionsPage() {
                 href="mailto:legal@yourdomain.com"
                 className="text-[#d49217] hover:text-[#b87a12] transition-colors cursor-pointer"
               >
-                legal@yourdomain.com
+                kailashkalamkari1984@gmail.com
               </a>
               .
             </p>
