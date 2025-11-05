@@ -4,7 +4,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { sampleProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useInventory } from "@/contexts/InventoryContext";
-import { Heart, Shield, Sparkles, Truck } from "lucide-react";
+import { Heart, Shield, Sparkles, Truck , ArrowLeftRight } from "lucide-react";
 import { Badge, Card, CardContent } from "@mui/material";
 import { useMemo, useState } from "react";
 
@@ -154,7 +154,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Sparkles className="h-5 w-5 text-[#D49217] mt-0.5" />
+                    <ArrowLeftRight  className="h-5 w-5 text-[#D49217] mt-0.5" />
                     <div>
                       <p className="font-semibold">Replace/Return</p>
                       <p className="text-sm text-muted-foreground">
