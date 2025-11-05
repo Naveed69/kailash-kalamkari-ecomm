@@ -71,3 +71,44 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Supabase and Admin panel setup
+
+Follow these steps to connect Supabase and enable the Admin panel:
+
+1. Create a Supabase project at https://app.supabase.com/
+2. In Project Settings → API copy the Project URL and anon (public) key.
+3. Create a `.env` or `.env.local` file in the project root with:
+
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+# comma separated admin emails (lowercase)
+VITE_ADMIN_EMAILS=admin@example.com,other@domain.com
+```
+
+4. In Supabase → Table Editor → select your `products` table → Policies. Add a policy to allow select for public (or for auth users):
+
+```sql
+create policy "Allow public select"
+on "public"."products"
+as permissive
+for select
+to public
+using (true);
+```
+
+5. For production, do NOT set `to public` — instead create policies that check `auth.role()` or user metadata and restrict by `VITE_ADMIN_EMAILS` in your app.
+
+6. Start the dev server:
+
+```bash
+npm install
+npm run dev
+```
+
+7. Visit `/admin/login` to sign in using the magic link you configured in Supabase Auth. Make sure the sign-in email is included in `VITE_ADMIN_EMAILS`.
+
+Notes:
+- The AdminRoute component checks `VITE_ADMIN_EMAILS` to determine whether the logged-in user is allowed.
+- Improve authorization by adding an `is_admin` flag in a database table or using Supabase user metadata.
