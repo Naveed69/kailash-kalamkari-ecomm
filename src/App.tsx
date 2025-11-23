@@ -22,6 +22,7 @@ import { useCart } from "./contexts/CartContext";
 import { useLocation } from "react-router-dom";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
 import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
+import Gallery from "./pages/Gallery";
 
 const queryClient = new QueryClient();
 
@@ -35,8 +36,8 @@ const AppContent = () => {
     <>
       <ScrollToTop />
       {!isInventoryRoute && (
-        <Header 
-          cartCount={cart?.totalItems ?? 0} 
+        <Header
+          cartCount={cart?.totalItems ?? 0}
           onCartClick={() => navigate("/cart")}
         />
       )}
@@ -50,6 +51,7 @@ const AppContent = () => {
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
+        <Route path="/gallery" element={<Gallery />} />
 
         <Route
           path="/inventory/*"

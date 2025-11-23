@@ -9,17 +9,12 @@ export interface Category {
   description: string;
 }
 
-interface CatogaryCardProps {
-  discription: Category;
-  name: Category;
-  image: Category;
+interface CategoryCardProps {
+  name: string;
+  image: string;
 }
 
-export const CatogaryCard = ({
-  discription,
-  name,
-  image,
-}: CatogaryCardProps) => {
+export const CategoryCard = ({ name, image }: CategoryCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (

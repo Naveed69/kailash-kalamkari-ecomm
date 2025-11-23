@@ -22,11 +22,11 @@ interface HeaderProps {
 
 export const Header = ({
   cartCount = 0,
-  onCartClick = () => {},
-  onWhatsAppClick = () => {},
-  onSearchChange = () => {},
-  setProductActive = () => {},
-  setIsAboutUsActive = () => {},
+  onCartClick = () => { },
+  onWhatsAppClick = () => { },
+  onSearchChange = () => { },
+  setProductActive = () => { },
+  setIsAboutUsActive = () => { },
 }: HeaderProps = {}) => {
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
@@ -42,6 +42,7 @@ export const Header = ({
   const navItems = [
     { label: "Home", href: "#" },
     { label: "Products", href: "products" },
+    { label: "Gallery", href: "gallery" },
     { label: "About Us", href: "about" },
   ];
 
@@ -69,7 +70,7 @@ export const Header = ({
               className="w-32 h-16" // Increased width and height
               onClick={() => navigate("/")}
             />
-            
+
             {/* <Badge
               variant="secondary"
               className="ml-2"

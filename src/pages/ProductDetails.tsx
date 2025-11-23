@@ -4,8 +4,9 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { sampleProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useInventory } from "@/contexts/InventoryContext";
-import { Heart, Shield, Sparkles, Truck , ArrowLeftRight } from "lucide-react";
-import { Badge, Card, CardContent } from "@mui/material";
+import { Heart, Shield, Sparkles, Truck, ArrowLeftRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { useMemo, useState } from "react";
 
 
@@ -16,11 +17,11 @@ const ProductDetails = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [modalOpen, setModalOpen] = useState(false);
   const { categories } = useInventory();
-  const products= categories.flatMap((cat) => cat.subCategories.flatMap((sub) => sub.products));
-   const [selectedImage, setSelectedImage] = useState(0);
-   
+  const products = categories.flatMap((cat) => cat.subCategories.flatMap((sub) => sub.products));
+  const [selectedImage, setSelectedImage] = useState(0);
+
   let product = sampleProducts.find((p) => p.id === id);
-  if(!product){
+  if (!product) {
     product = products.find((p) => p.id === id);
   }
 
@@ -54,35 +55,34 @@ const ProductDetails = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-8 items-start">
           <div >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full rounded-lg shadow-lg mb-4 object-cover"
-          />
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full rounded-lg shadow-lg mb-4 object-cover"
+            />
 
-           <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {productImages.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                    selectedImage === index
+                  className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${selectedImage === index
                       ? "border-primary"
                       : "border-transparent hover:border-muted"
-                  }`}
+                    }`}
                 >
                   <img src={image} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
-            </div>
+          </div>
 
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
             {/* changes this below code to material type once material type is added in json data*/}
             <p className="text-muted-foreground">Material: <strong>{product.name.split(" ").splice(1).join(" ")}</strong></p>
             <p className="text-muted-foreground mb-6">{product.description}</p>
-            
+
 
             <p className="text-2xl font-semibold mb-2">
               ₹{product.price.toLocaleString()}
@@ -111,7 +111,7 @@ const ProductDetails = () => {
                     : addToWishlist(product)
                 }
               >
-                  <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5" />
               </Button>
             </div>
 
@@ -154,7 +154,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <ArrowLeftRight  className="h-5 w-5 text-[#D49217] mt-0.5" />
+                    <ArrowLeftRight className="h-5 w-5 text-[#D49217] mt-0.5" />
                     <div>
                       <p className="font-semibold">Replace/Return</p>
                       <p className="text-sm text-muted-foreground">
@@ -183,46 +183,62 @@ const ProductDetails = () => {
                 </ul>
               </div>
 
-                <div>
-                  <h3 className="font-semibold mb-2">Care Instructions</h3>
-                  <p className="text-muted-foreground">
-                    Dry clean recommended. Hand wash with cold water if needed. Use mild detergent and avoid direct sunlight when drying.
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold mb-2">Care Instructions</h3>
+                <p className="text-muted-foreground">
+                  Dry clean recommended. Hand wash with cold water if needed. Use mild detergent and avoid direct sunlight when drying.
+                </p>
+              </div>
 
             </div>
           </div>
-         
+
         </div>
         {relatedProducts.length > 0 && (
           <section>
             <h2 className="text-3xl font-serif font-bold text-[#D49217] mb-8 mt-8">
               You May Also Like
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Responsive grid with adjusted card sizing for small screens */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <Link key={relatedProduct.id} to={`/product/${relatedProduct.id}`}>
-                  <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 relative">
+                  <Card
+                    className="
+                      group overflow-hidden hover:shadow-xl transition-all duration-300 relative
+                      w-full
+                      sm:min-w-0
+                      sm:max-w-full
+                      max-w-[140px] 
+                      sm:max-w-none
+                      mx-auto
+                    "
+                  >
                     {!relatedProduct.inStock && (
                       <Badge variant="destructive" className="absolute top-3 right-3 z-10">
                         Out of Stock
                       </Badge>
                     )}
-                    <div className="aspect-[3/4] overflow-hidden">
+                    <div
+                      className="
+                        aspect-[3/4] overflow-hidden
+                        max-h-[210px] sm:max-h-[260px] lg:max-h-[340px]
+                        w-full
+                      "
+                    >
                       <img
                         src={relatedProduct.image}
                         alt={relatedProduct.name}
-                        className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${
-                          !relatedProduct.inStock ? 'opacity-60' : ''
-                        }`}
+                        className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${!relatedProduct.inStock ? 'opacity-60' : ''
+                          }`}
                       />
                     </div>
-                    <CardContent className="p-4">
+                    <CardContent className="p-3 sm:p-4">
                       <p className="text-xs text-muted-foreground mb-1">{relatedProduct.material}</p>
-                      <h3 className="font-semibold mb-2 group-hover:text-[#D49217] transition-colors">
+                      <h3 className="font-semibold mb-2 group-hover:text-[#D49217] transition-colors text-sm sm:text-base">
                         {relatedProduct.name}
                       </h3>
-                      <p className="text-[#D49217] font-bold">
+                      <p className="text-[#D49217] font-bold text-sm sm:text-base">
                         ₹{relatedProduct.price.toLocaleString("en-IN")}
                         {/* {relatedProduct.priceUnit && <span className="text-sm font-normal">{relatedProduct.priceUnit}</span>} */}
                       </p>
@@ -236,17 +252,17 @@ const ProductDetails = () => {
       </div>
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full"> 
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-[#D49217] text-2xl font-bold mb-4">Replace/Return Policy</h2>
             <p className="mb-4">
               We offer a 7-day replacement and return policy on all our products. If you are not satisfied with your purchase, you can request a replacement or return within 7 days of receiving the product.
-              </p>
-              <p className="mb-4">
-                To initiate a replacement or return, please contact our customer support team with your order details. The product must be in its original condition and packaging.
-                </p>
-                <Button className="bg-[#D49217] hover:bg-[#cf972fff]" onClick={() => setModalOpen(false)}>
-                  Close
-                </Button>
+            </p>
+            <p className="mb-4">
+              To initiate a replacement or return, please contact our customer support team with your order details. The product must be in its original condition and packaging.
+            </p>
+            <Button className="bg-[#D49217] hover:bg-[#cf972fff]" onClick={() => setModalOpen(false)}>
+              Close
+            </Button>
           </div>
         </div>
       )}

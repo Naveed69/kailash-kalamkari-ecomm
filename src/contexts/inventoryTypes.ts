@@ -11,6 +11,7 @@ export interface Product {
   rating: number;
   category: string;
   quantity: number;
+  material?: string;
 }
 
 export interface SubCategory {

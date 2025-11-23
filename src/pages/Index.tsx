@@ -17,7 +17,8 @@ import { MobileNavbar } from "../components/ui/MobileNavbar";
 
 import { useInventory } from "@/contexts/InventoryContext";
 import { sampleProducts as defaultSampleProducts } from "@/data/products";
-import { CatogaryCard } from "@/components/ui/categoryCard";
+import { CategoryCard } from "@/components/ui/categoryCard";
+import { VideoPopup } from "@/components/VideoPopup";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
@@ -114,6 +115,22 @@ const Index = () => {
     isInWishlist,
   } = useWishlist() || {};
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+  
+  // Video Popup state
+  const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if the popup has been shown in this session
+    const hasSeenPopup = sessionStorage.getItem("hasSeenVideoPopup");
+    if (!hasSeenPopup) {
+      // Small delay to ensure smooth loading
+      const timer = setTimeout(() => {
+        setIsVideoPopupOpen(true);
+        sessionStorage.setItem("hasSeenVideoPopup", "true");
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   // If categories is array of objects with 'category' field, else fallback to []
   const mainCategories = useMemo(
     () =>
@@ -352,7 +369,7 @@ const Index = () => {
                     className="w-full h-full object-cover"
                   />
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/30 to-transparent"></div>
                   {/* Content overlay per slide */}
                   <div className="absolute top-0 left-0 w-full h-full flex items-center">
                     <div className="px-10 max-w-2xl text-left ml-0 mr-auto">
@@ -420,9 +437,8 @@ const Index = () => {
                 <button
                   key={index}
                   onClick={() => setCurrent(index)}
-                  className={`w-3 h-3 rounded-full ${
-                    current === index ? "bg-white" : "bg-gray-400"
-                  }`}
+                  className={`w-3 h-3 rounded-full ${current === index ? "bg-white" : "bg-gray-400"
+                    }`}
                   aria-label={`Go to Slide ${index + 1}`}
                   type="button"
                 />
@@ -492,7 +508,7 @@ const Index = () => {
                       onChange={(e) =>
                         setSortBy(
                           (e.target.value as "price-low" | "price-high" | "name") ||
-                            "name"
+                          "name"
                         )
                       }
                       className="text-sm border border-border rounded-md px-3 py-2 bg-background"
@@ -516,8 +532,7 @@ const Index = () => {
                         }}
                         className="cursor-pointer"
                       >
-                        <CatogaryCard
-                          category={filters.selectedCategories}
+                        <CategoryCard
                           name={categoryItem.name}
                           image={categoryItem.subCategoriesImage}
                         />
@@ -528,7 +543,7 @@ const Index = () => {
 
                 {/* Products Grid */}
                 {!activeCategory && !isSubcategoryActive && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {renderProductCards(filteredProducts)}
                   </div>
                 )}
@@ -568,7 +583,7 @@ const Index = () => {
 
                 {/* Products in Subcategory */}
                 {isSubcategoryActive && Array.isArray(subCategoryData) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {subCategoryData.map((product) => (
                       <ProductCard
                         key={product.id}
@@ -648,6 +663,12 @@ const Index = () => {
         isOpen={isWhatsAppOpen}
         onClose={() => setIsWhatsAppOpen(false)}
         onOpen={() => setIsWhatsAppOpen(true)}
+      />
+
+      {/* Video Popup */}
+      <VideoPopup
+        isOpen={isVideoPopupOpen}
+        onClose={() => setIsVideoPopupOpen(false)}
       />
     </div>
   );

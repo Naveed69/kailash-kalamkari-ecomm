@@ -263,13 +263,56 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-[#d49217]">Our Products</h4>
+            <h4 className="text-lg font-semibold mb-4 text-[#d49217]">Quick Links</h4>
             <ul className="space-y-2">
-              {services.map((service) => (
-                <li key={service} className="text-sm">
-                  {service}
-                </li>
-              ))}
+              <li className="text-sm">
+                <a
+                  href="/"
+                  className="text-[#d49217] hover:text-[#b87d14] transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "/";
+                  }}
+                >
+                  Home
+                </a>
+              </li>
+              <li className="text-sm">
+                <a
+                  href="/products"
+                  className="text-[#d49217] hover:text-[#b87d14] transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "/products";
+                  }}
+                >
+                  Products
+                </a>
+              </li>
+              <li className="text-sm">
+                <a
+                  href="/gallery"
+                  className="text-[#d49217] hover:text-[#b87d14] transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "/gallery";
+                  }}
+                >
+                  Gallery
+                </a>
+              </li>
+              <li className="text-sm">
+                <a
+                  href="/about"
+                  className="text-[#d49217] hover:text-[#b87d14] transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = "/about";
+                  }}
+                >
+                  About Us
+                </a>
+              </li>
             </ul>
           </div>
 
