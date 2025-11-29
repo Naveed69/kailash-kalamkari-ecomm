@@ -8,6 +8,16 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWishlist } from "@/contexts/WishlistContext";
 import logo from "@/assets/Logo/kklogo.png";
 import AboutUs from "@/pages/AboutUs";
+import { useAuth } from "@/lib/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, Package } from "lucide-react";
 
 interface HeaderProps {
   cartCount?: number;
@@ -30,6 +40,7 @@ export const Header = ({
 }: HeaderProps = {}) => {
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const wishlistCount = wishlist.length;
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -47,11 +58,13 @@ export const Header = ({
   ];
 
   const handleNavigation = () => {
-    // JWT token based verification is required here for better security
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (isLoggedIn) {
-      navigate("/inventory");
-    } else navigate("/adminLogin");
+    // Admin login navigation
+    navigate("/adminLogin");
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
   };
 
   return (
@@ -67,17 +80,9 @@ export const Header = ({
             <img
               src={logo}
               alt="Logo"
-              className="w-32 h-16" // Increased width and height
+              className="w-32 h-16 cursor-pointer" // Increased width and height
               onClick={() => navigate("/")}
             />
-
-            {/* <Badge
-              variant="secondary"
-              className="ml-2"
-              style={{ background: "#bdbdbdff" }}
-            >
-              Est. 1984
-            </Badge> */}
           </div>
 
           {/* Desktop Navigation */}
@@ -88,7 +93,8 @@ export const Header = ({
                   <a
                     key={item.label}
                     href={item.href}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       setProductActive(true);
                       setIsAboutUsActive(false);
                       navigate("/")
@@ -105,7 +111,8 @@ export const Header = ({
                   <a
                     key={item.label}
                     href={item.href}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       setProductActive(true);
                       setIsAboutUsActive(true);
                       navigate("/")
@@ -121,10 +128,15 @@ export const Header = ({
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={() => {
-                    setProductActive(false);
-                    setIsAboutUsActive(true);
-                    navigate("/")
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (item.href === 'about') {
+                       setProductActive(false);
+                       setIsAboutUsActive(true);
+                       navigate("/")
+                    } else {
+                       navigate(`/${item.href}`)
+                    }
                   }}
                   className="text-[#d49217ff]  hover:text-[#E6B740] transition-colors font-medium"
                 >
@@ -149,9 +161,47 @@ export const Header = ({
 
             {/* Action buttons */}
             <div className="flex items-center text-white space-x-2">
-              <Button variant="ghost" size="icon" onClick={handleNavigation}>
-                <User className="h-5 w-5 text-[#d49217] hover:text-[#E6B740]" />
-              </Button>
+              {/* Unified User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-5 w-5 text-slate-500 hover:text-slate-700" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {user ? (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate("/my-orders")}>
+                        <Package className="mr-2 h-4 w-4" />
+                        <span>My Orders</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/profile")}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>My Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate("/login")}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Login / Signup</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate("/adminLogin")}>
+                         <User className="mr-2 h-4 w-4" />
+                         <span>Admin Access</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Button
                 variant="ghost"
@@ -218,6 +268,23 @@ export const Header = ({
                     {/* Mobile navigation */}
                     <nav className="flex  flex-col space-y-4">
                       {navItems.map((item) => {
+                        if (item.label === "Track Order") {
+                          return (
+                            <a
+                              key={item.label}
+                              href={item.href}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate("/track-order");
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="text-[#d49217] hover:text-[#E6B740] text-foreground hover:text-primary transition-colors font-medium"
+                            >
+                              {item.label}
+                            </a>
+                          );
+                        }
+
                         if (item.label === "Products") {
                           return (
                             <a

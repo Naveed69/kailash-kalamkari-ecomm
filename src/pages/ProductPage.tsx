@@ -6,7 +6,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useInventory } from "@/contexts/InventoryContext";
-import { sampleProducts as defaultSampleProducts } from "@/data/products";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
 interface FilterState {
@@ -17,12 +16,13 @@ interface FilterState {
 }
 
 const ProductsPage = () => {
-  const { categories = [] } = useInventory() || {};
+  const { products = [], loading, error } = useInventory() || {};
   const { toast } = useToast();
   const { addToCart, isInCart } = useCart() || {};
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist() || {};
 
-  const sampleProducts = Array.isArray(defaultSampleProducts) ? defaultSampleProducts : [];
+  // Use real products from database
+  const sampleProducts = Array.isArray(products) ? products : [];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">("name");
@@ -182,6 +182,24 @@ const ProductsPage = () => {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p className="text-red-500">Error loading products: {error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Retry
+          </Button>
+        </div>
+      )}
+
+      {!loading && (
       <div className="container mx-auto px-4 py-8">
         {/* Search and Filter Bar */}
         <div className="mb-8 space-y-4">
@@ -396,6 +414,7 @@ const ProductsPage = () => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

@@ -23,6 +23,14 @@ import { useLocation } from "react-router-dom";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
 import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
 import Gallery from "./pages/Gallery";
+import DevAdminButton from "./components/DevAdminButton";
+import TrackOrder from "./pages/TrackOrder";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import { AuthProvider } from "./lib/AuthContext";
+import LoginPage from "./pages/Login";
+import MyOrdersPage from "./pages/MyOrders";
+import OrderDetails from "./pages/OrderDetails";
+import ProfilePage from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +60,12 @@ const AppContent = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/track-order" element={<TrackOrder />} />
+        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/my-orders" element={<MyOrdersPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/order/:id" element={<OrderDetails />} />
 
         <Route
           path="/inventory/*"
@@ -66,6 +80,7 @@ const AppContent = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isInventoryRoute && <Footer />}
+      <DevAdminButton />
     </>
   );
 };
@@ -76,13 +91,15 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <CartProvider>
-          <WishlistProvider>
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </WishlistProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <BrowserRouter>
+                <AppContent />
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -12,6 +12,7 @@ export interface Product {
   category: string;
   quantity: number;
   material?: string;
+  barcode?: string; // Product barcode for scanning
 }
 
 export interface SubCategory {

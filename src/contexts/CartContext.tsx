@@ -104,11 +104,27 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 };
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Initialize from localStorage if available
+  const initializer = (initialValue: CartState): CartState => {
+    try {
+      const storedCart = localStorage.getItem('cart');
+      return storedCart ? JSON.parse(storedCart) : initialValue;
+    } catch (error) {
+      console.error("Failed to load cart from localStorage", error);
+      return initialValue;
+    }
+  };
+
   const [cart, dispatch] = useReducer(cartReducer, {
     items: [],
     totalItems: 0,
     totalPrice: 0,
-  });
+  }, initializer);
+
+  // Save to localStorage whenever cart changes
+  React.useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
   
   const { toast } = useToast();
 

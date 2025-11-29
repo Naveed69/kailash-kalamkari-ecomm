@@ -1,12 +1,19 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { sampleProducts } from "@/data/products";
+// import { sampleProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useInventory } from "@/contexts/InventoryContext";
 import { Heart, Shield, Sparkles, Truck, ArrowLeftRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useMemo, useState } from "react";
 
 
@@ -16,14 +23,11 @@ const ProductDetails = () => {
   const { addToCart, isInCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [modalOpen, setModalOpen] = useState(false);
-  const { categories } = useInventory();
-  const products = categories.flatMap((cat) => cat.subCategories.flatMap((sub) => sub.products));
+  const { categories, products = [] } = useInventory();
+  // const products = categories.flatMap((cat) => cat.subCategories.flatMap((sub) => sub.products));
   const [selectedImage, setSelectedImage] = useState(0);
 
-  let product = sampleProducts.find((p) => p.id === id);
-  if (!product) {
-    product = products.find((p) => p.id === id);
-  }
+  const product = products.find((p) => p.id === id);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -250,22 +254,29 @@ const ProductDetails = () => {
           </section>
         )}
       </div>
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-[#D49217] text-2xl font-bold mb-4">Replace/Return Policy</h2>
-            <p className="mb-4">
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#D49217] text-2xl font-bold">Replace/Return Policy</DialogTitle>
+            <DialogDescription>
+              We want you to be completely satisfied with your purchase.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>
               We offer a 7-day replacement and return policy on all our products. If you are not satisfied with your purchase, you can request a replacement or return within 7 days of receiving the product.
             </p>
-            <p className="mb-4">
+            <p>
               To initiate a replacement or return, please contact our customer support team with your order details. The product must be in its original condition and packaging.
             </p>
+          </div>
+          <div className="flex justify-end mt-4">
             <Button className="bg-[#D49217] hover:bg-[#cf972fff]" onClick={() => setModalOpen(false)}>
               Close
             </Button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

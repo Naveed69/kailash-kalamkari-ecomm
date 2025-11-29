@@ -1,16 +1,17 @@
 .recent-activity {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid #dee2e6;
-  box-shadow: none;
+  background-color: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .recent-activity h3 {
   margin-top: 0;
   font-size: 20px;
-  color: #333;
-  margin-bottom: 20px;
+  color: var(--foreground);
+  margin-bottom: 24px;
+  font-weight: 600;
 }
 
 .activity-table-container {
@@ -19,23 +20,43 @@
 
 .activity-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .activity-table th,
 .activity-table td {
-  padding: 15px;
+  padding: 16px;
   text-align: left;
-  border-bottom: 1px solid #dee2e6;
-  color: #555;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
 }
 
 .activity-table th {
-  background-color: transparent;
-  font-weight: bold;
-  color: #333;
+  background-color: var(--muted);
+  font-weight: 600;
+  color: var(--muted-foreground);
   font-size: 12px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activity-table th:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.activity-table th:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.activity-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.activity-table tbody tr:hover {
+  background-color: var(--muted);
 }
 
 .activity-table tbody tr:last-child td {
