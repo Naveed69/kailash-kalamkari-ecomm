@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { 
   Edit, 
   Trash2, 
   Plus, 
   Search, 
   Package, 
-  MoreHorizontal, 
   ArrowUpDown,
   Filter,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -27,14 +29,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -44,6 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { supabase } from "@/lib/supabaseClient";
 
 const ProductList = () => {
   const navigate = useNavigate();
@@ -54,6 +49,7 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [productToDelete, setProductToDelete] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [togglingVisibility, setTogglingVisibility] = useState<number | null>(null);
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
@@ -112,6 +108,36 @@ const ProductList = () => {
       });
       setIsDeleteDialogOpen(false);
       setProductToDelete(null);
+    }
+  };
+
+  const handleVisibilityToggle = async (product: any, isVisible: boolean) => {
+    setTogglingVisibility(product.id);
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update({ is_visible: isVisible })
+        .eq("id", product.id);
+
+      if (error) throw error;
+
+      toast({
+        title: isVisible ? "Product Visible" : "Product Hidden",
+        description: `${product.name} is now ${isVisible ? 'visible' : 'hidden'} on the store`,
+        className: isVisible ? "bg-green-50 border-green-200" : "bg-slate-50 border-slate-200",
+      });
+
+      // Refresh product list
+      window.location.reload(); 
+    } catch (error) {
+      console.error("Error toggling visibility:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update product visibility",
+        variant: "destructive",
+      });
+    } finally {
+      setTogglingVisibility(null);
     }
   };
 
@@ -206,12 +232,13 @@ const ProductList = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <Table>
           <TableHeader className="bg-slate-50/50">
-            <TableRow className="hover:bg-slate-50/50 border-slate-100">
+            <TableRow className="hover:bg-transparent border-slate-100">
               <TableHead className="w-[100px] pl-6">Image</TableHead>
               <TableHead>Product Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
+              <TableHead className="w-[100px]">Visible</TableHead>
               <TableHead className="text-right pr-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -227,9 +254,14 @@ const ProductList = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredAndSortedProducts.map((product) => (
-                <TableRow key={product.id} className="group hover:bg-slate-50/50 cursor-pointer border-slate-50 transition-colors" onClick={() => navigate(`/inventory/products/${product.id}`)}>
-                  <TableCell className="pl-6 py-4">
+              filteredAndSortedProducts.map((product) => {
+                const isVisible = product.is_visible !== false; // Default to true if undefined
+                return (
+                <TableRow 
+                  key={product.id} 
+                  className={`group hover:bg-slate-50/50 border-slate-50 transition-colors ${!isVisible ? 'opacity-50' : ''}`}
+                >
+                  <TableCell className="pl-6 py-4" onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <div className="h-16 w-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden">
                       <img
                         src={product.image || product.images?.[0] || "https://placehold.co/400x400?text=No+Image"}
@@ -238,24 +270,34 @@ const ProductList = () => {
                       />
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <div>
-                      <p className="font-bold text-slate-900 text-base">{product.name}</p>
-                      <p className="text-xs text-slate-500 line-clamp-1 mt-0.5 max-w-[200px]">{product.description}</p>
+                      <div>
+                        <p className="font-bold text-slate-900 text-base">{product.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{product.description}</p>
+                          {!isVisible && (
+                            <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-300 text-[10px] px-1.5 py-0">
+                              <EyeOff className="h-3 w-3 mr-1" />
+                              Hidden
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-medium">
                       {product.category_name || "Uncategorized"}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <div className="font-bold text-slate-900">₹{product.price?.toLocaleString()}</div>
                     {product.originalPrice && product.originalPrice > product.price && (
                       <div className="text-xs text-slate-400 line-through">₹{product.originalPrice?.toLocaleString()}</div>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <div className="flex items-center gap-2">
                       <div className={`h-2.5 w-2.5 rounded-full ${(product.quantity || 0) > 5 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       <span className={`font-medium ${(product.quantity || 0) > 5 ? 'text-slate-700' : 'text-amber-700'}`}>
@@ -263,31 +305,48 @@ const ProductList = () => {
                       </span>
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Switch
+                        checked={isVisible}
+                        onCheckedChange={(checked) => handleVisibilityToggle(product, checked)}
+                        disabled={togglingVisibility === product.id}
+                        className="data-[state=checked]:bg-green-600"
+                      />
+                      {isVisible ? (
+                        <Eye className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-slate-400" />
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right pr-6">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 rounded-full">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4 text-slate-500" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[160px] rounded-xl shadow-lg border-slate-100">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(product); }} className="cursor-pointer">
-                          <Edit className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={(e) => { e.stopPropagation(); handleDeleteClick(product); }}
-                          className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div 
+                      className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="h-8 border-slate-200 text-slate-600 hover:bg-slate-50"
+                        onClick={() => handleEdit(product)}
+                      >
+                        <Edit className="mr-1.5 h-3.5 w-3.5" />
+                        Edit
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        className="h-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteClick(product)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>

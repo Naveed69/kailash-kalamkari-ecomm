@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -15,23 +15,55 @@ import {
   CheckCircle2, 
   Clock, 
   CreditCard,
-  ExternalLink
+  ExternalLink,
+  Copy,
+  AlertCircle,
+  ShoppingBag
 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
+
+// --- Types ---
+interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  category?: string;
+}
+
+interface Order {
+  id: number;
+  created_at: string;
+  status: 'pending' | 'paid' | 'in_packing' | 'packed' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled';
+  total_amount: number;
+  customer_name: string;
+  customer_phone: string;
+  customer_address: string;
+  items: OrderItem[];
+  shipping_company?: string;
+  tracking_id?: string;
+  packed_at?: string;
+  shipped_at?: string;
+  delivered_at?: string;
+  payment_method?: string;
+  razorpay_payment_id?: string;
+}
 
 const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loadingOrder, setLoadingOrder] = useState(true);
   const [markingDelivered, setMarkingDelivered] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/login');
+      navigate('/login?returnTo=/my-orders');
       return;
     }
 
@@ -42,19 +74,26 @@ const OrderDetails: React.FC = () => {
 
   const fetchOrderDetails = async () => {
     setLoadingOrder(true);
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user?.id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user?.id)
+        .single();
 
-    if (error) {
-      console.error('Error fetching order:', error);
-    } else {
+      if (error) throw error;
       setOrder(data);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      toast({
+        title: "Error",
+        description: "Could not load order details.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingOrder(false);
     }
-    setLoadingOrder(false);
   };
 
   const handleCustomerConfirmation = async () => {
@@ -94,6 +133,14 @@ const OrderDetails: React.FC = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Tracking ID copied to clipboard",
+    });
+  };
+
   if (loading || loadingOrder) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -107,229 +154,206 @@ const OrderDetails: React.FC = () => {
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
         <Package className="h-16 w-16 text-slate-300 mb-4" />
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Order Not Found</h2>
-        <p className="text-slate-600 mb-6">We couldn't find the order you're looking for.</p>
         <Button onClick={() => navigate('/my-orders')}>Back to My Orders</Button>
       </div>
     );
   }
 
-  // --- Logic & Helpers ---
-
-  const steps = [
-    { status: 'paid', label: 'Order Placed', date: order.created_at, icon: Package },
-    { status: 'packed', label: 'Packed', date: order.packed_at, icon: Package },
-    { status: 'shipped', label: 'Shipped', date: order.shipped_at, icon: Truck },
-    { status: 'delivered', label: 'Delivered', date: order.delivered_at, icon: CheckCircle2 },
+  // --- Timeline Logic ---
+  const timelineSteps = [
+    { 
+      id: 'placed', 
+      label: 'Order Placed', 
+      date: order.created_at,
+      icon: Package,
+      statusMatch: ['pending', 'paid', 'in_packing', 'packed', 'shipped', 'out_for_delivery', 'delivered']
+    },
+    { 
+      id: 'processing', 
+      label: 'Processing', 
+      date: null, 
+      icon: Clock,
+      statusMatch: ['in_packing', 'packed', 'shipped', 'out_for_delivery', 'delivered']
+    },
+    { 
+      id: 'packed', 
+      label: 'Packed', 
+      date: order.packed_at,
+      icon: CheckCircle2,
+      statusMatch: ['packed', 'shipped', 'out_for_delivery', 'delivered']
+    },
+    {
+      id: 'shipped',
+      label: 'Shipped',
+      description: order.shipping_company ? `Shipped via ${order.shipping_company}` : 'On its way to the courier',
+      date: order.shipped_at,
+      icon: Truck,
+      statusMatch: ['shipped', 'out_for_delivery', 'delivered']
+    }
   ];
 
-  const statusOrder: Record<string, number> = {
-    'pending': 0,
-    'paid': 1,
-    'in_packing': 2,
-    'packed': 3,
-    'shipped': 4,
-    'delivered': 5,
-    'cancelled': -1
+  const getCurrentStepIndex = () => {
+    if (order.status === 'cancelled') return -1;
+    let index = 0;
+    timelineSteps.forEach((step, i) => {
+      if (step.statusMatch.includes(order.status)) {
+        index = i;
+      }
+    });
+    return index;
   };
 
-  const currentStatusIndex = statusOrder[order.status] || 0;
-
-  const isStepCompleted = (stepStatus: string) => {
-    const stepIndex = statusOrder[stepStatus];
-    return currentStatusIndex >= stepIndex;
-  };
-
-  const isStepCurrent = (stepStatus: string) => {
-    // Special case for 'in_packing' which maps to 'packed' step visually but isn't complete
-    if (order.status === 'in_packing' && stepStatus === 'packed') return true;
-    return order.status === stepStatus;
-  };
-
-  const showTracking = ['packed', 'shipped', 'delivered'].includes(order.status) && order.tracking_id;
-
-  const getStatusMessage = () => {
-    if (order.status === 'delivered') {
-      return "Your order has been delivered. Thank you for shopping with us!";
-    }
-    if (order.status === 'shipped') {
-      return "Your parcel has been handed over to DTDC. Click below to track live shipment status.";
-    }
-    if (order.status === 'packed' || order.status === 'in_packing') {
-      return "Your order is packed. Track your parcel using the DTDC tracking ID below.";
-    }
-    return "Your order has been placed. Tracking details will appear once your package is packed.";
-  };
+  const currentStepIndex = getCurrentStepIndex();
+  const isCancelled = order.status === 'cancelled';
+  const showTracking = !isCancelled && (order.status === 'shipped' || order.status === 'out_for_delivery' || order.status === 'delivered') && order.tracking_id;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 font-sans">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-slate-50/50 py-6 font-sans">
+      <div className="container mx-auto px-4 max-w-5xl">
         {/* Navigation */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/my-orders')} 
-          className="mb-6 hover:bg-slate-200 -ml-2 text-slate-600"
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/my-orders')}
+          className="mb-4 hover:bg-white hover:shadow-sm -ml-2 text-slate-600 h-9 px-3"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Orders
+          Back to My Orders
         </Button>
 
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Order #{order.id}</h1>
-            <p className="text-slate-500 mt-1">
-              Placed on {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-             {/* Dynamic Status Badge */}
-             <Badge className={`text-sm px-4 py-1.5 capitalize shadow-sm ${
-                order.status === 'delivered' ? 'bg-green-600 hover:bg-green-700' :
-                order.status === 'shipped' ? 'bg-blue-600 hover:bg-blue-700' :
-                order.status === 'packed' ? 'bg-indigo-600 hover:bg-indigo-700' :
-                'bg-amber-600 hover:bg-amber-700'
-              }`}>
-                {order.status.replace('_', ' ')}
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-slate-900">Order #{order.id}</h1>
+              <Badge className={cn(
+                "capitalize px-2.5 py-0.5 text-xs font-medium border shadow-none",
+                order.status === 'paid' && "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100",
+                order.status === 'in_packing' && "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100",
+                order.status === 'packed' && "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100",
+                order.status === 'shipped' && "bg-green-100 text-green-800 border-green-200 hover:bg-green-100",
+                order.status === 'delivered' && "bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100",
+                order.status === 'cancelled' && "bg-red-100 text-red-800 border-red-200 hover:bg-red-100",
+                order.status === 'pending' && "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100"
+              )}>
+                {order.status === 'in_packing' ? 'Processing' : order.status.replace(/_/g, ' ')}
               </Badge>
+            </div>
+            <p className="text-sm text-slate-500">
+              Placed on {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* LEFT COLUMN - Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* LEFT COLUMN - Timeline & Items */}
           <div className="lg:col-span-2 space-y-6">
-            
-            {/* Simple Timeline - Matching Admin Design */}
-            <Card className="border-gray-200 shadow-sm">
-              <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
-                <CardTitle className="text-base font-semibold text-gray-900">
+
+            {/* 1. TRACKING TIMELINE */}
+            <Card className="border-slate-200 shadow-sm overflow-hidden">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-5">
+                <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-slate-500" />
                   Order Timeline
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="space-y-6">
-                  {steps.map((step, index) => {
-                    const completed = isStepCompleted(step.status);
-                    
-                    return (
-                      <div key={step.status} className="flex gap-4">
-                        {/* Icon/Dot with vertical line */}
-                        <div className="relative flex flex-col items-center">
-                          <div className={`
-                            w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
-                            ${completed ? 'bg-green-500' : 'bg-gray-300'}
-                          `}>
-                            {completed ? (
-                              <CheckCircle2 className="w-5 h-5 text-white" />
-                            ) : (
-                              <div className="w-2 h-2 rounded-full bg-white" />
-                            )}
-                          </div>
-                          {index < steps.length - 1 && (
-                            <div className={`w-0.5 h-full mt-2 ${
-                              completed ? 'bg-green-500' : 'bg-gray-200'
-                            }`} />
-                          )}
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 pb-6">
-                          <p className={`font-medium text-sm ${
-                            completed ? 'text-gray-900' : 'text-gray-400'
-                          }`}>
-                            {step.label}
-                          </p>
-                          {completed && step.date && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              {new Date(step.date).toLocaleDateString('en-IN', { 
-                                day: 'numeric', 
-                                month: 'short',
-                                year: 'numeric'
-                              })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 2. Tracking Section (Conditional) */}
-            {showTracking && (
-              <div className="space-y-4">
-                {/* No API Alert */}
-                {order.status === 'shipped' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3 items-start">
-                    <div className="mt-0.5">
-                      <Truck className="h-5 w-5 text-blue-600" />
+                {isCancelled ? (
+                  <div className="text-center py-6">
+                    <div className="h-12 w-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <AlertCircle className="h-6 w-6 text-red-500" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900">Live Tracking Not Available In-App</h4>
-                      <p className="text-sm text-blue-700 mt-1">
-                        Your parcel is with <strong>{order.shipping_company || 'DTDC'}</strong>. 
-                        Please use the AWB number below to track directly on their website.
-                      </p>
+                    <h3 className="text-base font-semibold text-red-700">Order Cancelled</h3>
+                    <p className="text-sm text-slate-500 mt-1">This order was cancelled.</p>
+                  </div>
+                ) : (
+                  <div className="relative pl-2">
+                    {/* Vertical Line Background */}
+                    <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-slate-100" />
+
+                    <div className="space-y-6 relative">
+                      {timelineSteps.map((step, index) => {
+                        const isCompleted = index <= currentStepIndex;
+                        const isCurrent = index === currentStepIndex;
+                        const Icon = step.icon;
+
+                        return (
+                          <div key={step.id} className="flex gap-4 relative">
+                            {/* Icon Bubble */}
+                            <div className={cn(
+                              "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-4 transition-all duration-300",
+                              isCompleted
+                                ? "bg-slate-900 border-slate-50 text-white shadow-sm"
+                                : "bg-white border-slate-100 text-slate-300"
+                            )}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+
+                            {/* Content */}
+                            <div className={cn("flex-1 pt-1", isCompleted ? "opacity-100" : "opacity-40")}>
+                              <h4 className="font-semibold text-slate-900 text-sm">{step.label}</h4>
+                              {step.description && <p className="text-xs text-slate-500 mt-0.5">{step.description}</p>}
+                              {isCompleted && step.date && (
+                                <p className="text-xs font-medium text-slate-400 mt-0.5">
+                                  {new Date(step.date).toLocaleDateString('en-IN', {
+                                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                                  })}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
-                <Card className="border-blue-200 bg-blue-50/30 shadow-sm">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                {/* Tracking Info Block - ONLY VISIBLE IF SHIPPED */}
+                {showTracking && (
+                  <div className="mt-6 bg-blue-50/50 border border-blue-100 rounded-lg p-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-800 mb-1">Tracking Details</h3>
-                        <p className="text-slate-600 text-sm mb-2">Shipped via <span className="font-semibold">{order.shipping_company || 'DTDC Express'}</span></p>
-                        <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded border border-blue-100 w-fit">
-                          <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">AWB</span>
-                          <span className="font-mono font-medium text-slate-700">{order.tracking_id}</span>
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200"
-                        onClick={() => window.open(`https://www.google.com/search?q=${order.shipping_company || 'DTDC'}+tracking+${order.tracking_id}`, '_blank')}
-                      >
-                        Track Shipment
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    {/* Customer Confirmation Button */}
-                    {order.status === 'shipped' && (
-                      <div className="mt-6 pt-6 border-t border-blue-200/50">
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                          <div>
-                            <h4 className="font-semibold text-emerald-900">Have you received this order?</h4>
-                            <p className="text-sm text-emerald-700">Help us close this order by confirming delivery.</p>
-                          </div>
-                          <Button 
-                            onClick={handleCustomerConfirmation} 
-                            disabled={markingDelivered}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm whitespace-nowrap w-full sm:w-auto"
-                          >
-                            {markingDelivered ? "Updating..." : "Yes, I Received My Order"}
+                        <p className="text-xs font-medium text-blue-900 mb-1 uppercase tracking-wider">Tracking Details</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-blue-700 font-medium">{order.shipping_company}</span>
+                          <span className="text-slate-300">|</span>
+                          <code className="bg-white px-2 py-0.5 rounded border border-blue-200 text-blue-800 font-mono text-sm font-semibold">
+                            {order.tracking_id}
+                          </code>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 text-blue-600" onClick={() => copyToClipboard(order.tracking_id!)}>
+                            <Copy className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full sm:w-auto h-9"
+                        onClick={() => window.open(`https://www.dtdc.in/tracking.asp?id=${order.tracking_id}`, '_blank')}
+                      >
+                        Track Shipment <ExternalLink className="ml-2 h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-            {/* 3. Items List */}
-            <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <Package className="h-5 w-5 text-slate-500" />
-                  Items in this Order
+            {/* 2. ORDER ITEMS */}
+            <Card className="border-slate-200 shadow-sm overflow-hidden">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-5">
+                <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                  <ShoppingBag className="h-4 w-4 text-slate-500" />
+                  Items ({order.items.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="divide-y divide-slate-100">
-                {order.items?.map((item: any, idx: number) => (
-                  <div key={idx} className="flex gap-4 py-6">
-                    <div className="h-24 w-24 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
+                {order.items.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex gap-4 py-4 cursor-pointer hover:bg-slate-50 transition-colors rounded-lg px-2 -mx-2"
+                    onClick={() => navigate(`/product/${item.id}`)}
+                  >
+                    <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
                        <img 
                          src={item.image} 
                          alt={item.name} 
@@ -337,79 +361,100 @@ const OrderDetails: React.FC = () => {
                          onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
                        />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-slate-800 text-lg truncate pr-4">{item.name}</h3>
-                          <p className="text-slate-500 text-sm mt-1">{item.category}</p>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+                      <div>
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className="font-medium text-slate-900 text-base leading-tight truncate pr-2 hover:text-blue-600 transition-colors">{item.name}</h3>
+                          <p className="font-semibold text-slate-900 whitespace-nowrap">₹{item.price.toLocaleString()}</p>
                         </div>
-                        <p className="font-bold text-slate-900 text-lg">₹{item.price?.toLocaleString()}</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <p className="text-slate-500 text-xs">{item.category}</p>
+                        </div>
                       </div>
-                      <div className="mt-4 flex items-center text-sm text-slate-600">
-                        <span className="bg-slate-100 px-2 py-1 rounded">Qty: {item.quantity}</span>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-normal text-xs px-2">
+                          Qty: {item.quantity}
+                        </Badge>
                       </div>
                     </div>
                   </div>
                 ))}
               </CardContent>
             </Card>
-
           </div>
 
-          {/* RIGHT COLUMN - Sidebar Info */}
+          {/* RIGHT COLUMN - Summary & Address */}
           <div className="space-y-6">
-            
+
             {/* Payment Summary */}
-            <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
-                <CardTitle className="text-base font-semibold text-slate-800">Payment Summary</CardTitle>
+            <Card className="border-slate-200 shadow-sm sticky top-6">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-5">
+                <CardTitle className="text-sm font-semibold text-slate-900">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="p-5 space-y-3">
-                <div className="flex justify-between text-slate-600">
-                  <span>Item Total</span>
-                  <span>₹{order.total_amount?.toLocaleString()}</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span>₹{order.total_amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-green-600">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-green-600">
-                  <span>Shipping</span>
-                  <span>Free</span>
+
+                <Separator />
+
+                <div className="flex justify-between items-end">
+                  <span className="font-bold text-base text-slate-900">Total</span>
+                  <span className="font-bold text-lg text-slate-900">₹{order.total_amount.toLocaleString()}</span>
                 </div>
-                <Separator className="my-2" />
-                <div className="flex justify-between font-bold text-lg text-slate-900">
-                  <span>Grand Total</span>
-                  <span>₹{order.total_amount?.toLocaleString()}</span>
-                </div>
-                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-sm text-slate-500">
-                  <CreditCard className="h-4 w-4" />
-                  <span>Paid via Razorpay</span>
+
+                <div className="bg-slate-50 rounded p-2.5 flex items-center gap-2 border border-slate-100 mt-2">
+                  <CreditCard className="h-4 w-4 text-slate-400" />
+                  <div>
+                    <p className="text-xs font-medium text-slate-900">Payment ID</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{order.razorpay_payment_id || 'N/A'}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Delivery Address */}
             <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
-                <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-5">
+                <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-slate-500" />
-                  Delivery Address
+                  Delivery Details
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5">
-                <p className="font-semibold text-slate-900 mb-1">{order.customer_name}</p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                  {order.customer_address}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
-                  <Phone className="h-3.5 w-3.5" />
-                  <span className="font-medium">{order.customer_phone}</span>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mb-1">Deliver To</p>
+                    <p className="font-medium text-slate-900 text-sm">{order.customer_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mb-1">Address</p>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      {order.customer_address}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mb-1">Contact</p>
+                    <div className="flex items-center gap-2 text-slate-700 font-medium text-sm">
+                      <Phone className="h-3.5 w-3.5 text-slate-400" />
+                      {order.customer_phone}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Help Section */}
-            <div className="bg-slate-100 rounded-lg p-4 text-center">
-              <p className="text-sm text-slate-500 mb-2">Need help with this order?</p>
-              <Button variant="outline" className="w-full bg-white hover:bg-slate-50 text-slate-700">
-                Contact Support
+            {/* Support Link */}
+            <div className="text-center">
+              <Button variant="link" className="text-slate-500 text-xs hover:text-slate-800">
+                Need help with this order? Contact Support
               </Button>
             </div>
 

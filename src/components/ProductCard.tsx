@@ -21,6 +21,7 @@ export interface Product {
   dimensions?: string; // Added for home decor products
   material?: string; // Added for home decor products
   quantity: number;
+  specifications?: Record<string, string>; // Added for dynamic product details
 }
 
 interface ProductCardProps {

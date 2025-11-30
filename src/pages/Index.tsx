@@ -18,7 +18,6 @@ import { MobileNavbar } from "../components/ui/MobileNavbar";
 import { useInventory } from "@/contexts/InventoryContext";
 // import { sampleProducts as defaultSampleProducts } from "@/data/products";
 import { CategoryCard } from "@/components/ui/categoryCard";
-import { VideoPopup } from "@/components/VideoPopup";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
@@ -116,21 +115,6 @@ const Index = () => {
   } = useWishlist() || {};
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   
-  // Video Popup state
-  const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
-
-  useEffect(() => {
-    // Check if the popup has been shown in this session
-    const hasSeenPopup = sessionStorage.getItem("hasSeenVideoPopup");
-    if (!hasSeenPopup) {
-      // Small delay to ensure smooth loading
-      const timer = setTimeout(() => {
-        setIsVideoPopupOpen(true);
-        sessionStorage.setItem("hasSeenVideoPopup", "true");
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
   // If categories is array of objects with 'category' field, else fallback to []
   const mainCategories = useMemo(
     () =>
@@ -661,12 +645,6 @@ const Index = () => {
         isOpen={isWhatsAppOpen}
         onClose={() => setIsWhatsAppOpen(false)}
         onOpen={() => setIsWhatsAppOpen(true)}
-      />
-
-      {/* Video Popup */}
-      <VideoPopup
-        isOpen={isVideoPopupOpen}
-        onClose={() => setIsVideoPopupOpen(false)}
       />
     </div>
   );

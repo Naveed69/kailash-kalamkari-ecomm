@@ -48,6 +48,7 @@ const sanitizePayload = (payload: Partial<Product>) => {
   const keyMap: Record<string, string> = {
     originalPrice: "original_price",
     inStock: "in_stock",
+    isVisible: "is_visible",
     // products belong to a subcategory (by id) and subcategories belong to categories
     subCategory: "sub_category_id",
     category: "category_id",
@@ -905,6 +906,61 @@ export const getOrderById = async (
     return { data, error: null };
   } catch (error) {
     console.error("Exception in getOrderById:", error);
+    return { data: null, error };
+  }
+};
+
+export const updateOrderStatus = async (
+  orderId: number | string,
+  status: string
+): Promise<{ data: any | null; error: any }> => {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status })
+      .eq("id", orderId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating order status:", error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("Exception in updateOrderStatus:", error);
+    return { data: null, error };
+  }
+};
+
+export const cancelOrder = async (
+  orderId: number | string,
+  reason: string
+): Promise<{ data: any | null; error: any }> => {
+  try {
+    // Try to update with cancellation_reason if column exists, otherwise just status
+    // We'll assume the column might not exist and just update status for now to be safe,
+    // or we can try to update it.
+    // Let's just update status for now as per schema knowledge limitations.
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ 
+        status: "cancelled",
+        // cancellation_reason: reason // Uncomment if column exists
+      })
+      .eq("id", orderId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error cancelling order:", error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("Exception in cancelOrder:", error);
     return { data: null, error };
   }
 };

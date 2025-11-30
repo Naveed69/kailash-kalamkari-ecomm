@@ -1,10 +1,9 @@
 import React from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Package, Phone, Mail, LogOut, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Loader2, Package, ChevronRight, ShoppingBag, LogOut } from 'lucide-react';
 
 const MyOrdersPage: React.FC = () => {
   const { user, signOut, loading } = useAuth();
@@ -53,98 +52,91 @@ const MyOrdersPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 font-sans">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-slate-50/50 py-8 font-sans">
+      <div className="container mx-auto px-4 max-w-3xl">
         
-        {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center text-2xl">
-              👋
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800">My Account</h1>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 mt-1">
-                <span className="flex items-center gap-1">
-                  <Phone className="h-3 w-3" /> {user.phone}
-                </span>
-                {user.email && (
-                  <span className="flex items-center gap-1">
-                    <Mail className="h-3 w-3" /> {user.email}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="text-slate-600 hover:text-red-600 hover:bg-red-50 border-slate-200">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <ShoppingBag className="h-6 w-6 text-slate-700" />
+            My Orders
+          </h1>
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-500 hover:text-red-600 hover:bg-red-50">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
         </div>
 
-        {/* Orders Section */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5 text-slate-500" />
-            Order History
-          </h2>
-
+        {/* Orders List */}
+        <div className="space-y-4">
           {loadingOrders ? (
-            <div className="flex flex-col items-center justify-center py-12 bg-white rounded-xl border border-slate-200">
+            <div className="flex flex-col items-center justify-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
               <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-              <p className="text-slate-500">Loading your orders...</p>
+              <p className="text-slate-500 text-sm">Loading your orders...</p>
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border border-slate-200 shadow-sm">
-              <div className="bg-slate-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="h-10 w-10 text-slate-300" />
+              <div className="bg-slate-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="h-8 w-8 text-slate-300" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">No orders yet</h3>
-              <p className="text-slate-500 mb-6 max-w-xs mx-auto">Looks like you haven't placed any orders yet. Start shopping to see them here!</p>
-              <Button onClick={() => navigate('/')} size="lg" className="bg-primary hover:bg-primary/90">
+              <h3 className="text-base font-semibold text-slate-800 mb-1">No orders yet</h3>
+              <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">Start shopping to see your orders here!</p>
+              <Button onClick={() => navigate('/')} className="bg-slate-900 hover:bg-slate-800 text-white">
                 Start Shopping
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid gap-4">
               {orders.map((order) => (
                 <div
                   key={order.id}
                   onClick={() => navigate(`/order/${order.id}`)}
-                  className="group bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+                  className="group bg-white rounded-lg border border-slate-200 p-4 hover:shadow-md transition-all cursor-pointer flex flex-col sm:flex-row gap-4 items-start sm:items-center"
                 >
-                  {/* Hover Accent Line */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                    
-                    {/* Left: Order Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-bold text-lg text-slate-800">Order #{order.id}</span>
-                        <Badge className={`text-xs px-2 py-0.5 capitalize shadow-none ${
-                          order.status === 'delivered' ? 'bg-green-100 text-green-700 hover:bg-green-100' :
-                          order.status === 'shipped' ? 'bg-blue-100 text-blue-700 hover:bg-blue-100' :
-                          order.status === 'packed' ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-100' :
-                          'bg-amber-100 text-amber-700 hover:bg-amber-100'
-                        }`}>
-                          {order.status.replace('_', ' ')}
-                        </Badge>
+                  {/* Image Thumbnail (First Item) */}
+                  <div className="h-16 w-16 bg-slate-100 rounded-md overflow-hidden flex-shrink-0 border border-slate-100">
+                    {order.items && order.items.length > 0 ? (
+                      <img 
+                        src={order.items[0].image} 
+                        alt="Order Item" 
+                        className="h-full w-full object-cover"
+                        onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center">
+                        <Package className="h-6 w-6 text-slate-300" />
                       </div>
-                      <p className="text-sm text-slate-500">
-                        Placed on {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </p>
-                      
-                      {/* Item Preview Text */}
-                      <p className="text-sm text-slate-600 mt-3 line-clamp-1">
-                        {order.items?.length} item{order.items?.length !== 1 ? 's' : ''} • Total: <span className="font-semibold text-slate-900">₹{order.total_amount.toLocaleString()}</span>
-                      </p>
-                    </div>
+                    )}
+                  </div>
 
-                    {/* Right: Action Arrow */}
-                    <div className="flex items-center text-primary font-medium text-sm group-hover:translate-x-1 transition-transform">
-                      View Details <ChevronRight className="h-4 w-4 ml-1" />
+                  {/* Order Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-slate-900 text-sm">Order #{order.id}</span>
+                      <Badge className={`text-[10px] px-1.5 py-0 capitalize shadow-none font-normal border ${
+                        order.status === 'paid' ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100' :
+                        order.status === 'in_packing' ? 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100' :
+                        order.status === 'packed' ? 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100' :
+                        order.status === 'shipped' ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100' :
+                        order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100' :
+                        order.status === 'cancelled' ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100' :
+                        'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
+                      }`}>
+                        {order.status === 'in_packing' ? 'Processing' : order.status.replace(/_/g, ' ')}
+                      </Badge>
                     </div>
+                    <p className="text-xs text-slate-500 mb-1">
+                      {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+
+                  {/* Price & Action */}
+                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 mt-2 sm:mt-0">
+                    <span className="font-bold text-slate-900 text-sm">₹{order.total_amount.toLocaleString()}</span>
+                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
                   </div>
                 </div>
               ))}

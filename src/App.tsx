@@ -94,7 +94,7 @@ const App = () => {
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <BrowserRouter>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <AppContent />
               </BrowserRouter>
             </WishlistProvider>

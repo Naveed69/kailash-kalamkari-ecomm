@@ -20,17 +20,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { RefreshCw, MapPin, Phone, User, Package, Filter, Search, Truck, CheckCircle2, Clock, PackageCheck, MoreHorizontal, ArrowRight } from "lucide-react";
+import { 
+  RefreshCw, 
+  MapPin, 
+  Phone, 
+  User, 
+  Package, 
+  Filter, 
+  Search, 
+  Truck, 
+  CheckCircle2, 
+  Clock, 
+  PackageCheck, 
+  MoreHorizontal, 
+  ArrowRight,
+  AlertCircle,
+  XCircle,
+  Bike,
+  Eye,
+  X
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import PackingMode from "@/Inventory/components/PackingMode";
 
-import { shipOrder, getOrderStatistics, deliverOrder } from "@/lib/adminApi";
+import { shipOrder, getOrderStatistics, deliverOrder, updateOrderStatus, cancelOrder } from "@/lib/adminApi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
 
 interface OrderItem {
   id: string;
@@ -84,24 +103,39 @@ const Orders = () => {
   const [trackingId, setTrackingId] = useState("");
   const [isShipping, setIsShipping] = useState(false);
   
+  // Cancel dialog state
+  const [cancelOrderData, setCancelOrderData] = useState<Order | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [isCancelling, setIsCancelling] = useState(false);
+
   // Statistics
   const [stats, setStats] = useState<any>(null);
 
   const handleShipOrder = async () => {
-    if (!shippingOrder || !trackingId) {
+    if (!shippingOrder) return;
+
+    // Validation for non-manual shipping
+    if (shippingCompany !== "Manual" && shippingCompany !== "InStore" && !trackingId) {
       toast({
-        title: "Error",
-        description: "Please enter a tracking ID",
+        title: "Tracking ID Required",
+        description: "Please enter a tracking ID for courier shipments.",
         variant: "destructive",
       });
       return;
     }
 
     setIsShipping(true);
+    
+    // For manual/instore, we might not have a tracking ID, so we use a placeholder or empty
+    const finalTrackingId = (shippingCompany === "Manual" || shippingCompany === "InStore") 
+      ? (trackingId || "MANUAL_DELIVERY") 
+      : trackingId;
+
     const { data, error } = await shipOrder(shippingOrder.id, {
       shipping_company: shippingCompany,
-      tracking_id: trackingId
+      tracking_id: finalTrackingId
     });
+    
     setIsShipping(false);
 
     if (error) {
@@ -113,11 +147,62 @@ const Orders = () => {
     } else {
       toast({
         title: "Order Shipped!",
-        description: `Order #${shippingOrder.id} marked as shipped`,
+        description: `Order #${shippingOrder.id} marked as shipped via ${shippingCompany}`,
         className: "bg-green-50 border-green-200",
       });
       setShippingOrder(null);
       setTrackingId("");
+      setShippingCompany("DTDC");
+      fetchOrders();
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderData || !cancelReason.trim()) {
+      toast({
+        title: "Reason Required",
+        description: "Please enter a reason for cancellation.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCancelling(true);
+    const { error } = await cancelOrder(cancelOrderData.id, cancelReason);
+    setIsCancelling(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel order",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Order Cancelled",
+        description: `Order #${cancelOrderData.id} has been cancelled.`,
+        className: "bg-red-50 border-red-200",
+      });
+      setCancelOrderData(null);
+      setCancelReason("");
+      fetchOrders();
+    }
+  };
+
+  const handleStatusUpdate = async (orderId: number, newStatus: string) => {
+    const { error } = await updateOrderStatus(orderId, newStatus);
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Status Updated",
+        description: `Order #${orderId} moved to ${newStatus.replace('_', ' ')}`,
+        className: "bg-blue-50 border-blue-200",
+      });
       fetchOrders();
     }
   };
@@ -159,13 +244,13 @@ const Orders = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
-      case "paid": return "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100";
-      case "in_packing": return "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100";
-      case "packed": return "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100";
-      case "shipped": return "bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100";
-      case "delivered": return "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100";
-      case "cancelled": return "bg-red-50 text-red-700 border-red-200 hover:bg-red-100";
+      case "pending": return "bg-slate-100 text-slate-700 border-slate-200";
+      case "paid": return "bg-blue-100 text-blue-800 border-blue-200";
+      case "in_packing": return "bg-orange-100 text-orange-800 border-orange-200";
+      case "packed": return "bg-purple-100 text-purple-800 border-purple-200";
+      case "shipped": return "bg-green-100 text-green-800 border-green-200";
+      case "delivered": return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "cancelled": return "bg-red-100 text-red-800 border-red-200";
       default: return "bg-slate-100 text-slate-700 border-slate-200";
     }
   };
@@ -178,7 +263,16 @@ const Orders = () => {
       case "packed": return <PackageCheck className="h-3.5 w-3.5" />;
       case "shipped": return <Truck className="h-3.5 w-3.5" />;
       case "delivered": return <CheckCircle2 className="h-3.5 w-3.5" />;
+      case "cancelled": return <XCircle className="h-3.5 w-3.5" />;
       default: return <Package className="h-3.5 w-3.5" />;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "in_packing": return "Processing";
+      case "paid": return "Order Placed";
+      default: return status.replace('_', ' ');
     }
   };
 
@@ -273,13 +367,13 @@ const Orders = () => {
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full md:w-auto">
           <TabsList className="bg-white border border-slate-200 p-1 h-auto rounded-xl shadow-sm">
-            {["all", "paid", "in_packing", "packed", "shipped", "delivered", "cancelled"].map((tab) => (
+            {["all", "paid", "in_packing", "packed", "shipped", "cancelled"].map((tab) => (
               <TabsTrigger 
                 key={tab} 
                 value={tab}
                 className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white px-4 py-2 capitalize transition-all"
               >
-                {tab.replace('_', ' ')}
+                {tab === 'in_packing' ? 'Processing' : tab === 'paid' ? 'New' : tab.replace('_', ' ')}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -341,7 +435,7 @@ const Orders = () => {
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2 overflow-hidden">
                         {order.items.slice(0, 3).map((item, i) => (
-                          <div key={i} className="h-8 w-8 rounded-full ring-2 ring-white bg-slate-100 overflow-hidden">
+                          <div key={i} className="h-8 w-8 rounded-full ring-2 ring-white bg-slate-100 overflow-hidden border border-slate-200">
                             <img 
                               className="h-full w-full object-cover"
                               src={item.image || "/placeholder.svg"}
@@ -357,69 +451,117 @@ const Orders = () => {
                   </TableCell>
                   <TableCell className="font-bold text-slate-900 py-4">₹{order.total_amount.toLocaleString()}</TableCell>
                   <TableCell className="py-4">
-                    <Badge variant="outline" className={`${getStatusColor(order.status)} border-0 px-3 py-1 flex items-center gap-1.5 w-fit rounded-full font-medium`}>
+                    <Badge variant="outline" className={`${getStatusColor(order.status)} border-0 px-3 py-1 flex items-center gap-1.5 w-fit rounded-full font-medium shadow-sm`}>
                       {getStatusIcon(order.status)}
-                      <span className="capitalize">{order.status.replace('_', ' ')}</span>
+                      <span className="capitalize">{getStatusLabel(order.status)}</span>
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right pr-6 py-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-200 rounded-full">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4 text-slate-500" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[180px] p-1">
-                        <DropdownMenuItem onClick={() => setSelectedOrder(order)} className="rounded-md cursor-pointer">
-                          <ArrowRight className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        
-                        {(order.status === 'paid' || order.status === 'in_packing') && (
-                          <DropdownMenuItem onClick={() => setPackingOrder(order)} className="text-amber-700 focus:text-amber-800 focus:bg-amber-50 rounded-md cursor-pointer mt-1">
-                            <Package className="mr-2 h-4 w-4" />
-                            Pack Order
-                          </DropdownMenuItem>
-                        )}
-                        
-                        {order.status === 'packed' && (
-                          <DropdownMenuItem onClick={() => setShippingOrder(order)} className="text-blue-700 focus:text-blue-800 focus:bg-blue-50 rounded-md cursor-pointer mt-1">
-                            <Truck className="mr-2 h-4 w-4" />
-                            Ship Order
-                          </DropdownMenuItem>
-                        )}
-
-                        {order.status === 'shipped' && (
-                          <DropdownMenuItem 
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              if (window.confirm(`Mark Order #${order.id} as Delivered?`)) {
-                                const { error } = await deliverOrder(order.id);
-                                if (!error) {
-                                  toast({
-                                    title: "Order Delivered",
-                                    description: `Order #${order.id} marked as delivered`,
-                                    className: "bg-green-50 border-green-200",
-                                  });
-                                  fetchOrders();
-                                } else {
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to update status",
-                                    variant: "destructive",
-                                  });
-                                }
-                              }
-                            }}
-                            className="text-emerald-700 focus:text-emerald-800 focus:bg-emerald-50 rounded-md cursor-pointer mt-1"
+                    {/* INLINE ACTIONS - VISIBLE ON HOVER */}
+                    <div 
+                      className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0"
+                      onClick={(e) => e.stopPropagation()} // Prevent row click
+                    >
+                      {/* ORDER PLACED (Paid) */}
+                      {order.status === 'paid' && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            className="h-8 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                            onClick={() => handleStatusUpdate(order.id, 'in_packing')}
                           >
-                            <CheckCircle2 className="mr-2 h-4 w-4" />
-                            Mark Delivered
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                            Mark Processing
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            onClick={() => setCancelOrderData(order)}
+                          >
+                            Cancel
+                          </Button>
+                        </>
+                      )}
+
+                      {/* PROCESSING (In Packing) */}
+                      {order.status === 'in_packing' && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            className="h-8 bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
+                            onClick={() => setPackingOrder(order)}
+                          >
+                            <Package className="mr-1.5 h-3.5 w-3.5" />
+                            Mark Packed
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            onClick={() => setCancelOrderData(order)}
+                          >
+                            Cancel
+                          </Button>
+                        </>
+                      )}
+
+                      {/* PACKED */}
+                      {order.status === 'packed' && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                            onClick={() => setShippingOrder(order)}
+                          >
+                            <Truck className="mr-1.5 h-3.5 w-3.5" />
+                            Mark Shipped
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            onClick={() => setCancelOrderData(order)}
+                          >
+                            Cancel
+                          </Button>
+                        </>
+                      )}
+
+                      {/* SHIPPED */}
+                      {order.status === 'shipped' && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-8 border-slate-200 text-slate-600 hover:bg-slate-50"
+                            onClick={() => setShippingOrder(order)}
+                          >
+                            Edit Tracking
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            className="h-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => setCancelOrderData(order)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+
+                      {/* DELIVERED / CANCELLED */}
+                      {(order.status === 'delivered' || order.status === 'cancelled') && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="h-8 border-slate-200 text-slate-600 hover:bg-slate-50"
+                          onClick={() => navigate(`/inventory/orders/${order.id}`)}
+                        >
+                          <Eye className="mr-1.5 h-3.5 w-3.5" />
+                          View Details
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -427,8 +569,6 @@ const Orders = () => {
           </TableBody>
         </Table>
       </div>
-
-
 
       {/* Shipping Dialog */}
       <Dialog open={!!shippingOrder} onOpenChange={(open) => !open && setShippingOrder(null)}>
@@ -439,14 +579,14 @@ const Orders = () => {
               Ship Order #{shippingOrder?.id}
             </DialogTitle>
             <DialogDescription>
-              Enter tracking details to mark this order as shipped.
+              Select a shipping provider and enter tracking details.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label>Shipping Company</Label>
+              <Label>Shipping Provider</Label>
               <Select value={shippingCompany} onValueChange={setShippingCompany}>
-                <SelectTrigger className="rounded-xl">
+                <SelectTrigger className="rounded-xl h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -454,28 +594,49 @@ const Orders = () => {
                   <SelectItem value="BlueDart">BlueDart</SelectItem>
                   <SelectItem value="Delhivery">Delhivery</SelectItem>
                   <SelectItem value="IndiaPost">India Post</SelectItem>
+                  <SelectItem value="Manual">Manual Delivery (Local)</SelectItem>
+                  <SelectItem value="InStore">In-Store Pickup</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Tracking ID / AWB</Label>
-              <Input 
-                value={trackingId} 
-                onChange={(e) => setTrackingId(e.target.value)}
-                placeholder="e.g. D123456789"
-                className="font-mono uppercase rounded-xl"
-              />
-              {trackingId && (
-                <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg flex items-center gap-2 border border-blue-100">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Preview: https://www.dtdc.in/tracking.asp?id={trackingId}
+
+            {shippingCompany !== "Manual" && shippingCompany !== "InStore" ? (
+              <div className="space-y-2">
+                <Label>Tracking ID / AWB</Label>
+                <Input 
+                  value={trackingId} 
+                  onChange={(e) => setTrackingId(e.target.value)}
+                  placeholder="e.g. D123456789"
+                  className="font-mono uppercase rounded-xl h-11"
+                />
+                {trackingId && (
+                  <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg flex items-center gap-2 border border-blue-100">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Preview: https://www.dtdc.in/tracking.asp?id={trackingId}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 flex gap-3">
+                <Bike className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-amber-900 text-sm">
+                    {shippingCompany === "Manual" ? "Local Delivery Mode" : "Store Pickup Mode"}
+                  </h4>
+                  <p className="text-xs text-amber-700 mt-1">
+                    No tracking ID required. The customer will be notified that their order is {shippingCompany === "Manual" ? "out for delivery" : "ready for pickup"}.
+                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShippingOrder(null)} className="rounded-lg">Cancel</Button>
-            <Button onClick={handleShipOrder} disabled={isShipping || !trackingId} className="bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-200">
+            <Button variant="outline" onClick={() => setShippingOrder(null)} className="rounded-lg h-11">Cancel</Button>
+            <Button 
+              onClick={handleShipOrder} 
+              disabled={isShipping || (shippingCompany !== "Manual" && shippingCompany !== "InStore" && !trackingId)} 
+              className="bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-200 h-11 px-6"
+            >
               {isShipping ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -486,6 +647,52 @@ const Orders = () => {
                   <CheckCircle2 className="mr-2 h-4 w-4" />
                   Confirm Shipment
                 </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Order Dialog */}
+      <Dialog open={!!cancelOrderData} onOpenChange={(open) => !open && setCancelOrderData(null)}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl text-red-600">
+              <AlertCircle className="h-5 w-5" />
+              Cancel Order #{cancelOrderData?.id}
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cancel-reason">Reason for Cancellation <span className="text-red-500">*</span></Label>
+              <Textarea 
+                id="cancel-reason"
+                value={cancelReason} 
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="e.g. Customer requested cancellation, Out of stock..."
+                className="rounded-xl resize-none"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelOrderData(null)} className="rounded-lg h-11">Keep Order</Button>
+            <Button 
+              onClick={handleCancelOrder} 
+              disabled={isCancelling || !cancelReason.trim()} 
+              variant="destructive"
+              className="rounded-lg shadow-md shadow-red-200 h-11 px-6"
+            >
+              {isCancelling ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                "Confirm Cancellation"
               )}
             </Button>
           </DialogFooter>

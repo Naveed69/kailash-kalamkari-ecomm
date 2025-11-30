@@ -52,6 +52,7 @@ const AddProduct = () => {
     colors: "",
     quantity: "1",
     inStock: true,
+    isVisible: true,
   });
 
   // UI state
@@ -81,6 +82,21 @@ const AddProduct = () => {
     "#FFA500", "#FFC0CB", "#A52A2A", "#DDA0DD", "#F0E68C", "#E6E6FA",
     "#000000", "#FFFFFF", "#808080", "#C0C0C0", "#D2691E", "#F5F5DC"
   ];
+
+  // Specifications state
+  const [specifications, setSpecifications] = useState<{ key: string; value: string }[]>([]);
+  const [newSpec, setNewSpec] = useState({ key: "", value: "" });
+
+  const addSpec = () => {
+    if (newSpec.key.trim() && newSpec.value.trim()) {
+      setSpecifications([...specifications, { key: newSpec.key.trim(), value: newSpec.value.trim() }]);
+      setNewSpec({ key: "", value: "" });
+    }
+  };
+
+  const removeSpec = (index: number) => {
+    setSpecifications(specifications.filter((_, i) => i !== index));
+  };
 
   // Fetch categories on mount
   useEffect(() => {
@@ -167,6 +183,25 @@ const AddProduct = () => {
       
       console.log("🎨 Setting colors:", colorsToSet);
       setSelectedColors(colorsToSet);
+
+      // Handle specifications
+      if (editingProduct.specifications) {
+        try {
+          const specs = typeof editingProduct.specifications === 'string' 
+            ? JSON.parse(editingProduct.specifications) 
+            : editingProduct.specifications;
+            
+          if (specs && typeof specs === 'object') {
+            const specsArray = Object.entries(specs).map(([key, value]) => ({
+              key,
+              value: String(value)
+            }));
+            setSpecifications(specsArray);
+          }
+        } catch (e) {
+          console.error("Error parsing specifications:", e);
+        }
+      }
 
       // Set barcode if editing
       if (editingProduct.barcode) {
@@ -481,6 +516,14 @@ const validateForm = () => {
       }
     }
 
+    // Convert specifications array to object
+    const specsObject = specifications.reduce((acc, curr) => {
+      if (curr.key.trim()) {
+        acc[curr.key.trim()] = curr.value.trim();
+      }
+      return acc;
+    }, {} as Record<string, string>);
+
     // Prepare product data
     const productData: any = {
       name: formData.name.trim(),
@@ -490,8 +533,10 @@ const validateForm = () => {
       category: parseInt(formData.category),
       subCategory: formData.subCategory ? parseInt(formData.subCategory) : null,
       colors: selectedColors, // Use the selectedColors array
+      specifications: specsObject, // Add specifications
       quantity: parseInt(formData.quantity),
       inStock: formData.inStock,
+      isVisible: formData.isVisible,
       image: imageUrls[0] || null, // Main image (first one)
       images: imageUrls, // All images
       barcode: barcode, // Add barcode to product data
@@ -887,6 +932,73 @@ const validateForm = () => {
                     <p className="text-xs text-gray-500 mt-1.5 text-center">Pick</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Specifications */}
+            <div className="space-y-4">
+              <Label className="text-slate-700 font-medium">Product Specifications (Optional)</Label>
+              <p className="text-sm text-muted-foreground">Add details like Material, Origin, Craft, Dimensions, etc.</p>
+              
+              {/* Existing Specs */}
+              {specifications.length > 0 && (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {specifications.map((spec, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">{spec.key}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate">{spec.value}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeSpec(index)}
+                        className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add New Spec */}
+              <div className="flex gap-3 items-end">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="spec-key" className="text-xs">Label (e.g. Material)</Label>
+                  <Input
+                    id="spec-key"
+                    placeholder="Material"
+                    value={newSpec.key}
+                    onChange={(e) => setNewSpec({ ...newSpec, key: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="spec-value" className="text-xs">Value (e.g. Cotton Silk)</Label>
+                  <Input
+                    id="spec-value"
+                    placeholder="Cotton Silk"
+                    value={newSpec.value}
+                    onChange={(e) => setNewSpec({ ...newSpec, value: e.target.value })}
+                    className="h-10"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addSpec();
+                      }
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={addSpec}
+                  disabled={!newSpec.key.trim() || !newSpec.value.trim()}
+                  className="h-10 bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  Add
+                </Button>
               </div>
             </div>
 

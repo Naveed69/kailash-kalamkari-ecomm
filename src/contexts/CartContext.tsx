@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Product } from '@/components/ProductCard';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/lib/AuthContext';
 
 interface CartItem extends Product {
   quantity: number;
@@ -38,7 +39,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       if (existingItem) {
         const updatedItems = state.items.map(item =>
           item.id === action.payload.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { 
+                ...item, 
+                quantity: item.quantity + 1,
+                // Update color if a new one is provided
+                ...(action.payload as any).selectedColor && { selectedColor: (action.payload as any).selectedColor }
+              }
             : item
         );
         
@@ -127,13 +133,45 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [cart]);
   
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const addToCart = (product: Product) => {
     dispatch({ type: 'ADD_ITEM', payload: product });
-    toast({
-      title: 'Added to cart',
-      description: `${product.name} has been added to your cart.`,
-    });
+    
+    // Smart login prompts based on user state
+    if (!user) {
+      const newItemCount = cart.items.length + 1;
+      
+      // First time adding to cart - gentle suggestion
+      if (newItemCount === 1) {
+        toast({
+          title: 'Added to cart',
+          description: `${product.name} has been added. Sign in to save your cart across devices.`,
+          duration: 4000,
+        });
+      }
+      // After 3 items - stronger suggestion
+      else if (newItemCount === 3) {
+        toast({
+          title: '✨ Save your cart!',
+          description: `You have ${newItemCount} items. Sign in to save them across devices!`,
+          duration: 6000,
+        });
+      }
+      // Regular add notification
+      else {
+        toast({
+          title: 'Added to cart',
+          description: `${product.name} has been added to your cart.`,
+        });
+      }
+    } else {
+      // User is logged in - normal toast
+      toast({
+        title: '✅ Added to cart',
+        description: `${product.name} has been added to your cart.`,
+      });
+    }
   };
 
   const removeFromCart = (productId: string) => {

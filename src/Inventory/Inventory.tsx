@@ -13,7 +13,6 @@ import Orders from "./pages/Orders";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import AddProduct from "./components/AddProduct";
 import "./Inventory.css";
-import InventoryHome from "./pages/inventory_Home";
 import { Toaster } from "@/components/ui/toaster";
 import Categories from "./pages/Categories";
 
@@ -23,7 +22,7 @@ function Inventory() {
       <Sidebar />
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<InventoryHome />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetails />} />
