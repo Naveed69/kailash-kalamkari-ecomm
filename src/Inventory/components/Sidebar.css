@@ -1,10 +1,10 @@
 .sidebar {
-  width: 250px;
-  background-color: #f8f9fa;
-  color: #333;
+  width: 280px;
+  background: #ffffff;
+  color: #1e293b;
   height: 100vh;
-  padding: 20px;
-  border-right: 1px solid #dee2e6;
+  padding: 0;
+  border-right: 1px solid #e2e8f0;
   position: fixed;
   top: 0;
   left: 0;
@@ -12,55 +12,153 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
 }
 
-.logout {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar-header {
-  margin-bottom: 30px;
-  text-align: left;
+  padding: 24px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfc;
 }
 
-.sidebar-header h2 {
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  box-shadow: 0 2px 8px rgba(30, 41, 59, 0.15);
+}
+
+.brand-name {
   margin: 0;
-  font-size: 20px;
-  color: #333;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  margin: 3px 0 0 0;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+  padding: 16px 12px;
 }
 
 .sidebar-nav ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .sidebar-nav a {
   display: flex;
   align-items: center;
-  color: #555;
+  color: #64748b;
   text-decoration: none;
-  padding: 12px 15px;
+  padding: 11px 14px;
   border-radius: 8px;
-  margin-bottom: 10px;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+  position: relative;
 }
 
 .sidebar-nav a:hover {
-  background-color: #e9ecef;
+  background: #f8fafc;
+  color: #334155;
 }
 
 .sidebar-nav a.active {
-  background-color: #e6f2ff;
-  color: #d49217;
-  font-weight: bold;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
 }
 
-.sidebar-nav a span {
-  margin-left: 10px;
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 11px;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid #f1f5f9;
+  background: #fafbfc;
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.logout-icon {
+  width: 17px;
+  height: 17px;
+}
+
+/* Scrollbar Styling */
+.sidebar-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
 }

@@ -1,127 +1,120 @@
-import { fashionProducts } from "@/data/products";
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import type { Category, SubCategory, Product } from "@/contexts/inventoryTypes";
+import { 
+  getCategories, 
+  getSubCategories, 
+  getProducts, 
+  createProduct as apiCreateProduct,
+  updateProduct as apiUpdateProduct,
+  deleteProduct as apiDeleteProduct 
+} from "@/lib/adminApi";
 
-// Updated Context Type with loading states
+// Updated Context Type
 interface InventoryContextType {
   categories: Category[];
+  products: Product[]; // Added flat products list
   loading: boolean;
   error: string | null;
-  // Operations with server sync
-  fetchCategories: () => Promise<void>;
-  updateProduct: (productId: string, updatedProduct: Product) => Promise<void>;
+  // Operations
+  fetchData: () => Promise<void>;
+  updateProduct: (productId: string, updatedProduct: Partial<Product>) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
-  addProduct: (
-    categoryId: string,
-    subCategoryId: string,
-    product: Product
-  ) => Promise<void>;
+  addProduct: (product: any) => Promise<void>;
 }
 
-const InventoryContext = createContext<InventoryContextType | undefined>(
-  undefined
-);
+const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
-// API Service Functions (Replace with your actual API calls)
-const inventoryAPI = {
-  fetchCategories: async (): Promise<Category[]> => {
-    return fashionProducts as Category[];
-    // const response = await fetch("/api/categories");
-    // if (!response.ok) throw new Error("Failed to fetch categories");
-    // return response.json();
-  },
-
-  updateProduct: async (
-    productId: string,
-    productData: Partial<Product>
-  ): Promise<Product> => {
-    const response = await fetch(`/api/products/${productId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
-    });
-    if (!response.ok) throw new Error("Failed to update product");
-    return response.json();
-  },
-
-  deleteProduct: async (productId: string): Promise<void> => {
-    const response = await fetch(`/api/products/${productId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Failed to delete product");
-  },
-
-  addProduct: async (
-    productData: Omit<Product, "id"> & {
-      categoryId: string;
-      subCategoryId: string;
-    }
-  ): Promise<Product> => {
-    const response = await fetch("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
-    });
-    if (!response.ok) throw new Error("Failed to add product");
-    return response.json();
-  },
-};
-
-export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all categories from server
-  const fetchCategories = async () => {
+  // Fetch all data from server
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await inventoryAPI.fetchCategories();
-      setCategories(data);
+      const [catsResult, subCatsResult, prodsResult] = await Promise.all([
+        getCategories(),
+        getSubCategories(),
+        getProducts()
+      ]);
+
+      if (catsResult.error) throw new Error(catsResult.error.message);
+      if (subCatsResult.error) throw new Error(subCatsResult.error.message);
+      if (prodsResult.error) throw new Error(prodsResult.error.message);
+
+      const rawCats = catsResult.data || [];
+      const rawSubCats = subCatsResult.data || [];
+      const rawProds = (prodsResult.data || []) as any[];
+
+      // Transform products to match Product interface
+      const transformedProds: Product[] = rawProds.map((p: any) => ({
+        id: String(p.id),
+        name: p.name || '',
+        price: typeof p.price === 'string' ? parseFloat(p.price) : (p.price || 0),
+        originalPrice: p.original_price ? (typeof p.original_price === 'string' ? parseFloat(p.original_price) : p.original_price) : undefined,
+        image: p.image || '',
+        category: p.category_id ? String(p.category_id) : undefined,
+        subCategory: p.sub_category_id ? String(p.sub_category_id) : undefined,
+        description: p.description || '',
+        colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? (p.colors.startsWith('[') ? JSON.parse(p.colors) : [p.colors]) : []),
+        inStock: typeof p.in_stock === 'string' ? (p.in_stock === 'true' || p.in_stock === '1') : Boolean(p.in_stock),
+        rating: p.rating,
+        dimensions: p.dimensions,
+        material: p.material,
+        quantity: p.stock_quantity || p.quantity || 0,
+        barcode: p.barcode
+      }));
+
+      setProducts(transformedProds);
+
+      // Build nested structure for backward compatibility / specific UI needs
+      const nestedCategories: Category[] = rawCats.map((cat: any) => {
+        const catSubCats = rawSubCats.filter((sc: any) => sc.category_id === cat.id);
+        
+        const mappedSubCats: SubCategory[] = catSubCats.map((sc: any) => {
+          // Products in this subcategory
+          const scProds = transformedProds.filter((p: any) => p.subCategory === String(sc.id));
+          
+          return {
+            id: sc.id.toString(),
+            name: sc.name, // adminApi maps subCatName to name
+            subCategoriesImage: "", // Placeholder if needed
+            products: scProds
+          };
+        });
+
+        return {
+          id: cat.id.toString(),
+          name: cat.name,
+          category: cat.name, // Redundant but matches type
+          image: "", // Placeholder
+          subCategories: mappedSubCats
+        };
+      });
+
+      setCategories(nestedCategories);
+
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch categories"
-      );
+      console.error("Error fetching inventory:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch inventory");
     } finally {
       setLoading(false);
     }
   };
 
-  // Update product - optimistic update with rollback
-  const updateProduct = async (productId: string, updatedProduct: Product) => {
+  // Update product
+  const updateProduct = async (productId: string, updatedProduct: Partial<Product>) => {
     setLoading(true);
-    setError(null);
-
-    // Optimistic update
-    const previousCategories = [...categories];
     try {
-      setCategories((prev) =>
-        prev.map((category) => ({
-          ...category,
-          subCategories: category.subCategories.map((subCategory) => ({
-            ...subCategory,
-            products: subCategory.products.map((product) =>
-              product.id === productId
-                ? { ...product, ...updatedProduct }
-                : product
-            ),
-          })),
-        }))
-      );
-
-      // Server update
-      await inventoryAPI.updateProduct(productId, updatedProduct);
-
-      // Refetch to ensure sync
-      await fetchCategories();
+      const { error } = await apiUpdateProduct(productId, updatedProduct);
+      if (error) throw new Error(error.message);
+      await fetchData(); // Refresh data
     } catch (err) {
-      // Rollback on error
-      setCategories(previousCategories);
       setError(err instanceof Error ? err.message : "Failed to update product");
-      throw err; // Re-throw so component can handle
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -130,26 +123,11 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
   // Delete product
   const deleteProduct = async (productId: string) => {
     setLoading(true);
-    setError(null);
-
-    const previousCategories = [...categories];
     try {
-      setCategories((prev) =>
-        prev.map((category) => ({
-          ...category,
-          subCategories: category.subCategories.map((subCategory) => ({
-            ...subCategory,
-            products: subCategory.products.filter(
-              (product) => product.id !== productId
-            ),
-          })),
-        }))
-      );
-
-      await inventoryAPI.deleteProduct(productId);
-      await fetchCategories(); // Refetch to ensure sync
+      const { error } = await apiDeleteProduct(productId);
+      if (error) throw new Error(error.message);
+      await fetchData(); // Refresh data
     } catch (err) {
-      setCategories(previousCategories);
       setError(err instanceof Error ? err.message : "Failed to delete product");
       throw err;
     } finally {
@@ -158,39 +136,12 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // Add product
-  const addProduct = async (
-    categoryId: string,
-    subCategoryId: string,
-    product: Product
-  ) => {
+  const addProduct = async (productData: any) => {
     setLoading(true);
-    setError(null);
-
     try {
-      const newProduct = await inventoryAPI.addProduct({
-        ...product,
-        categoryId,
-        subCategoryId,
-      });
-
-      // Update local state with the product from server (includes generated ID)
-      setCategories((prev) =>
-        prev.map((category) =>
-          category.id === categoryId
-            ? {
-                ...category,
-                subCategories: category.subCategories.map((subCategory) =>
-                  subCategory.id === subCategoryId
-                    ? {
-                        ...subCategory,
-                        products: [...subCategory.products, newProduct],
-                      }
-                    : subCategory
-                ),
-              }
-            : category
-        )
-      );
+      const { error } = await apiCreateProduct(productData);
+      if (error) throw new Error(error.message);
+      await fetchData(); // Refresh data
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add product");
       throw err;
@@ -200,17 +151,21 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // Load initial data
-  React.useEffect(() => {
-    fetchCategories();
+  useEffect(() => {
+    fetchData().catch(err => {
+      console.error('Failed to load inventory:', err);
+      // Don't throw - just log the error to prevent white screen
+    });
   }, []);
 
   return (
     <InventoryContext.Provider
       value={{
         categories,
+        products,
         loading,
         error,
-        fetchCategories,
+        fetchData,
         updateProduct,
         deleteProduct,
         addProduct,

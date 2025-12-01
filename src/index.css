@@ -25,18 +25,18 @@ All colors MUST be HSL.
     --secondary: 25 30% 85%;
     --secondary-foreground: 25 15% 15%;
 
-    --muted: 25 20% 90%;
-    --muted-foreground: 25 15% 45%;
+    --muted: 25 20% 92%; /* Slightly lighter for better separation */
+    --muted-foreground: 25 10% 40%; /* Slightly darker/neutral for readability */
 
-    /* Accent gold */
-    --accent: 45 85% 65%;
+    /* Accent gold - Refined for better text contrast */
+    --accent: 45 85% 60%; 
     --accent-foreground: 25 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 35 25% 98%;
 
-    --border: 25 20% 85%;
-    --input: 25 20% 90%;
+    --border: 25 10% 88%; /* Cleaner, less saturated border */
+    --input: 25 10% 90%;
     --ring: 220 85% 25%;
 
     /* Traditional Indian gradient */
@@ -108,5 +108,19 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

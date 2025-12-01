@@ -16,9 +16,8 @@ import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
 
 import { useInventory } from "@/contexts/InventoryContext";
-import { sampleProducts as defaultSampleProducts } from "@/data/products";
+// import { sampleProducts as defaultSampleProducts } from "@/data/products";
 import { CategoryCard } from "@/components/ui/categoryCard";
-import { VideoPopup } from "@/components/VideoPopup";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
@@ -104,7 +103,7 @@ const carouselSlides = [
 ];
 
 const Index = () => {
-  const { categories = [] } = useInventory() || {};
+  const { categories = [], products = [] } = useInventory() || {};
   const { toast } = useToast();
   const navigate = useNavigate();
   const { cart = { totalItems: 0 }, addToCart, isInCart } = useCart() || {};
@@ -116,21 +115,6 @@ const Index = () => {
   } = useWishlist() || {};
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   
-  // Video Popup state
-  const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
-
-  useEffect(() => {
-    // Check if the popup has been shown in this session
-    const hasSeenPopup = sessionStorage.getItem("hasSeenVideoPopup");
-    if (!hasSeenPopup) {
-      // Small delay to ensure smooth loading
-      const timer = setTimeout(() => {
-        setIsVideoPopupOpen(true);
-        sessionStorage.setItem("hasSeenVideoPopup", "true");
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
   // If categories is array of objects with 'category' field, else fallback to []
   const mainCategories = useMemo(
     () =>
@@ -140,10 +124,8 @@ const Index = () => {
     [categories]
   );
 
-  // SAFE GUARD: if sampleProducts is missing, provide empty array
-  const sampleProducts = Array.isArray(defaultSampleProducts)
-    ? defaultSampleProducts
-    : [];
+  // Use dynamic products from inventory
+  const sampleProducts = Array.isArray(products) ? products : [];
 
   // Function to render product cards
   const renderProductCards = useCallback(
@@ -663,12 +645,6 @@ const Index = () => {
         isOpen={isWhatsAppOpen}
         onClose={() => setIsWhatsAppOpen(false)}
         onOpen={() => setIsWhatsAppOpen(true)}
-      />
-
-      {/* Video Popup */}
-      <VideoPopup
-        isOpen={isVideoPopupOpen}
-        onClose={() => setIsVideoPopupOpen(false)}
       />
     </div>
   );

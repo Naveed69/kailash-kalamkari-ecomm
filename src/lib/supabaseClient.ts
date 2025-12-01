@@ -10,4 +10,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 	);
 }
 
-export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
+// Create client with dummy values if env vars missing (prevents app crash)
+// API calls will fail gracefully with error messages instead of crashing
+export const supabase = createClient(
+	supabaseUrl || "https://placeholder.supabase.co", 
+	supabaseAnonKey || "placeholder-anon-key"
+);
