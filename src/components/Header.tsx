@@ -194,10 +194,7 @@ export const Header = ({
                         <span>Login / Signup</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate("/adminLogin")}>
-                         <User className="mr-2 h-4 w-4" />
-                         <span>Admin Access</span>
-                      </DropdownMenuItem>
+
                     </>
                   )}
                 </DropdownMenuContent>

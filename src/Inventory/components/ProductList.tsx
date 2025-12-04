@@ -40,10 +40,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/lib/supabaseClient";
 
+interface FilterState {
+  categories: string[];
+  priceRange: [number, number];
+  colors: string[];
+  inStock: boolean;
+  isVisible: boolean | null; // Added visibility filter
+}
+
 const ProductList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { products: contextProducts, deleteProduct } = useInventory();
+  const { products: contextProducts, deleteProduct, updateProduct, fetchData } = useInventory();
+  
+  // Log when products update
+  React.useEffect(() => {
+    console.log("🛒 ProductList received products update:", contextProducts.length);
+  }, [contextProducts]);
+
   
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -51,43 +65,99 @@ const ProductList = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [togglingVisibility, setTogglingVisibility] = useState<number | null>(null);
 
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>();
+    contextProducts.forEach(p => {
+      if (p.categoryName) cats.add(p.categoryName);
+    });
+    return Array.from(cats);
+  }, [contextProducts]);
+
+  const availableColors = useMemo(() => {
+    const cols = new Set<string>();
+    contextProducts.forEach(p => {
+      if (Array.isArray(p.colors)) {
+        p.colors.forEach(c => cols.add(c));
+      }
+    });
+    return Array.from(cols);
+  }, [contextProducts]);
+  const [showFilters, setShowFilters] = useState(false); // New state
+
+  const [filters, setFilters] = useState<FilterState>({ // New state
+    categories: [],
+    priceRange: [0, 1000000],
+    colors: [],
+    inStock: false,
+    isVisible: null, // Default to show all
+  });
+
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = contextProducts.filter((product) => {
       const searchLower = searchQuery.toLowerCase();
-      return (
+      // Search filter
+      const matchesSearch = 
         product.name?.toLowerCase().includes(searchLower) ||
         product.description?.toLowerCase().includes(searchLower) ||
-        product.category_name?.toLowerCase().includes(searchLower)
-      );
+        product.categoryName?.toLowerCase().includes(searchLower);
+
+      if (!matchesSearch) return false;
+
+      // Category filter
+      if (filters.categories.length > 0) {
+        if (!filters.categories.includes(product.categoryName || '')) return false;
+      }
+
+      // Price filter
+      const price = product.originalPrice ?? product.price;
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+        return false;
+      }
+
+      // Color filter
+      if (filters.colors.length > 0) {
+        if (!Array.isArray(product.colors) || 
+            !filters.colors.some(color => product.colors?.includes(color))) {
+          return false;
+        }
+      }
+
+      // Stock filter
+      if (filters.inStock && !product.inStock) {
+        return false;
+      }
+
+      // Visibility filter
+      if (filters.isVisible !== null) {
+        if (product.isVisible !== filters.isVisible) return false;
+      }
+
+      return true;
     });
 
     // Sort
-    switch (sortBy) {
-      case "newest":
-        filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
-        break;
-      case "oldest":
-        filtered.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
-        break;
-      case "name-asc":
-        filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-        break;
-      case "name-desc":
-        filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-        break;
-      case "price-low":
-        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-      case "price-high":
-        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-      default:
-        break;
-    }
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "newest":
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        case "oldest":
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        case "name-asc":
+          return (a.name || "").localeCompare(b.name || "");
+        case "name-desc":
+          return (b.name || "").localeCompare(a.name || "");
+        case "price-low":
+          return (a.price || 0) - (b.price || 0);
+        case "price-high":
+          return (b.price || 0) - (a.price || 0);
+        default:
+          return 0; // No specific sort
+      }
+    });
 
     return filtered;
-  }, [contextProducts, searchQuery, sortBy]);
+  }, [contextProducts, searchQuery, sortBy, filters]);
 
   const handleEdit = (product: any) => {
     navigate("/inventory/add-product", { state: { product } });
@@ -111,24 +181,45 @@ const ProductList = () => {
     }
   };
 
+  const toggleCategory = (category: string) => {
+    setFilters(prev => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter(c => c !== category)
+        : [...prev.categories, category]
+    }));
+  };
+
+  const toggleColor = (color: string) => {
+    setFilters(prev => ({
+      ...prev,
+      colors: prev.colors.includes(color)
+        ? prev.colors.filter(c => c !== color)
+        : [...prev.colors, color]
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      categories: [],
+      priceRange: [0, 1000000],
+      colors: [],
+      inStock: false,
+      isVisible: null,
+    });
+    setSearchQuery("");
+  };
+
   const handleVisibilityToggle = async (product: any, isVisible: boolean) => {
     setTogglingVisibility(product.id);
     try {
-      const { error } = await supabase
-        .from("products")
-        .update({ is_visible: isVisible })
-        .eq("id", product.id);
-
-      if (error) throw error;
+      await updateProduct(product.id, { isVisible: isVisible }); // Use isVisible here
 
       toast({
         title: isVisible ? "Product Visible" : "Product Hidden",
         description: `${product.name} is now ${isVisible ? 'visible' : 'hidden'} on the store`,
         className: isVisible ? "bg-green-50 border-green-200" : "bg-slate-50 border-slate-200",
       });
-
-      // Refresh product list
-      window.location.reload(); 
     } catch (error) {
       console.error("Error toggling visibility:", error);
       toast({
@@ -144,12 +235,22 @@ const ProductList = () => {
   const lowStockCount = contextProducts.filter(p => (p.quantity || 0) < 5).length;
   const totalValue = contextProducts.reduce((acc, p) => acc + ((p.price || 0) * (p.quantity || 0)), 0);
 
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.categories.length > 0) count++;
+    if (filters.colors.length > 0) count++;
+    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000000) count++;
+    if (filters.inStock) count++;
+    if (filters.isVisible !== null) count++;
+    return count;
+  }, [filters]);
+
   return (
     <div className="p-8 space-y-8 bg-slate-50/50 min-h-screen font-sans">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Products</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Product Inventory</h1>
           <p className="text-slate-500 mt-2 text-lg">
             Manage your inventory, prices, and stock levels.
           </p>
@@ -162,6 +263,7 @@ const ProductList = () => {
           Add Product
         </Button>
       </div>
+
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -222,11 +324,157 @@ const ProductList = () => {
               <SelectItem value="price-high">Price (High to Low)</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="h-11 w-11 p-0 rounded-xl border-slate-200">
-            <Filter className="h-4 w-4 text-slate-600" />
+          <Button 
+            variant="outline" 
+            className="relative h-11 px-4 text-base border-slate-200 rounded-xl"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            Filters
+            {activeFilterCount > 0 && (
+              <Badge className="ml-2 bg-slate-900 text-white px-2 py-0.5 rounded-full">
+                {activeFilterCount}
+              </Badge>
+            )}
           </Button>
         </div>
       </div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="mb-8 p-6 border border-slate-100 rounded-2xl bg-white shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-slate-900">Advanced Filters</h3>
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Clear All
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Categories */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3">Category</h4>
+              <div className="space-y-2">
+                {availableCategories.map(category => (
+                  <label key={category} className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={filters.categories.includes(category)}
+                      onChange={() => toggleCategory(category)}
+                      className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                    <span className="text-sm">{category}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Colors */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3">Colors</h4>
+              <div className="space-y-2">
+                {availableColors.map(color => (
+                  <label key={color} className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={filters.colors.includes(color)}
+                      onChange={() => toggleColor(color)}
+                      className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                    <span className="text-sm">{color}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3">Price Range (₹)</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-slate-500 mb-1 block">Min Price</label>
+                  <Input
+                    type="number"
+                    value={filters.priceRange[0]}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      priceRange: [Number(e.target.value), prev.priceRange[1]]
+                    }))}
+                    className="w-full px-3 py-2 border-slate-200 rounded-xl bg-slate-50 focus-visible:ring-slate-900"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-slate-500 mb-1 block">Max Price</label>
+                  <Input
+                    type="number"
+                    value={filters.priceRange[1]}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      priceRange: [prev.priceRange[0], Number(e.target.value)]
+                    }))}
+                    className="w-full px-3 py-2 border-slate-200 rounded-xl bg-slate-50 focus-visible:ring-slate-900"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Availability and Visibility */}
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-3">Availability</h4>
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={filters.inStock}
+                    onChange={(e) => setFilters(prev => ({ 
+                      ...prev, 
+                      inStock: e.target.checked 
+                    }))}
+                    className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <span className="text-sm">In Stock Only</span>
+                </label>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-3">Visibility</h4>
+                <div className="flex flex-col space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                    <input
+                      type="radio"
+                      name="visibility"
+                      checked={filters.isVisible === null}
+                      onChange={() => setFilters(prev => ({ ...prev, isVisible: null }))}
+                      className="rounded-full border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                    <span className="text-sm">Show All</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                    <input
+                      type="radio"
+                      name="visibility"
+                      checked={filters.isVisible === true}
+                      onChange={() => setFilters(prev => ({ ...prev, isVisible: true }))}
+                      className="rounded-full border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                    <span className="text-sm">Visible</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-600 hover:text-slate-900 transition-colors">
+                    <input
+                      type="radio"
+                      name="visibility"
+                      checked={filters.isVisible === false}
+                      onChange={() => setFilters(prev => ({ ...prev, isVisible: false }))}
+                      className="rounded-full border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                    <span className="text-sm">Hidden</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -255,7 +503,7 @@ const ProductList = () => {
               </TableRow>
             ) : (
               filteredAndSortedProducts.map((product) => {
-                const isVisible = product.is_visible !== false; // Default to true if undefined
+                const isVisible = product.isVisible !== false; // Default to true if undefined
                 return (
                 <TableRow 
                   key={product.id} 
@@ -288,7 +536,7 @@ const ProductList = () => {
                   </TableCell>
                   <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-medium">
-                      {product.category_name || "Uncategorized"}
+                      {product.categoryName || "Uncategorized"}
                     </Badge>
                   </TableCell>
                   <TableCell onClick={() => navigate(`/inventory/products/${product.id}`)}>

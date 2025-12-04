@@ -277,6 +277,25 @@ const ProductDetails = () => {
                   <span className="text-base font-semibold text-slate-900">{product.dimensions}</span>
                 </div>
               )}
+              
+              {/* Specifications Section */}
+              {product.specifications && Object.keys(product.specifications).length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  <h4 className="text-sm font-bold text-slate-900 mb-3">Specifications</h4>
+                  <div className="grid grid-cols-1 gap-3">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                        <span className="text-sm font-medium text-slate-500 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </span>
+                        <span className="text-base font-semibold text-slate-900">
+                          {value as string}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

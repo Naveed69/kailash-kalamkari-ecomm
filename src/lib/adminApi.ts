@@ -121,7 +121,7 @@ export const createProduct = async (payload: Partial<Product>): Promise<{ data: 
   // Try initial insert
   const attemptInsert = async (obj: any) => await supabase.from("products").insert([obj]).select().single();
 
-  let { data, error, status } = await attemptInsert(sanitized);
+  const { data, error, status } = await attemptInsert(sanitized);
   if (!error) return { data: (data as Product) ?? null, error: null };
 
   console.warn("Supabase insert error - first attempt:", { message: error.message, details: error.details, hint: error.hint, code: error.code, status });
@@ -206,7 +206,7 @@ export const updateProduct = async (id: string, payload: Partial<Product>): Prom
   console.debug("updateProduct - sanitized payload:", sanitized);
   const attemptUpdate = async (obj: any) => await supabase.from("products").update(obj).eq("id", id).select().maybeSingle();
 
-  let { data, error, status } = await attemptUpdate(sanitized);
+  const { data, error, status } = await attemptUpdate(sanitized);
   if (!error) {
     if (!data) return { data: null, error: { message: "Product not found", code: "NOT_FOUND", status: 404 } };
     return { data: (data as Product) ?? null, error: null };

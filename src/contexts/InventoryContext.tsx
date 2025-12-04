@@ -41,6 +41,12 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children 
         getProducts()
       ]);
 
+      console.log("📦 Inventory Data Fetched:", { 
+        categories: catsResult.data?.length, 
+        subCategories: subCatsResult.data?.length, 
+        products: prodsResult.data?.length 
+      });
+
       if (catsResult.error) throw new Error(catsResult.error.message);
       if (subCatsResult.error) throw new Error(subCatsResult.error.message);
       if (prodsResult.error) throw new Error(prodsResult.error.message);
@@ -48,6 +54,8 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children 
       const rawCats = catsResult.data || [];
       const rawSubCats = subCatsResult.data || [];
       const rawProds = (prodsResult.data || []) as any[];
+
+      const categoryMap = new Map(rawCats.map((cat: any) => [String(cat.id), cat.name]));
 
       // Transform products to match Product interface
       const transformedProds: Product[] = rawProds.map((p: any) => ({
@@ -57,6 +65,7 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children 
         originalPrice: p.original_price ? (typeof p.original_price === 'string' ? parseFloat(p.original_price) : p.original_price) : undefined,
         image: p.image || '',
         category: p.category_id ? String(p.category_id) : undefined,
+        categoryName: p.category_id ? categoryMap.get(String(p.category_id)) : undefined, // Add this
         subCategory: p.sub_category_id ? String(p.sub_category_id) : undefined,
         description: p.description || '',
         colors: Array.isArray(p.colors) ? p.colors : (typeof p.colors === 'string' ? (p.colors.startsWith('[') ? JSON.parse(p.colors) : [p.colors]) : []),
@@ -65,10 +74,14 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children 
         dimensions: p.dimensions,
         material: p.material,
         quantity: p.stock_quantity || p.quantity || 0,
-        barcode: p.barcode
+        barcode: p.barcode,
+        isVisible: p.is_visible,
+        specifications: p.specifications || {},
+        specifications: p.specifications || {},
       }));
 
       setProducts(transformedProds);
+      console.log("✅ Products State Updated:", transformedProds.length);
 
       // Build nested structure for backward compatibility / specific UI needs
       const nestedCategories: Category[] = rawCats.map((cat: any) => {

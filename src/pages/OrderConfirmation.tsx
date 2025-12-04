@@ -71,10 +71,8 @@ const OrderConfirmation = () => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
     });
   };
 
@@ -84,8 +82,8 @@ const OrderConfirmation = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D49217]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D49217]"></div>
       </div>
     );
   }
@@ -95,197 +93,118 @@ const OrderConfirmation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 print:py-0 print:bg-white">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Success Banner */}
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 print:hidden">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-                <p className="text-gray-600">Thank you for your purchase. Your order has been successfully placed.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-slate-50/50 py-12 px-4 print:py-0 print:bg-white font-sans">
+      <div className="max-w-2xl mx-auto space-y-6">
+        
+        {/* Success Header */}
+        <div className="text-center space-y-3 mb-8">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900">Order Confirmed!</h1>
+          <p className="text-slate-600 max-w-sm mx-auto">
+            Thank you for your purchase. We've received your order and will begin processing it right away.
+          </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-sm font-medium text-slate-700 mt-2">
+            <span>Order #{order.id}</span>
+            <span className="text-slate-300">|</span>
+            <span>{formatDate(order.created_at)}</span>
+          </div>
+        </div>
 
-        {/* Order Details */}
-        <Card>
-          <CardHeader className="bg-[#D49217] text-white print:bg-white print:text-black">
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-2xl">Order #{order.id}</CardTitle>
-                <p className="text-sm opacity-90 mt-1">Placed on {formatDate(order.created_at)}</p>
-              </div>
-              <Badge className="bg-green-600 hover:bg-green-700 print:bg-green-600">
-                {order.status.toUpperCase()}
-              </Badge>
-            </div>
+        {/* Order Summary Card */}
+        <Card className="border-slate-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-5">
+            <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <Package className="h-4 w-4 text-slate-500" />
+              Order Summary
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 space-y-6">
-            {/* Payment Info */}
-            {order.razorpay_payment_id && (
-              <div className="bg-blue-50 rounded-lg p-4 print:bg-gray-50">
-                <h3 className="font-semibold text-blue-900 mb-2">Payment Successful</h3>
-                <p className="text-sm text-blue-700">
-                  Payment ID: <span className="font-mono">{order.razorpay_payment_id}</span>
-                </p>
-              </div>
-            )}
-
-            <Separator />
-
-            {/* Customer Details */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Customer Information
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4 pl-7">
-                <div>
-                  <p className="text-sm text-gray-500">Name</p>
-                  <p className="font-medium">{order.customer_name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium">{order.customer_phone}</p>
-                </div>
-                {order.customer_email && (
-                  <div className="md:col-span-2">
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{order.customer_email}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Delivery Address */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Delivery Address
-              </h3>
-              <div className="pl-7 text-gray-700">
-                <p>{order.address_line1}</p>
-                {order.address_line2 && <p>{order.address_line2}</p>}
-                <p>{order.city}, {order.state} - {order.pincode}</p>
-                {order.landmark && <p className="text-sm text-gray-500 italic mt-1">Landmark: {order.landmark}</p>}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Order Items */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                Order Items ({order.items.length})
-              </h3>
-              <div className="space-y-3">
-                {order.items.map((item, index) => (
-                  <div key={index} className="flex gap-4 p-3 bg-gray-50 rounded-lg">
+          <CardContent className="p-0">
+            {/* Items */}
+            <div className="divide-y divide-slate-100">
+              {order.items.map((item, index) => (
+                <div key={index} className="flex gap-4 p-4 hover:bg-slate-50/50 transition-colors">
+                  <div className="h-16 w-16 bg-slate-100 rounded-md overflow-hidden border border-slate-200 flex-shrink-0">
                     {item.image && (
                       <img 
                         src={item.image} 
                         alt={item.name}
-                        className="w-20 h-20 object-cover rounded"
+                        className="h-full w-full object-cover"
                       />
                     )}
-                    <div className="flex-1">
-                      <h4 className="font-medium">{item.name}</h4>
-                      {item.category && (
-                        <Badge variant="outline" className="text-xs mt-1">{item.category}</Badge>
-                      )}
-                      <p className="text-sm text-gray-600 mt-1">
-                        Qty: {item.quantity} × ₹{item.price.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg">₹{(item.price * item.quantity).toLocaleString()}</p>
-                    </div>
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-slate-900 text-sm truncate">{item.name}</h4>
+                    {item.category && (
+                      <p className="text-xs text-slate-500 mt-0.5">{item.category}</p>
+                    )}
+                    <p className="text-xs text-slate-500 mt-1">
+                      Qty: {item.quantity}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-sm text-slate-900">₹{(item.price * item.quantity).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <Separator />
-
-            {/* Total */}
-            <div className="bg-gray-100 rounded-lg p-4">
-              <div className="flex justify-between items-center text-xl font-bold">
-                <span>Total Amount Paid:</span>
-                <span className="text-[#D49217]">₹{order.total_amount.toLocaleString()}</span>
+            {/* Total Section */}
+            <div className="bg-slate-50/50 border-t border-slate-100 p-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-700">Total Amount</span>
+                <span className="text-lg font-bold text-[#D49217]">₹{order.total_amount.toLocaleString()}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Tracking Information - Critical for customers */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <h3 className="text-xl font-bold text-gray-900">📦 Track Your Order</h3>
-              <p className="text-gray-600">Save these details to track your order anytime:</p>
-              
-              <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                <div className="bg-white rounded-lg p-4 border-2 border-blue-300">
-                  <p className="text-sm text-gray-500 mb-1">Order ID</p>
-                  <p className="text-2xl font-bold text-blue-600">#{order.id}</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 border-2 border-blue-300">
-                  <p className="text-sm text-gray-500 mb-1">Phone Number</p>
-                  <p className="text-2xl font-bold text-blue-600">{order.customer_phone}</p>
-                </div>
-              </div>
-              
-              <p className="text-sm text-gray-600 italic">
-                💡 Use your <strong>Order ID</strong> and <strong>Phone Number</strong> to track your order status
+        {/* Delivery Address Card */}
+        <Card className="border-slate-200 shadow-sm">
+          <CardContent className="p-5 flex gap-4">
+            <MapPin className="h-5 w-5 text-slate-400 flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-slate-900">Delivery Address</p>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {order.address_line1}
+                {order.address_line2 && <>, {order.address_line2}</>}
+                <br />
+                {order.city}, {order.state} - {order.pincode}
               </p>
             </div>
           </CardContent>
         </Card>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 print:hidden">
+        <div className="space-y-3 pt-2 print:hidden">
           <Button
-            onClick={() => navigate("/track-order")}
-            className="flex-1 bg-[#D49217] hover:bg-[#B87D15]"
-            size="lg"
+            onClick={() => navigate(`/order/${order.id}`)}
+            className="w-full bg-[#D49217] hover:bg-[#B87D15] text-white h-11 font-medium shadow-sm"
           >
-            <Truck className="mr-2 h-5 w-5" />
-            Go to Order Tracking
+            View Order Details & Track
           </Button>
-          <Button
-            onClick={handlePrint}
-            variant="outline"
-            size="lg"
-          >
-            <Download className="mr-2 h-5 w-5" />
-            Print / Save
-          </Button>
-          <Button
-            onClick={() => navigate("/")}
-            variant="outline"
-            size="lg"
-          >
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            Continue Shopping
-          </Button>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              className="w-full border-slate-200 hover:bg-slate-50 text-slate-700"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Save Receipt
+            </Button>
+            <Button
+              onClick={() => navigate("/")}
+              variant="outline"
+              className="w-full border-slate-200 hover:bg-slate-50 text-slate-700"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Continue Shopping
+            </Button>
+          </div>
         </div>
 
-        {/* Help Info */}
-        <Card className="bg-blue-50 border-blue-200 print:hidden">
-          <CardContent className="pt-6">
-            <p className="text-center text-sm text-blue-900">
-              Need help? Contact us at <span className="font-semibold">support@kailashkalamkari.com</span> or call us at <span className="font-semibold">+91-XXXXXXXXXX</span>
-            </p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
