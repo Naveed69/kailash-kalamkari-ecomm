@@ -1,7 +1,10 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Product } from '@/components/ProductCard';
 import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import { useAuth } from '@/lib/AuthContext';
+import { wishlistApi } from '@/lib/wishlistApi';
+import { useInventory } from '@/contexts/InventoryContext';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -13,23 +16,84 @@ interface WishlistContextType {
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  // Initialize from localStorage if available
+  const initializer = (): Product[] => {
+    try {
+      const storedWishlist = localStorage.getItem('wishlist');
+      return storedWishlist ? JSON.parse(storedWishlist) : [];
+    } catch (error) {
+      console.error('Failed to load wishlist from localStorage', error);
+      return [];
+    }
+  };
+
+  const [wishlist, setWishlist] = useState<Product[]>(initializer);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { products } = useInventory(); // Get full product list to map IDs
 
-  const addToWishlist = (product: Product) => {
+  // Save to localStorage whenever wishlist changes
+  useEffect(() => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  // Sync with Database when user logs in
+  useEffect(() => {
+    const syncWishlist = async () => {
+      if (!user || products.length === 0) return;
+
+      try {
+        // 1. Get user's wishlist from DB
+        const dbProductIds = await wishlistApi.getUserWishlist(user.id);
+        
+        // 2. Identify local items that need to be synced to DB
+        const localProductIds = wishlist.map(p => p.id);
+        const itemsToSync = localProductIds.filter(id => !dbProductIds.includes(id));
+        
+        // 3. Sync local items to DB
+        if (itemsToSync.length > 0) {
+          await Promise.all(itemsToSync.map(id => wishlistApi.addToWishlist(user.id, id)));
+        }
+
+        // 4. Merge DB and Local (DB is source of truth + what we just synced)
+        const allWishlistIds = Array.from(new Set([...dbProductIds, ...localProductIds]));
+        
+        // 5. Map IDs back to full product objects
+        const mergedWishlist = products.filter(p => allWishlistIds.includes(p.id));
+        
+        setWishlist(mergedWishlist);
+      } catch (error) {
+        console.error("Failed to sync wishlist:", error);
+      }
+    };
+
+    syncWishlist();
+  }, [user, products.length]); // Run when user changes or products load
+
+  const addToWishlist = async (product: Product) => {
     // Wishlist requires login - it's a saved list
     if (!user) {
       toast({
         title: '❤️ Sign in to save favorites',
-        description: 'Create an account to save your favorite items! Visit the login page to get started.',
-        duration: 5000,
+        description: 'Create an account to save your favorite items across devices!',
+        duration: 6000,
+        action: (
+          <ToastAction
+            altText="Sign In"
+            onClick={() => {
+              // Navigate to login with return URL
+              window.location.href = `/login?returnTo=${encodeURIComponent(window.location.pathname)}`;
+            }}
+          >
+            Sign In
+          </ToastAction>
+        ),
       });
       return;
     }
 
+    // Optimistic update
     setWishlist((prev) => {
-      // Check if product is already in wishlist
       if (prev.some((item) => item.id === product.id)) {
         toast({
           title: 'Already in favorites',
@@ -37,22 +101,39 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         });
         return prev;
       }
-      
-      toast({
-        title: '❤️ Added to favorites',
-        description: `${product.name} has been saved to your favorites.`,
-      });
-      
       return [...prev, product];
     });
+
+    toast({
+      title: '❤️ Added to favorites',
+      description: `${product.name} has been saved to your favorites.`,
+    });
+
+    // Save to DB
+    try {
+      await wishlistApi.addToWishlist(user.id, product.id);
+    } catch (error) {
+      console.error("Failed to save to wishlist DB:", error);
+      // Optionally revert state if failed, but for now keep optimistic
+    }
   };
 
-  const removeFromWishlist = (productId: string) => {
+  const removeFromWishlist = async (productId: string) => {
+    // Optimistic update
     setWishlist((prev) => prev.filter((item) => item.id !== productId));
+    
     toast({
       title: 'Removed from favorites',
       description: 'Item has been removed from your favorites.',
     });
+
+    if (user) {
+      try {
+        await wishlistApi.removeFromWishlist(user.id, productId);
+      } catch (error) {
+        console.error("Failed to remove from wishlist DB:", error);
+      }
+    }
   };
 
   const isInWishlist = (productId: string) => {

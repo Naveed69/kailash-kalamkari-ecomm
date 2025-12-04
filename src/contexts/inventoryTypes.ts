@@ -10,9 +10,12 @@ export interface Product {
   inStock: boolean;
   rating: number;
   category: string;
+  categoryName?: string; // Add category name for display purposes
   quantity: number;
   material?: string;
   barcode?: string; // Product barcode for scanning
+  isVisible?: boolean; // Visibility status of the product
+  specifications?: Record<string, string>; // Dynamic product specifications
 }
 
 export interface SubCategory {

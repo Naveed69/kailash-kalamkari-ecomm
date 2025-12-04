@@ -524,6 +524,10 @@ const validateForm = () => {
       return acc;
     }, {} as Record<string, string>);
 
+    // Extract material from specifications if present (case-insensitive)
+    const materialSpec = specifications.find(s => s.key.trim().toLowerCase() === 'material');
+    const materialValue = materialSpec ? materialSpec.value.trim() : null;
+
     // Prepare product data
     const productData: any = {
       name: formData.name.trim(),
@@ -540,6 +544,7 @@ const validateForm = () => {
       image: imageUrls[0] || null, // Main image (first one)
       images: imageUrls, // All images
       barcode: barcode, // Add barcode to product data
+      material: materialValue, // Add material from specifications
     };
 
       if (isEditMode) {

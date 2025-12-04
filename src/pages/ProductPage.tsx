@@ -30,7 +30,7 @@ const ProductsPage = () => {
 
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
-    priceRange: [0, 10000],
+    priceRange: [0, 1000000],
     colors: [],
     inStock: false,
   });
@@ -83,7 +83,7 @@ const ProductsPage = () => {
   );
 
   const filteredProducts = useMemo(() => {
-    let filtered = sampleProducts.filter((product) => {
+    const filtered = sampleProducts.filter((product) => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -157,7 +157,7 @@ const ProductsPage = () => {
   const clearFilters = () => {
     setFilters({
       categories: [],
-      priceRange: [0, 10000],
+      priceRange: [0, 1000000],
       colors: [],
       inStock: false,
     });
@@ -168,7 +168,7 @@ const ProductsPage = () => {
     filters.categories.length + 
     filters.colors.length + 
     (filters.inStock ? 1 : 0) +
-    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 10000 ? 1 : 0);
+    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000000 ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-background">

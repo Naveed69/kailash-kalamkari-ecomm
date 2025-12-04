@@ -13,11 +13,3 @@ export function generateBarcode(): string {
   return `KK${timestamp}${random}`;
 }
 
-/**
- * Validates if a barcode follows the expected format
- */
-export function isValidBarcode(barcode: string): boolean {
-  // Format: KK followed by alphanumeric characters
-  const regex = /^KK[A-Z0-9]+$/;
-  return regex.test(barcode);
-}

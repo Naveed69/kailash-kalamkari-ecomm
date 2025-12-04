@@ -100,6 +100,9 @@ const ProductDetails = () => {
     
     // If already in cart, update the color
     if (inCart) {
+      // Get current quantity BEFORE removing
+      const currentQuantity = getItemQuantity(product.id);
+      
       const productWithColor = {
         ...product,
         selectedColor: selectedColor || (product.colors && product.colors[0])
@@ -110,7 +113,6 @@ const ProductDetails = () => {
       addToCart(productWithColor as any);
       
       // Restore the quantity
-      const currentQuantity = getItemQuantity(product.id);
       if (currentQuantity > 1) {
         setTimeout(() => updateQuantity(product.id, currentQuantity), 100);
       }
@@ -420,7 +422,9 @@ const ProductDetails = () => {
                 <AccordionContent>
                   <div className="grid grid-cols-2 gap-y-3 text-sm">
                     <div className="text-muted-foreground">Material</div>
-                    <div className="font-medium">{product.material || "N/A"}</div>
+                    <div className="font-medium">
+                      {product.material || "N/A"}
+                    </div>
                     
                     <div className="text-muted-foreground">Craft</div>
                     <div className="font-medium">Srikalahasti Kalamkari</div>
@@ -429,14 +433,17 @@ const ProductDetails = () => {
                     <div className="font-medium">Andhra Pradesh, India</div>
 
                     {/* Dynamic Specifications */}
-                    {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
-                      <>
-                        <div className="text-muted-foreground capitalize" key={`${key}-label`}>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                        <div className="font-medium" key={`${key}-value`}>{value}</div>
-                      </>
-                    ))}
-
-                    {!product.specifications && (
+                    {product.specifications && Object.entries(product.specifications).length > 0 ? (
+                      Object.entries(product.specifications)
+                      .filter(([key]) => key.toLowerCase() !== 'material') // Exclude Material as it's shown above
+                      .map(([key, value]) => (
+                      <React.Fragment key={key}>
+                        <div className="text-muted-foreground capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                        <div className="font-medium">{value}</div>
+                      </React.Fragment>
+                    ))
+                    ) : (
+                      // Fallback content if no dynamic specifications
                       <>
                         <div className="text-muted-foreground">Pattern</div>
                         <div className="font-medium">Hand-Painted Motifs</div>

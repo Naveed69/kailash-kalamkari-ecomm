@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-export interface Category {
-  id: string;
-  name: string;
-  image: string;
-  subCategory: string;
-  description: string;
-}
+
 
 interface CategoryCardProps {
   name: string;

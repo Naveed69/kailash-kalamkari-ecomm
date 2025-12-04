@@ -184,20 +184,18 @@ const Index = () => {
       const product = sampleProducts.find((p) => p.id === productId);
 
       if (typeof isInWishlist === "function" && isInWishlist(productId)) {
-        if (typeof removeFromWishlist === "function") removeFromWishlist(productId);
-        toast?.({
-          title: "Removed from wishlist",
-          description: `${product?.name ?? "Item"} removed from your wishlist.`,
-        });
+        // Remove from wishlist
+        if (typeof removeFromWishlist === "function") {
+          removeFromWishlist(productId);
+        }
       } else if (product) {
-        if (typeof addToWishlist === "function") addToWishlist(product);
-        toast?.({
-          title: "Added to wishlist",
-          description: `${product.name} added to your wishlist.`,
-        });
+        // Add to wishlist - WishlistContext will handle the toast
+        if (typeof addToWishlist === "function") {
+          addToWishlist(product);
+        }
       }
     },
-    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts, toast]
+    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts]
   );
 
   // Carousel navigation
@@ -258,7 +256,7 @@ const Index = () => {
       filters.priceRange[1] >= 10000 &&
       !searchQuery;
 
-    let sortedProducts = [...sampleProducts];
+    const sortedProducts = [...sampleProducts];
 
     if (noFiltersApplied) {
       sortedProducts.sort((a, b) => {
@@ -275,7 +273,7 @@ const Index = () => {
       return sortedProducts;
     }
 
-    let filtered = sampleProducts.filter((product) => {
+    const filtered = sampleProducts.filter((product) => {
       if (
         searchQuery &&
         !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
