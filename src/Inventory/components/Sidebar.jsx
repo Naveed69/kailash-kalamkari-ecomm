@@ -9,21 +9,29 @@ import {
   FiTag,
 } from "react-icons/fi";
 import "./Sidebar.css";
+import { useAuth } from "@/lib/AuthContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.setItem("isLoggedIn", "false");
-    navigate("/");
+  const { signOut, role } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    localStorage.removeItem("isLoggedIn"); // Clear legacy auth just in case
+    navigate("/admin");
   };
   
   const menuItems = [
-    { to: "/inventory/dashboard", icon: FiGrid, label: "Dashboard" },
-    { to: "/inventory/products", icon: FiBox, label: "Products" },
-    { to: "/inventory/add-product", icon: FiPlusSquare, label: "Add Product" },
-    { to: "/inventory/categories", icon: FiTag, label: "Categories" },
-    { to: "/inventory/orders", icon: FiClipboard, label: "Orders" },
+    { to: "/inventory/dashboard", icon: FiGrid, label: "Dashboard", roles: ['super_admin', 'admin'] },
+    { to: "/inventory/products", icon: FiBox, label: "Products", roles: ['super_admin', 'admin'] },
+    { to: "/inventory/add-product", icon: FiPlusSquare, label: "Add Product", roles: ['super_admin'] },
+    { to: "/inventory/categories", icon: FiTag, label: "Categories", roles: ['super_admin'] },
+    { to: "/inventory/orders", icon: FiClipboard, label: "Orders", roles: ['super_admin', 'admin'] },
   ];
+
+  const filteredItems = menuItems.filter(item => 
+    !item.roles || (role && item.roles.includes(role))
+  );
 
   return (
     <div className="sidebar">
@@ -34,12 +42,13 @@ const Sidebar = () => {
             <div>
               <h2 className="brand-name">Kailash Kalamkari</h2>
               <p className="brand-subtitle">Admin Panel</p>
+              {role && <span className="text-xs text-gray-400 capitalize">{role.replace('_', ' ')}</span>}
             </div>
           </div>
         </div>
         <nav className="sidebar-nav">
           <ul>
-            {menuItems.map((item) => (
+            {filteredItems.map((item) => (
               <li key={item.to}>
                 <NavLink to={item.to} className={({ isActive }) => isActive ? 'active' : ''}>
                   <item.icon className="nav-icon" />

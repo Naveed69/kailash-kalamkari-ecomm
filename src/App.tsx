@@ -70,7 +70,7 @@ const AppContent = () => {
         <Route
           path="/inventory/*"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
               <Inventory />
             </ProtectedRoute>
           }
