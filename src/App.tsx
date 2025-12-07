@@ -65,7 +65,7 @@ const AppContent = () => {
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms-conditions"={<TermsAndConditionsPage />} />
+        <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
