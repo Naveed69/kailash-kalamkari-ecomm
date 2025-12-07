@@ -29,7 +29,7 @@ All colors MUST be HSL.
     --muted-foreground: 25 10% 40%; /* Slightly darker/neutral for readability */
 
     /* Accent gold - Refined for better text contrast */
-    --accent: 45 85% 60%; 
+    --accent: 45 85% 60%;
     --accent-foreground: 25 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
@@ -40,7 +40,11 @@ All colors MUST be HSL.
     --ring: 220 85% 25%;
 
     /* Traditional Indian gradient */
-    --gradient-traditional: linear-gradient(135deg, hsl(220 85% 25%), hsl(45 85% 65%));
+    --gradient-traditional: linear-gradient(
+      135deg,
+      hsl(220 85% 25%),
+      hsl(45 85% 65%)
+    );
     --gradient-warm: linear-gradient(180deg, hsl(35 25% 98%), hsl(25 30% 95%));
 
     --radius: 0.75rem;
@@ -119,7 +123,7 @@ All colors MUST be HSL.
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }

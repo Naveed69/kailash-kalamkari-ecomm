@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useWishlist } from "@/contexts/WishlistContext";
-import logo from "@/assets/Logo/kklogo.png";
-import AboutUs from "@/pages/AboutUs";
-import { useAuth } from "@/lib/AuthContext";
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useWishlist } from "@/contexts/WishlistContext"
+import logo from "@/assets/Logo/kklogo.png"
+import AboutUs from "@/pages/AboutUs"
+import { useAuth } from "@/lib/AuthContext"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,56 +16,56 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut, Package } from "lucide-react";
+} from "@/components/ui/dropdown-menu"
+import { LogOut, Package } from "lucide-react"
 
 interface HeaderProps {
-  cartCount?: number;
-  wishlistCount?: number;
-  onCartClick?: () => void;
-  onWishlistClick?: () => void;
-  onWhatsAppClick?: () => void;
-  onSearchChange?: (query: string) => void;
-  setProductActive?: (active: boolean) => void;
-  setIsAboutUsActive?: (active: boolean) => void;
+  cartCount?: number
+  wishlistCount?: number
+  onCartClick?: () => void
+  onWishlistClick?: () => void
+  onWhatsAppClick?: () => void
+  onSearchChange?: (query: string) => void
+  setProductActive?: (active: boolean) => void
+  setIsAboutUsActive?: (active: boolean) => void
 }
 
 export const Header = ({
   cartCount = 0,
-  onCartClick = () => { },
-  onWhatsAppClick = () => { },
-  onSearchChange = () => { },
-  setProductActive = () => { },
-  setIsAboutUsActive = () => { },
+  onCartClick = () => {},
+  onWhatsAppClick = () => {},
+  onSearchChange = () => {},
+  setProductActive = () => {},
+  setIsAboutUsActive = () => {},
 }: HeaderProps = {}) => {
-  const { wishlist } = useWishlist();
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const wishlistCount = wishlist.length;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { wishlist } = useWishlist()
+  const navigate = useNavigate()
+  const { user, signOut } = useAuth()
+  const wishlistCount = wishlist.length
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    onSearchChange(value);
-  };
+    setSearchQuery(value)
+    onSearchChange(value)
+  }
 
   const navItems = [
-    { label: "Home", href: "#" },
-    { label: "Products", href: "products" },
-    { label: "Gallery", href: "gallery" },
-    { label: "About Us", href: "about" },
-  ];
+    { label: "Home", href: "/" },
+    { label: "Products", href: "/products" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "About Us", href: "/about" },
+  ]
 
   const handleNavigation = () => {
     // Admin login navigation
-    navigate("/adminLogin");
-  };
+    navigate("/adminLogin")
+  }
 
   const handleLogout = async () => {
-    await signOut();
-    navigate("/");
-  };
+    await signOut()
+    navigate("/")
+  }
 
   return (
     <header
@@ -87,63 +87,15 @@ export const Header = ({
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
-            {navItems.map((item) => {
-              if (item.label === "Products") {
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setProductActive(true);
-                      setIsAboutUsActive(false);
-                      navigate("/")
-                    }}
-                    className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
-                  >
-                    {item.label}
-                  </a>
-                );
-              }
-
-              if (item.label === "Home") {
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setProductActive(true);
-                      setIsAboutUsActive(true);
-                      navigate("/")
-                    }}
-                    className="text-[#d49217] hover:text-[#E6B740] transition-colors font-medium"
-                  >
-                    {item.label}
-                  </a>
-                );
-              }
-
-              return (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (item.href === 'about') {
-                       setProductActive(false);
-                       setIsAboutUsActive(true);
-                       navigate("/")
-                    } else {
-                       navigate(`/${item.href}`)
-                    }
-                  }}
-                  className="text-[#d49217ff]  hover:text-[#E6B740] transition-colors font-medium"
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="text-[#d49217ff]  hover:text-[#E6B740] transition-colors font-medium"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Search and Actions */}
@@ -194,7 +146,6 @@ export const Header = ({
                         <span>Login / Signup</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-
                     </>
                   )}
                 </DropdownMenuContent>
@@ -264,71 +215,16 @@ export const Header = ({
 
                     {/* Mobile navigation */}
                     <nav className="flex  flex-col space-y-4">
-                      {navItems.map((item) => {
-                        if (item.label === "Track Order") {
-                          return (
-                            <a
-                              key={item.label}
-                              href={item.href}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                navigate("/track-order");
-                                setIsMobileMenuOpen(false);
-                              }}
-                              className="text-[#d49217] hover:text-[#E6B740] text-foreground hover:text-primary transition-colors font-medium"
-                            >
-                              {item.label}
-                            </a>
-                          );
-                        }
-
-                        if (item.label === "Products") {
-                          return (
-                            <a
-                              key={item.label}
-                              onClick={() => {
-                                setProductActive(true);
-                                setIsAboutUsActive(false);
-                                setIsMobileMenuOpen(false);
-                              }}
-                              className="text-[#d49217] hover:text-[#E6B740] text-foreground hover:text-primary transition-colors font-medium"
-                            >
-                              {item.label}
-                            </a>
-                          );
-                        }
-
-                        if (item.label === "Home") {
-                          return (
-                            <a
-                              key={item.label}
-                              href={item.href}
-                              onClick={() => {
-                                setProductActive(true);
-                                setIsAboutUsActive(true);
-                              }}
-                              className="text-[#d49217] hover:text-[#E6B740] text-foreground transition-colors font-medium"
-                            >
-                              {item.label}
-                            </a>
-                          );
-                        }
-
-                        return (
-                          <a
-                            key={item.label}
-                            href={item.href}
-                            className="text-[#d49217] hover:text-[#E6B740] text-foreground transition-colors font-medium"
-                            onClick={() => {
-                              setProductActive(false);
-                              setIsAboutUsActive(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                          >
-                            {item.label}
-                          </a>
-                        );
-                      })}
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.label}
+                          to={item.href}
+                          className="text-[#d49217] hover:text-[#E6B740] text-foreground transition-colors font-medium"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
                     </nav>
                   </div>
                 </SheetContent>
@@ -338,5 +234,5 @@ export const Header = ({
         </div>
       </div>
     </header>
-  );
-};
+  )
+}

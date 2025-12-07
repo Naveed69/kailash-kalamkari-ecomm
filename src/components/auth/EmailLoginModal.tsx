@@ -26,12 +26,7 @@ export const EmailLoginModal: React.FC<EmailLoginModalProps> = ({
             Enter your email to receive a magic link for secure sign in
           </DialogDescription>
         </DialogHeader>
-        <EmailLogin 
-          onSuccess={() => {
-            // Close modal after successful email sent
-            setTimeout(() => onOpenChange(false), 2000);
-          }}
-        />
+        <EmailLogin />
       </DialogContent>
     </Dialog>
   );

@@ -1,6 +1,6 @@
 "use client"
 
-import { MapPin, Phone, Mail, MessageCircle, Facebook, Instagram, Twitter, Youtube } from "lucide-react"
+import { MapPin, Phone, Mail, MessageCircle, Facebook, Instagram, Twitter, Youtube, X } from "lucide-react"
 import { useRef, useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,8 @@ const CONTACT_INFO = {
   email: "kailashkalamkari1984@gmail.com",
   address: "Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India",
   whatsappNumber: "9951821516",
-  mapsUrl: "https://maps.app.goo.gl/BvwZzbZy9GJUoa8j9",
+  mapsUrl: "https://www.google.com/maps/place/Panagal+Rd,+Srikalahasti,+Andhra+Pradesh+517640,+India",
+  // TODO: Update this embed URL with the correct one from Google Maps
   mapEmbedUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.785282606641!2d79.68492557579845!3d17.7496996833361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a334f1a5c0b5c3d%3A0x8d5ef5e5a5e5e5e5!2sPanagal+Rd,+Srikalahasti,+Andhra+Pradesh+517640,+India!5e0!3m2!1sen!2sin!4v1234567890",
 }
@@ -25,7 +26,7 @@ const SOCIAL_MEDIA = [
     url: "https://instagram.com/kailashkalamkari",
     label: "Follow us on Instagram",
   },
-  { name: "Twitter", icon: Twitter, url: "https://twitter.com/kailashkalamkari", label: "Follow us on Twitter" },
+  { name: "X", icon: X, url: "https://x.com/kailashkalamkari", label: "Follow us on X" },
   { name: "YouTube", icon: Youtube, url: "https://youtube.com/@kailashkalamkari", label: "Subscribe on YouTube" },
 ]
 

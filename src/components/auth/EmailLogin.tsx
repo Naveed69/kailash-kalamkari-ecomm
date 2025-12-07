@@ -8,12 +8,10 @@ import { Mail, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface EmailLoginProps {
-  onSuccess?: () => void;
   showHeader?: boolean;
 }
 
 export const EmailLogin: React.FC<EmailLoginProps> = ({ 
-  onSuccess, 
   showHeader = false 
 }) => {
   const [email, setEmail] = useState('');
@@ -51,10 +49,6 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
         description: 'We sent you a magic link to sign in.',
         className: 'bg-green-50 border-green-200',
       });
-      
-      if (onSuccess) {
-        setTimeout(() => onSuccess(), 2000);
-      }
     } catch (error: any) {
       toast({
         title: 'Error',

@@ -102,7 +102,7 @@ const carouselSlides = [
   },
 ];
 
-const Index = () => {
+const Index = ({ searchQuery }: { searchQuery: string }) => {
   const { categories = [], products = [] } = useInventory() || {};
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -145,7 +145,6 @@ const Index = () => {
     [isInWishlist, isInCart]
   );
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">(
     "name"
   );
@@ -276,8 +275,13 @@ const Index = () => {
     const filtered = sampleProducts.filter((product) => {
       if (
         searchQuery &&
-        !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        !(
+          product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.categoryName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.subCategory?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.material?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
       ) {
         return false;
       }
@@ -286,8 +290,8 @@ const Index = () => {
         filters.categories.length > 0 &&
         !filters.categories.some((cat) =>
           typeof cat === "string"
-            ? cat === product.category
-            : (cat as any)?.name === product.category
+            ? cat === product.categoryName
+            : (cat as any)?.name === product.categoryName
         )
       ) {
         return false;
@@ -327,7 +331,7 @@ const Index = () => {
   }, [sampleProducts, searchQuery, filters, sortBy]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
 
       {/* Hero Section */}
       {isProductActive && isAboutUsActive && (

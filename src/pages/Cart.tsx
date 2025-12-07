@@ -693,14 +693,6 @@ export default function CartPage() {
         <EmailLoginModal
           open={showLoginModal}
           onOpenChange={setShowLoginModal}
-          onSuccess={() => {
-            toast({
-              title: "Welcome!",
-              description: "You're now logged in. Please complete your order details.",
-              className: "bg-green-50 border-green-200",
-            });
-            setShowLoginModal(false);
-          }}
           redirectTo="/cart"
         />
       </div>

@@ -20,11 +20,6 @@ const LoginPage: React.FC = () => {
         </div>
         
         <EmailLogin 
-          onSuccess={() => {
-            // Redirect to checkout or home
-            const returnTo = new URLSearchParams(window.location.search).get('returnTo');
-            navigate(returnTo || '/');
-          }}
           showHeader={true}
         />
       </div>

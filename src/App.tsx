@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -39,6 +40,11 @@ const AppContent = () => {
   const navigate = useNavigate();
   const { cart } = useCart();
   const isInventoryRoute = location.pathname.startsWith("/inventory");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
 
   return (
     <>
@@ -47,10 +53,11 @@ const AppContent = () => {
         <Header
           cartCount={cart?.totalItems ?? 0}
           onCartClick={() => navigate("/cart")}
+          onSearchChange={handleSearchChange}
         />
       )}
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<Index searchQuery={searchQuery} />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<Cart />} />
@@ -58,7 +65,7 @@ const AppContent = () => {
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
+        <Route path="/terms-conditions"={<TermsAndConditionsPage />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />

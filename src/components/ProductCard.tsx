@@ -13,9 +13,11 @@ export interface Product {
   originalPrice?: number;
   image: string;
   category?: string; // Made optional since it's inferred from parent
+  categoryName?: string;
   subCategory?: string; // Made optional
   description: string;
   colors: string[];
+  selectedColor?: string;
   inStock: boolean;
   rating?: number;
   dimensions?: string; // Added for home decor products
@@ -91,7 +93,7 @@ export const ProductCard = ({
       <CardContent className="p-4">
         <div className="space-y-2">
           <Badge variant="secondary" className="text-xs">
-            {product.category}
+            {product.categoryName}
           </Badge>
           <h3 className="font-semibold text-card-foreground line-clamp-2">
             {product.name}

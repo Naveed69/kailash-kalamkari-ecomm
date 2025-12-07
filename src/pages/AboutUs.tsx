@@ -174,22 +174,22 @@ const AboutUs: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <img
-              src="https://images.unsplash.com/photo-1588392382834-a891154bca4d?w=500&q=80"
+              src="https://images.unsplash.com/photo-1599481238640-4c1278796895?w=500&q=80"
               alt="Artisan training"
               className="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]"
             />
             <img
-              src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500&q=80"
+              src="https://images.unsplash.com/photo-1582211594413-26f635a4276b?w=500&q=80"
               alt="Traditional workshop"
               className="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]"
             />
             <img
-              src="https://images.unsplash.com/photo-1632522485154-d2588c8e5bfe?w=500&q=80"
+              src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=500&q=80"
               alt="Heritage preservation"
               className="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]"
             />
             <img
-              src="https://images.unsplash.com/photo-1609966544644-40edfc9ab9a0?w=500&q=80"
+              src="https://images.unsplash.com/photo-1596205872934-073a115865c3?w=500&q=80"
               alt="Cultural exhibition"
               className="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]"
             />
