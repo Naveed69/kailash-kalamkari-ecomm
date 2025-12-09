@@ -342,6 +342,8 @@ const Footer = () => {
                 <div>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm hover:text-[#d49217] transition-colors break-all"
                   >
                     {CONTACT_INFO.email}
