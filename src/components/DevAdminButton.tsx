@@ -93,7 +93,7 @@ const DevAdminButton = () => {
   return (
     <button
       onClick={handleAdminClick}
-      className="fixed bottom-6 right-6 z-[9999] group"
+      className="fixed bottom-16 right-6 z-[9999] group"
       title="Admin Access (Dev Only)"
     >
       <div className="relative">
