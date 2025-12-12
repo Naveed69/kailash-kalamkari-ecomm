@@ -22,7 +22,7 @@ export default function Wishlist() {
             </p>
           </div>
           <Button asChild variant="outline">
-            <Link to="/">Continue Shopping</Link>
+            <Link to="/products">Continue Shopping</Link>
           </Button>
         </div>
 
@@ -34,7 +34,7 @@ export default function Wishlist() {
               Save items you love by clicking the heart icon on any product
             </p>
             <Button asChild>
-              <Link to="/">Browse Products</Link>
+              <Link to="/products">Browse Products</Link>
             </Button>
           </div>
         ) : (

@@ -77,7 +77,6 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({ children 
         barcode: p.barcode,
         isVisible: p.is_visible,
         specifications: p.specifications || {},
-        specifications: p.specifications || {},
       }));
 
       setProducts(transformedProds);

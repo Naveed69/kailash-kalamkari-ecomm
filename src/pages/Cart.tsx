@@ -59,7 +59,7 @@ export default function CartPage() {
 
     // Validation
     if (name === "phone") {
-      const regex = /^[6-9]\d{9}$/;
+      const regex = /^\d{10}$/;
       if (value && !regex.test(value)) {
         setError((prev) => ({ ...prev, phone: "Invalid 10 digit mobile number" }));
       } else {
@@ -150,7 +150,7 @@ export default function CartPage() {
       currency: "INR",
       name: "Kailash Kalamkari",
       description: "Order Payment",
-      image: "/placeholder.svg", // Replace with actual logo if available
+      image: "https://via.placeholder.com/128", // Replace with actual logo if available
       handler: async function (response: any) {
         try {
           // Fetch fresh product data with barcodes from database
@@ -209,6 +209,21 @@ export default function CartPage() {
               barcode: dbProduct.barcode || dbProduct.id, // Use barcode or fallback to ID
             };
           });
+
+          // Check if order already exists
+          const { data: existingOrder, error: existingOrderError } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('razorpay_order_id', response.razorpay_order_id)
+            .maybeSingle();
+
+          if (existingOrderError) throw existingOrderError;
+
+          if (existingOrder) {
+            // Order already exists, redirect to confirmation
+            window.location.href = `/order-confirmation/${existingOrder.id}`;
+            return;
+          }
 
           // Create order with fresh item data
           const { data: orderData, error: orderError } = await supabase.from('orders').insert([{
@@ -334,7 +349,7 @@ export default function CartPage() {
             Explore our collection of authentic Kalamkari products.
           </p>
           <Button asChild size="lg" className="bg-[#D49217] hover:bg-[#b87d14] text-white px-8">
-            <Link to="/">Start Shopping</Link>
+            <Link to="/products">Start Shopping</Link>
           </Button>
         </div>
       </div>

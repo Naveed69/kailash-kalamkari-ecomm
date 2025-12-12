@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { ShoppingCart, Heart, Search, User, Menu } from "lucide-react"
+import { ShoppingCart, Heart, User, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useWishlist } from "@/contexts/WishlistContext"
 import logo from "@/assets/Logo/kklogo.png"
@@ -25,7 +25,6 @@ interface HeaderProps {
   onCartClick?: () => void
   onWishlistClick?: () => void
   onWhatsAppClick?: () => void
-  onSearchChange?: (query: string) => void
   setProductActive?: (active: boolean) => void
   setIsAboutUsActive?: (active: boolean) => void
 }
@@ -34,21 +33,16 @@ export const Header = ({
   cartCount = 0,
   onCartClick = () => {},
   onWhatsAppClick = () => {},
-  onSearchChange = () => {},
   setProductActive = () => {},
   setIsAboutUsActive = () => {},
 }: HeaderProps = {}) => {
   const { wishlist } = useWishlist()
   const navigate = useNavigate()
-  const { user, signOut } = useAuth()
+  const { user, logout } = useAuth()
   const wishlistCount = wishlist.length
-  const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value)
-    onSearchChange(value)
-  }
+
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -63,7 +57,7 @@ export const Header = ({
   }
 
   const handleLogout = async () => {
-    await signOut()
+    await logout()
     navigate("/")
   }
 
@@ -100,17 +94,6 @@ export const Header = ({
 
           {/* Search and Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 w-full sm:w-64 max-w-xs focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
-              />
-            </div>
-
             {/* Action buttons */}
             <div className="flex items-center text-white space-x-2">
               {/* Unified User Menu */}
@@ -194,25 +177,6 @@ export const Header = ({
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[85vw] max-w-sm">
                   <div className="space-y-4 mt-6">
-                    {/* Mobile search */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input
-                        placeholder="Search products..."
-                        value={searchQuery}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-10 
-                                  w-40 sm:w-48 md:w-56 lg:w-64
-                                  border border-[#D4A017]
-                                  focus:border-[#D4A017]
-                                  focus:ring-transparent
-                                  focus:ring-offset-0
-                                  focus-visible:ring-0
-                                  focus-visible:ring-offset-0
-                                  outline-none"
-                      />
-                    </div>
-
                     {/* Mobile navigation */}
                     <nav className="flex  flex-col space-y-4">
                       {navItems.map((item) => (

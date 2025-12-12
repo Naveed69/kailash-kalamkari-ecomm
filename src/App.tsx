@@ -11,6 +11,7 @@ import ProductsPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
+import { InventoryProvider } from "./contexts/InventoryContext";
 import Wishlist from "./pages/Wishlist";
 import Inventory from "./Inventory/Inventory";
 import AdminLogin from "./pages/AdminLogin";
@@ -27,6 +28,7 @@ import Gallery from "./pages/Gallery";
 import DevAdminButton from "./components/DevAdminButton";
 import TrackOrder from "./pages/TrackOrder";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import SearchPage from "./pages/SearchPage";
 import { AuthProvider } from "./lib/AuthContext";
 import LoginPage from "./pages/Login";
 import MyOrdersPage from "./pages/MyOrders";
@@ -40,11 +42,6 @@ const AppContent = () => {
   const navigate = useNavigate();
   const { cart } = useCart();
   const isInventoryRoute = location.pathname.startsWith("/inventory");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
 
   return (
     <>
@@ -53,11 +50,10 @@ const AppContent = () => {
         <Header
           cartCount={cart?.totalItems ?? 0}
           onCartClick={() => navigate("/cart")}
-          onSearchChange={handleSearchChange}
         />
       )}
       <Routes>
-        <Route path="/" element={<Index searchQuery={searchQuery} />} />
+        <Route path="/" element={<Index />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<Cart />} />
@@ -67,6 +63,7 @@ const AppContent = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
         <Route path="/login" element={<LoginPage />} />
@@ -100,11 +97,13 @@ const App = () => {
         <Sonner />
         <AuthProvider>
           <CartProvider>
-            <WishlistProvider>
-              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                <AppContent />
-              </BrowserRouter>
-            </WishlistProvider>
+            <InventoryProvider>
+              <WishlistProvider>
+                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  <AppContent />
+                </BrowserRouter>
+              </WishlistProvider>
+            </InventoryProvider>
           </CartProvider>
         </AuthProvider>
       </TooltipProvider>

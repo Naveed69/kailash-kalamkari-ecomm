@@ -237,16 +237,32 @@ const ProductDetails = () => {
                                   {product.name}
                                 </h1>
                               </div>
-                              {/* Wishlist Button (Desktop) */}
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
-                                className="hidden md:flex rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 hover:border-[#D49217]"
-                              >
-                                <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-slate-600"}`} />
-                              </Button>
-                            </div>
+                                                          {/* Wishlist Button (Desktop) */}
+                                                          <div className="flex items-center gap-2">
+                                                            <Button
+                                                              variant="outline"
+                                                              size="icon"
+                                                              onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
+                                                              className="hidden md:flex rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 hover:border-[#D49217]"
+                                                            >
+                                                              <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-slate-600"}`} />
+                                                            </Button>
+                                                            <Button
+                                                              variant="outline"
+                                                              size="icon"
+                                                              onClick={() => {
+                                                                navigator.clipboard.writeText(window.location.href);
+                                                                toast({
+                                                                  title: "Link Copied!",
+                                                                  description: "Product link copied to clipboard.",
+                                                                  className: "bg-green-50 border-green-200",
+                                                                });
+                                                              }}
+                                                              className="hidden md:flex rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 hover:border-[#D49217]"
+                                                            >
+                                                              <Share2 className="h-5 w-5 text-slate-600" />
+                                                            </Button>
+                                                          </div>                            </div>
               
                             {/* Rating Placeholder */}
                             <button

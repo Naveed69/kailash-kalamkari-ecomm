@@ -1,338 +1,355 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { ProductCard, Product } from "@/components/ProductCard";
-import { WhatsAppPopup } from "@/components/WhatsAppPopup";
-import ReviewsSection from "@/components/ReviewsSection";
-import { OurJourneySection } from "@/components/OurJourneySection";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
-import { MainCategories } from "@/components/ui/categoryFilter";
+import { useState, useMemo, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import { ProductCard, Product } from "@/components/ProductCard"
+import { WhatsAppPopup } from "@/components/WhatsAppPopup"
+import ReviewsSection from "@/components/ReviewsSection"
+import { OurJourneySection } from "@/components/OurJourneySection"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/use-toast"
+import { ProductFilter, FilterState } from "@/components/ui/ProductFilter"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { SlidersHorizontal } from "lucide-react"
 
-import carouselImage1 from "@/assets/carousel/KANCHIPURAM PATTU SAREES.png";
-import carouselImage2 from "@/assets/carousel/KANCHIPURAM PATTU SAREES2.png";
-import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png";
-import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
-import { MobileNavbar } from "../components/ui/MobileNavbar";
+import carouselImage1 from "@/assets/carousel/KANCHIPURAM PATTU SAREES.png"
+import carouselImage2 from "@/assets/carousel/KANCHIPURAM PATTU SAREES2.png"
+import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png"
+import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png"
+import { MobileNavbar } from "../components/ui/MobileNavbar"
 
-import { useInventory } from "@/contexts/InventoryContext";
-// import { sampleProducts as defaultSampleProducts } from "@/data/products";
-import { CategoryCard } from "@/components/ui/categoryCard";
-import { useCart } from "@/contexts/CartContext";
-import { useWishlist } from "@/contexts/WishlistContext";
-import Heritage from "@/assets/Heritage/Heritage.jpeg";
+import { useInventory } from "@/contexts/InventoryContext"
+import { CategoryCard } from "@/components/ui/categoryCard"
+import { useCart } from "@/contexts/CartContext"
+import { useWishlist } from "@/contexts/WishlistContext"
+import Heritage from "@/assets/Heritage/Heritage.jpeg"
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
-  category: string;
+  category: string
   subCategories: Array<{
-    name: string;
-    subCategoriesImage: string;
-    products: Product[];
-  }>;
+    name: string
+    subCategoriesImage: string
+    products: Product[]
+  }>
 }
 
 type Category = {
-  id: string;
-  name: string;
-  image: string;
+  id: string
+  name: string
+  image: string
   subCategories: Array<{
-    name: string;
-    subCategoriesImage: string;
-    products: Product[];
-  }>;
-};
-
-type MainCategory = {
-  id: string;
-  name: string;
-  image: string;
-};
-
-interface FilterState {
-  categories: string[];
-  mainCategories: string[];
-  selectedCategories: string;
-  priceRange: [number, number];
-  colors: string[];
-  inStock: boolean;
+    name: string
+    subCategoriesImage: string
+    products: Product[]
+  }>
 }
 
-// Carousel slides static data
-const carouselSlides = [
-  {
-    image: carouselImage3,
-    title: "Bangalore Silk Sarees",
-    description:
-      "Luxurious silk sarees handwoven in Bangalore, perfect for grand occasions.",
-    button: {
-      text: "Explore Bangalore Silk",
-      action: "products",
-    },
-  },
-  {
-    image: carouselImage4,
-    title: "Traditional Silks",
-    description:
-      "Celebrate traditions with elegant silk sarees featuring timeless motifs.",
-    button: {
-      text: "Shop Traditional",
-      action: "products",
-    },
-  },
-  {
-    image: carouselImage1,
-    title: "Kanchipuram Pattu Sarees",
-    description:
-      "Authentic Kanchipuram silk sarees with intricate handwoven designs.",
-    button: {
-      text: "View Kanchipuram Collection",
-      action: "products",
-    },
-  },
-  {
-    image: carouselImage2,
-    title: "Modern Kanchipuram",
-    description:
-      "Discover modern interpretations of Kanchipuram sarees with contemporary flair.",
-    button: {
-      text: "See New Arrivals",
-      action: "products",
-    },
-  },
-];
+type MainCategory = {
+  id: string
+  name: string
+  image: string
+}
 
-const Index = ({ searchQuery }: { searchQuery: string }) => {
-  const { categories = [], products = [] } = useInventory() || {};
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { cart = { totalItems: 0 }, addToCart, isInCart } = useCart() || {};
+const Index = () => {
+  const { categories = [], products = [] } = useInventory() || {}
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const { cart = { totalItems: 0 }, addToCart, isInCart } = useCart() || {}
   const {
     wishlist = [],
     addToWishlist,
     removeFromWishlist,
     isInWishlist,
-  } = useWishlist() || {};
-  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
-  
-  // If categories is array of objects with 'category' field, else fallback to []
+  } = useWishlist() || {}
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
+  const [current, setCurrent] = useState(0)
+
+  const carouselSlides = useMemo(
+    () => [
+      {
+        image: carouselImage1,
+        title: "Luxurious Kanchipuram Sarees",
+        description:
+          "Handwoven with pure silk and zari, our Kanchipuram sarees are a testament to timeless elegance.",
+        button: {
+          text: "Shop Now",
+          action: "products",
+        },
+      },
+      {
+        image: carouselImage2,
+        title: "Elegant Bangalore Silk",
+        description:
+          "Experience the rich texture and vibrant colors of our exclusive Bangalore silk collection.",
+        button: {
+          text: "Explore Collection",
+          action: "products",
+        },
+      },
+      {
+        image: carouselImage3,
+        title: "Traditional Kalamkari Art",
+        description:
+          "Discover the ancient art of Kalamkari in our exquisite collection of hand-painted sarees.",
+        button: {
+          text: "View Gallery",
+          action: "gallery",
+        },
+      },
+      {
+        image: carouselImage4,
+        title: "Premium Silk Sarees",
+        description:
+          "Indulge in the finest quality silk sarees, perfect for special occasions.",
+        button: {
+          text: "Shop Now",
+          action: "products",
+        },
+      },
+    ],
+    []
+  )
+
   const mainCategories = useMemo(
     () =>
       Array.isArray(categories)
         ? categories.map((item: any) => item?.category ?? "")
         : [],
     [categories]
-  );
+  )
 
-  // Use dynamic products from inventory
-  const sampleProducts = Array.isArray(products) ? products : [];
+  const sampleProducts = Array.isArray(products) ? products : []
 
-  // Function to render product cards
   const renderProductCards = useCallback(
     (products: Product[]) => {
-      if (!Array.isArray(products)) return null;
+      if (!Array.isArray(products)) return null
       return products.map((product) => (
         <ProductCard
           key={product.id}
           product={product}
           onAddToCart={handleAddToCart}
           onToggleWishlist={() => handleToggleWishlist(product.id)}
-          isWishlisted={typeof isInWishlist === "function" && product.id ? isInWishlist(product.id) : false}
-          isInCart={typeof isInCart === "function" && product.id ? isInCart(product.id) : false}
+          isWishlisted={
+            typeof isInWishlist === "function" && product.id
+              ? isInWishlist(product.id)
+              : false
+          }
+          isInCart={
+            typeof isInCart === "function" && product.id
+              ? isInCart(product.id)
+              : false
+          }
         />
-      ));
+      ))
     },
     [isInWishlist, isInCart]
-  );
+  )
 
   const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">(
     "name"
-  );
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [isSubcategoryActive, setSubCategoryActive] = useState(false);
+  )
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [isSubcategoryActive, setSubCategoryActive] = useState(false)
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(
     null
-  );
-  const [isAboutUsActive, setIsAboutUsActive] = useState(true);
-  const [isProductActive, setProductActive] = useState(true);
-  const [current, setCurrent] = useState(0);
+  )
+  const [isAboutUsActive, setIsAboutUsActive] = useState(true)
+  const [isProductActive, setProductActive] = useState(true)
 
-  // Filter state
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
-    mainCategories: [],
-    selectedCategories: "",
-    priceRange: [0, 10000],
+    priceRange: [0, 1000000],
     colors: [],
     inStock: false,
-  });
+  })
 
-  const sampleImages = carouselSlides.map((slide) => slide.image);
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>()
+    products.forEach((p) => {
+      if (p.categoryName) cats.add(p.categoryName)
+    })
+    return Array.from(cats)
+  }, [products])
 
-  // Handle cart and wishlist actions
+  const availableColors = useMemo(() => {
+    const cols = new Set<string>()
+    products.forEach((p) => {
+      if (Array.isArray(p.colors)) {
+        p.colors.forEach((c) => cols.add(c))
+      }
+    })
+    return Array.from(cols)
+  }, [products])
+
+  const clearFilters = () => {
+    setFilters({
+      categories: [],
+      priceRange: [0, 1000000],
+      colors: [],
+      inStock: false,
+    })
+  }
+
+  const activeFilterCount =
+    filters.categories.length +
+    filters.colors.length +
+    (filters.inStock ? 1 : 0) +
+    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000000 ? 1 : 0)
+
   const handleAddToCart = useCallback(
     (product: Product) => {
-      if (typeof addToCart === "function") addToCart(product);
+      if (typeof addToCart === "function") addToCart(product)
     },
     [addToCart]
-  );
+  )
 
   const handleToggleWishlist = useCallback(
     (productId: string) => {
-      if (!sampleProducts || !Array.isArray(sampleProducts)) return;
-      const product = sampleProducts.find((p) => p.id === productId);
+      if (!sampleProducts || !Array.isArray(sampleProducts)) return
+      const product = sampleProducts.find((p) => p.id === productId)
 
       if (typeof isInWishlist === "function" && isInWishlist(productId)) {
-        // Remove from wishlist
         if (typeof removeFromWishlist === "function") {
-          removeFromWishlist(productId);
+          removeFromWishlist(productId)
         }
       } else if (product) {
-        // Add to wishlist - WishlistContext will handle the toast
         if (typeof addToWishlist === "function") {
-          addToWishlist(product);
+          addToWishlist(product)
         }
       }
     },
     [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts]
-  );
+  )
 
-  // Carousel navigation
   const nextSlide = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % carouselSlides.length);
-  }, []);
+    setCurrent((prev) => (prev + 1) % carouselSlides.length)
+  }, [])
   const prevSlide = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
-  }, []);
-
-  // Carousel auto transition
+    setCurrent(
+      (prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length
+    )
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % carouselSlides.length);
-    }, 5000);
+      setCurrent((prev) => (prev + 1) % carouselSlides.length)
+    }, 5000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
-  // Get category data
   const categoryData = useMemo(() => {
-    if (!filters.selectedCategories || !Array.isArray(categories)) return null;
+    if (!activeCategory || !Array.isArray(categories)) return null
     const cat = categories.find(
-      (item: any) => item?.category === filters.selectedCategories
-    ) as FashionProductCategory | undefined;
-    return Array.isArray(cat?.subCategories) ? cat.subCategories : null;
-  }, [filters.selectedCategories, categories]);
+      (item: any) => item?.category === activeCategory
+    ) as FashionProductCategory | undefined
+    return Array.isArray(cat?.subCategories) ? cat.subCategories : null
+  }, [activeCategory, categories])
 
-  // Get subcategory data
   const subCategoryData = useMemo(() => {
-    if (
-      !filters.selectedCategories ||
-      !activeSubcategory ||
-      !Array.isArray(categories)
-    )
-      return null;
+    if (!activeCategory || !activeSubcategory || !Array.isArray(categories))
+      return null
     const cat = categories.find(
-      (item: any) => item?.category === filters.selectedCategories
-    ) as FashionProductCategory | undefined;
-    if (!cat || !Array.isArray(cat.subCategories)) return null;
+      (item: any) => item?.category === activeCategory
+    ) as FashionProductCategory | undefined
+    if (!cat || !Array.isArray(cat.subCategories)) return null
 
     const subCat = cat.subCategories.find(
       (sub) => sub?.name === activeSubcategory
-    );
-    return Array.isArray(subCat?.products) ? subCat.products : null;
-  }, [filters.selectedCategories, activeSubcategory, categories]);
+    )
+    return Array.isArray(subCat?.products) ? subCat.products : null
+  }, [activeCategory, activeSubcategory, categories])
 
   const filteredProducts = useMemo(() => {
-    if (!Array.isArray(sampleProducts)) return [];
+    if (!Array.isArray(sampleProducts)) return []
 
-    // If no filters are applied and no search query, return all products
     const noFiltersApplied =
       filters.categories.length === 0 &&
       filters.colors.length === 0 &&
       !filters.inStock &&
       filters.priceRange[0] === 0 &&
-      filters.priceRange[1] >= 10000 &&
-      !searchQuery;
+      filters.priceRange[1] >= 1000000 &&
+      !activeCategory &&
+      !isSubcategoryActive
 
-    const sortedProducts = [...sampleProducts];
+    const sortedProducts = [...sampleProducts]
 
     if (noFiltersApplied) {
       sortedProducts.sort((a, b) => {
         switch (sortBy) {
           case "price-low":
-            return a.price - b.price;
+            return a.price - b.price
           case "price-high":
-            return b.price - a.price;
-          case "name":
-          default:
-            return a.name.localeCompare(b.name);
+            return b.price - a.name.localeCompare(b.name)
         }
-      });
-      return sortedProducts;
+      })
+      return sortedProducts
     }
 
-    const filtered = sampleProducts.filter((product) => {
-      if (
-        searchQuery &&
-        !(
-          product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.categoryName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.subCategory?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.material?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      ) {
-        return false;
-      }
-      // Category filter
-      if (
-        filters.categories.length > 0 &&
-        !filters.categories.some((cat) =>
-          typeof cat === "string"
-            ? cat === product.categoryName
-            : (cat as any)?.name === product.categoryName
-        )
-      ) {
-        return false;
-      }
-      // Price filter
-      const price = product.originalPrice ?? product.price;
-      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
-        return false;
-      }
-      // Color filter
-      if (
-        filters.colors.length > 0 &&
-        !(Array.isArray(product.colors) &&
-          filters.colors.some((color) => product.colors?.includes(color)))
-      ) {
-        return false;
-      }
-      // Stock filter
-      if (filters.inStock && !product.inStock) {
-        return false;
-      }
-      return true;
-    });
+    let filtered = [...sampleProducts]
+
+    if (filters.categories.length > 0) {
+      filtered = filtered.filter((product) =>
+        filters.categories.includes(product.categoryName as string)
+      )
+    }
+
+    if (activeCategory && !isSubcategoryActive) {
+      filtered = filtered.filter(
+        (product) => product.category === categoryData?.name
+      )
+    }
+
+    if (isSubcategoryActive && activeSubcategory) {
+      filtered = filtered.filter(
+        (product) => product.subCategory === activeSubcategory
+      )
+    }
+
+    filtered = filtered.filter((product) => {
+      const price = product.originalPrice ?? product.price
+      return price >= filters.priceRange[0] && price <= filters.priceRange[1]
+    })
+
+    if (filters.colors.length > 0) {
+      filtered = filtered.filter(
+        (product) =>
+          Array.isArray(product.colors) &&
+          filters.colors.some((color) => product.colors?.includes(color))
+      )
+    }
+
+    if (filters.inStock) {
+      filtered = filtered.filter((product) => product.inStock)
+    }
 
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
-          return a.price - b.price;
+          return a.price - b.price
         case "price-high":
-          return b.price - a.price;
-        case "name":
-        default:
-          return a.name.localeCompare(b.name);
+          return b.price - a.name.localeCompare(b.name)
       }
-    });
-    return filtered;
-  }, [sampleProducts, searchQuery, filters, sortBy]);
+    })
+    return filtered
+  }, [
+    sampleProducts,
+    filters,
+    sortBy,
+    activeCategory,
+    isSubcategoryActive,
+    activeSubcategory,
+    categoryData,
+  ])
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-
       {/* Hero Section */}
       {isProductActive && isAboutUsActive && (
         <section className="relative min-h-[40vh] md:min-h-[20vh] bg-gradient-to-r from-primary/10 to-accent/10 flex items-center">
@@ -343,7 +360,11 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                 <div
                   key={index}
                   className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 
-                    ${index === current ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+                    ${
+                      index === current
+                        ? "opacity-100 pointer-events-auto"
+                        : "opacity-0 pointer-events-none"
+                    }
                   `}
                   style={{ zIndex: index === current ? 2 : 1 }}
                 >
@@ -372,9 +393,9 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                                 slide.button.action === "products" &&
                                 typeof document !== "undefined"
                               ) {
-                                const el = document.getElementById("products");
+                                const el = document.getElementById("products")
                                 if (el) {
-                                  el.scrollIntoView({ behavior: "smooth" });
+                                  el.scrollIntoView({ behavior: "smooth" })
                                 }
                               }
                             }}
@@ -421,8 +442,9 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                 <button
                   key={index}
                   onClick={() => setCurrent(index)}
-                  className={`w-3 h-3 rounded-full ${current === index ? "bg-white" : "bg-gray-400"
-                    }`}
+                  className={`w-3 h-3 rounded-full ${
+                    current === index ? "bg-white" : "bg-gray-400"
+                  }`}
                   aria-label={`Go to Slide ${index + 1}`}
                   type="button"
                 />
@@ -450,16 +472,37 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
               {/* Filters Sidebar */}
               {/* Desktop View Side Bar */}
               <div className="w-80 flex-shrink-0 hidden lg:block">
-                <MainCategories
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  categories={[]} // Intentionally left as [], provide real one if needed
-                  mainCategories={mainCategories}
-                  colors={[]}
-                  maxPrice={10000}
-                  setActiveCategory={setActiveCategory}
-                  setSubCategoryActiveCategory={setSubCategoryActive}
-                />
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="relative w-full sm:w-fit"
+                    >
+                      <SlidersHorizontal className="h-5 w-5 mr-2" />
+                      Filters
+                      {activeFilterCount > 0 && (
+                        <Badge className="ml-2 bg-primary">
+                          {activeFilterCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-full sm:max-w-xs">
+                    <SheetHeader>
+                      <SheetTitle>Filter Products</SheetTitle>
+                    </SheetHeader>
+                    <div className="py-4 space-y-6">
+                      <ProductFilter
+                        filters={filters}
+                        onFiltersChange={setFilters}
+                        availableCategories={availableCategories}
+                        availableColors={availableColors}
+                        maxPrice={1000000}
+                        onClear={clearFilters}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
 
               {/* Mobile View Nav Bar */}
@@ -467,7 +510,7 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                 <MobileNavbar
                   filters={filters}
                   onFiltersChange={setFilters}
-                  mainCategories={mainCategories}
+                  mainCategories={[]}
                   setActiveCategory={setActiveCategory}
                   setSubCategoryActiveCategory={setSubCategoryActive}
                 />
@@ -481,18 +524,15 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                       <span className="text-sm text-muted-foreground">
                         {filteredProducts?.length ?? 0} products found
                       </span>
-                      {searchQuery && (
-                        <Badge variant="secondary">
-                          Search: "{searchQuery}"
-                        </Badge>
-                      )}
                     </div>
                     <select
                       value={sortBy}
                       onChange={(e) =>
                         setSortBy(
-                          (e.target.value as "price-low" | "price-high" | "name") ||
-                          "name"
+                          (e.target.value as
+                            | "price-low"
+                            | "price-high"
+                            | "name") || "name"
                         )
                       }
                       className="text-sm border border-border rounded-md px-3 py-2 bg-background"
@@ -505,25 +545,27 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                 )}
 
                 {/* Categories */}
-                {activeCategory && !isSubcategoryActive && Array.isArray(categoryData) && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-6">
-                    {categoryData.map((categoryItem: any) => (
-                      <div
-                        key={categoryItem.name}
-                        onClick={() => {
-                          setActiveSubcategory(categoryItem.name);
-                          setSubCategoryActive(true);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <CategoryCard
-                          name={categoryItem.name}
-                          image={categoryItem.subCategoriesImage}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {activeCategory &&
+                  !isSubcategoryActive &&
+                  Array.isArray(categoryData) && (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                      {categoryData.map((categoryItem: any) => (
+                        <div
+                          key={categoryItem.name}
+                          onClick={() => {
+                            setActiveSubcategory(categoryItem.name)
+                            setSubCategoryActive(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <CategoryCard
+                            name={categoryItem.name}
+                            image={categoryItem.subCategoriesImage}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 {/* Products Grid */}
                 {!activeCategory && !isSubcategoryActive && (
@@ -538,8 +580,8 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        setSubCategoryActive(false);
-                        setActiveSubcategory(null);
+                        setSubCategoryActive(false)
+                        setActiveSubcategory(null)
                       }}
                       className="flex items-center gap-2 mb-4"
                     >
@@ -618,7 +660,7 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                 </p>
                 <Button
                   onClick={() => setIsWhatsAppOpen(true)}
-                  className="bg-[#d49217ff] hover:bg-[#d49217ff]"
+                  className="bg-[#D49217] hover:bg-[#cf972fff]"
                 >
                   Learn More About Our Process
                 </Button>
@@ -629,7 +671,7 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
                   alt="Kalamkari craftsmanship"
                   className="rounded-lg shadow-lg w-full h-[400px] object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/30 to-transparent"></div>
               </div>
             </div>
           </div>
@@ -649,7 +691,7 @@ const Index = ({ searchQuery }: { searchQuery: string }) => {
         onOpen={() => setIsWhatsAppOpen(true)}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
