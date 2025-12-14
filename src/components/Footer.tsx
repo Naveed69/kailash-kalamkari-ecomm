@@ -10,23 +10,32 @@ const LOGO_SRC = logo;
 const CONTACT_INFO = {
   phone: "+91 9951821516",
   email: "kailashkalamkari1984@gmail.com",
+
+  // 👇 paste the EXACT address shown by Google Maps
   address: "Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India",
+
   whatsappNumber: "9951821516",
-  mapsUrl: "https://maps.app.goo.gl/BvwZzbZy9GJUoa8j9",
+
+  // short link → only for clicking
+  mapsUrl: "https://maps.app.goo.gl/tNdV3jYR4DBa4rLr5",
+
+  // 👇 this is what makes iframe work
   mapEmbedUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.785282606641!2d79.68492557579845!3d17.7496996833361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a334f1a5c0b5c3d%3A0x8d5ef5e5a5e5e5e5!2sPanagal+Rd,+Srikalahasti,+Andhra+Pradesh+517640,+India!5e0!3m2!1sen!2sin!4v1234567890",
-}
+    "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3234.618879944675!2d79.6885615!3d13.749467!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4d3f1e73f6ce97%3A0x4c1653fa15661c6a!2sKAILASH%20Kalamkari!5e1!3m2!1sen!2sin!4v1765721307065!5m2!1sen!2sin"};
+
+
+
 
 const SOCIAL_MEDIA = [
-  { name: "Facebook", icon: Facebook, url: "https://facebook.com/kailashkalamkari", label: "Follow us on Facebook" },
+  { name: "Facebook", icon: Facebook, url: "https://share.google/l9qkOGlNKmBI84gCR", label: "Follow us on Facebook" },
   {
     name: "Instagram",
     icon: Instagram,
-    url: "https://instagram.com/kailashkalamkari",
+    url: "https://www.instagram.com/kailash_kalamkari_1984?igsh=MTRqNmtxcDViY3pqMQ==",
     label: "Follow us on Instagram",
   },
   { name: "Twitter", icon: Twitter, url: "https://twitter.com/kailashkalamkari", label: "Follow us on Twitter" },
-  { name: "YouTube", icon: Youtube, url: "https://youtube.com/@kailashkalamkari", label: "Subscribe on YouTube" },
+  { name: "YouTube", icon: Youtube, url: "https://youtube.com/@kailashkalamkarisarees?si=oUOAYh3q6yVTxUCM", label: "Subscribe on YouTube" },
 ]
 
 // Text Hover Effect Component

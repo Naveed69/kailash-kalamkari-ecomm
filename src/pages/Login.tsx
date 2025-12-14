@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmailLogin } from '@/components/auth/EmailLogin';
+// import { EmailLogin } from '@/components/auth/EmailLogin';
 import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/Logo/kklogo.png';
 
@@ -19,14 +19,14 @@ const LoginPage: React.FC = () => {
           <p className="text-slate-600">Sign in to access your account and orders</p>
         </div>
         
-        <EmailLogin 
+        {/* <EmailLogin 
           onSuccess={() => {
             // Redirect to checkout or home
             const returnTo = new URLSearchParams(window.location.search).get('returnTo');
             navigate(returnTo || '/');
           }}
           showHeader={true}
-        />
+        /> */}
       </div>
     </div>
   );
