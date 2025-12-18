@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
-import { EmailLoginModal } from "@/components/auth/EmailLoginModal";
+// import { EmailLoginModal } from "@/components/auth/EmailLoginModal";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -705,11 +705,11 @@ export default function CartPage() {
         </div>
 
         {/* Email Login Modal */}
-        <EmailLoginModal
+        {/* <EmailLoginModal
           open={showLoginModal}
           onOpenChange={setShowLoginModal}
           redirectTo="/cart"
-        />
+        /> */}
       </div>
     </div>
   );

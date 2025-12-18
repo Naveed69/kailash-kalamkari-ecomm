@@ -20,20 +20,24 @@ const LOGO_SRC = logo
 const CONTACT_INFO = {
   phone: "+91 9951821516",
   email: "kailashkalamkari1984@gmail.com",
+
+  // 👇 paste the EXACT address shown by Google Maps
   address: "Panagal Rd, Srikalahasti, Andhra Pradesh 517640, India",
+
   whatsappNumber: "9951821516",
-  mapsUrl: "https://maps.app.goo.gl/nR9DJjtnLh7Vuvtz7",
-  // TODO: Update this embed URL with the correct one from Google Maps to match the new mapsUrl
-  mapEmbedUrl: "https://www.google.com/maps/embed?q=13.7497066,79.6870682",
-}
+
+  // short link → only for clicking
+  mapsUrl: "https://maps.app.goo.gl/tNdV3jYR4DBa4rLr5",
+
+  // 👇 this is what makes iframe work
+  mapEmbedUrl:
+    "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3234.618879944675!2d79.6885615!3d13.749467!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4d3f1e73f6ce97%3A0x4c1653fa15661c6a!2sKAILASH%20Kalamkari!5e1!3m2!1sen!2sin!4v1765721307065!5m2!1sen!2sin"};
+
+
+
 
 const SOCIAL_MEDIA = [
-  {
-    name: "Facebook",
-    icon: Facebook,
-    url: "https://share.google/l9qkOGlNKmBI84gCR",
-    label: "Follow us on Facebook",
-  },
+  { name: "Facebook", icon: Facebook, url: "https://share.google/l9qkOGlNKmBI84gCR", label: "Follow us on Facebook" },
   {
     name: "Instagram",
     icon: Instagram,
