@@ -2,13 +2,40 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X, Menu, Search, ShoppingCart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-export const MobileNavbar = () => {
+export const MobileNavbar = ({
+  filters,
+  onFiltersChange,
+  mainCategories,
+  setActiveCategory,
+  setSubCategoryActiveCategory,
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Navbar categories (example) - these should ideally come from a central place or context
+  const clearFilters = () => {
+    onFiltersChange({
+      categories: [],
+      selectedCategories: "",
+      priceRange: [0, 10000000],
+      colors: [],
+      inStock: false,
+    });
+    setActiveCategory(false);
+  };
+
+  const updateFilter = (key, value) => {
+    onFiltersChange({ ...filters, [key]: value });
+  };
+
+  const activeFilterCount =
+    filters.categories.length +
+    filters.colors.length +
+    (filters.inStock ? 1 : 0) +
+    (filters.priceRange[0] > 0 || filters.priceRange[1] < 1000000 ? 1 : 0) +
+    (filters.selectedCategories && filters.selectedCategories !== "" ? 1 : 0);
+
+  // Navbar categories
   const navCategories = ["Sarees", "Dupattas", "Fabrics", "Home Decor"];
 
   return (
@@ -20,9 +47,15 @@ export const MobileNavbar = () => {
             <button
               key={category}
               onClick={() => {
-                navigate(`/products?category=${category}`);
+                updateFilter("selectedCategories", category);
+                setActiveCategory(true);
+                setSubCategoryActiveCategory(false);
               }}
-              className={`flex-1 min-w-0 py-3 px-2 text-xs font-medium transition-colors whitespace-nowrap text-gray-600 hover:bg-gray-50`}
+              className={`flex-1 min-w-0 py-3 px-2 text-xs font-medium transition-colors whitespace-nowrap ${
+                filters.selectedCategories === category
+                  ? "bg-blue-50 text-blue-700 border-t-2 border-blue-600"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               {category}
             </button>
