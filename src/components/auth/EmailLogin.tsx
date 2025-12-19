@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword 
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useNavigate } from 'react-router-dom';
 
 interface EmailLoginProps {
   showHeader?: boolean;
@@ -15,17 +20,19 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
   showHeader = false 
 }) => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
+    if (!email || !password) {
       toast({
-        title: 'Email required',
-        description: 'Please enter your email address',
+        title: 'Error',
+        description: 'Please fill in all fields',
         variant: 'destructive',
       });
       return;
@@ -34,25 +41,30 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: `${window.location.origin}`,
-        },
-      });
-
-      if (error) throw error;
-
-      setEmailSent(true);
-      toast({
-        title: '✅ Check your email!',
-        description: 'We sent you a magic link to sign in.',
-        className: 'bg-green-50 border-green-200',
-      });
+      if (isLogin) {
+        // Sign in
+        await signInWithEmailAndPassword(auth, email, password);
+        toast({
+          title: 'Success',
+          description: 'Successfully signed in!',
+        });
+        navigate('/inventory/dashboard');
+      } else {
+        // Sign up
+        await createUserWithEmailAndPassword(auth, email, password);
+        toast({
+          title: 'Success',
+          description: 'Account created successfully!',
+        });
+        // Auto sign in after sign up
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate('/inventory/dashboard');
+      }
     } catch (error: any) {
+      console.error('Authentication error:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to send magic link',
+        description: error.message || 'Authentication failed',
         variant: 'destructive',
       });
     } finally {
@@ -60,81 +72,88 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
     }
   };
 
-  if (emailSent) {
-    return (
-      <Card className="border-green-200 bg-green-50/50">
-        <CardContent className="pt-6">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <Mail className="w-8 h-8 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Check your email</h3>
-              <p className="text-sm text-slate-600">
-                We sent a magic link to <strong>{email}</strong>
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Click the link in the email to sign in
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEmailSent(false);
-                setEmail('');
-              }}
-              className="mt-4"
-            >
-              Try different email
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
-    <Card>
+    <Card className="w-full max-w-md mx-auto">
       {showHeader && (
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>
-            Enter your email to receive a magic link
-          </CardDescription>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </CardTitle>
         </CardHeader>
       )}
-      <CardContent className={showHeader ? "" : "pt-6"}>
-        <form onSubmit={handleLogin} className="space-y-4">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              required
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="pl-10"
+                required
+              />
+            </div>
           </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              {isLogin && (
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline"
+                  onClick={() => {/* Add forgot password logic */}}
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="pl-10"
+                required
+                minLength={6}
+              />
+            </div>
+          </div>
+          
           <Button 
             type="submit" 
-            className="w-full bg-[#D49217] hover:bg-[#C28315]"
+            className="w-full" 
             disabled={loading}
           >
             {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending magic link...
-              </>
-            ) : (
-              <>
-                <Mail className="mr-2 h-4 w-4" />
-                Continue with Email
-              </>
-            )}
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isLogin ? 'Sign In' : 'Create Account'}
           </Button>
-         </form>
+          
+          <div className="text-center text-sm">
+            <button
+              type="button"
+              className="text-primary hover:underline"
+              onClick={() => setIsLogin(!isLogin)}
+              disabled={loading}
+            >
+              {isLogin 
+                ? "Don't have an account? Sign up" 
+                : 'Already have an account? Sign in'}
+            </button>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );

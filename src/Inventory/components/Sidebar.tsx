@@ -10,16 +10,22 @@ import {
 } from "react-icons/fi"
 import "./Sidebar.css"
 import { useAuth } from "@/lib/AuthContext"
+import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { useToast } from "@/components/ui/use-toast"
 
 const Sidebar = () => {
   const navigate = useNavigate()
-  const { logout, user } = useAuth()
-  const role = user?.user_metadata?.role
+  const { user, logout} = useAuth()
+  const role = user?.metadata?.role
+
+    const { toast } = useToast();
+  
 
   const handleLogout = async () => {
     await logout()
     localStorage.removeItem("isLoggedIn") // Clear legacy auth just in case
-    navigate("/admin")
+    navigate("/login")
   }
 
   const menuItems = [
