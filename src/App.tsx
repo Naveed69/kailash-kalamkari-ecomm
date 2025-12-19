@@ -1,47 +1,48 @@
-import { useState } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import Index from "./pages/Index";
-import Cart from "./pages/Cart";
-import AboutUs from "./pages/AboutUs";
-import ProductsPage from "./pages/ProductPage";
-import NotFound from "./pages/NotFound";
-import { CartProvider } from "./contexts/CartContext";
-import { WishlistProvider } from "./contexts/WishlistContext";
-import { InventoryProvider } from "./contexts/InventoryContext";
-import Wishlist from "./pages/Wishlist";
-import Inventory from "./Inventory/Inventory";
-import AdminLogin from "./pages/AdminLogin";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ProductDetails from "./pages/ProductDetails";
-import ScrollToTop from "./components/ScrollToTop";
-import { Header } from "./components/Header";
-import Footer from "./components/Footer";
-import { useCart } from "./contexts/CartContext";
-import { useLocation } from "react-router-dom";
-import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
-import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
-import Gallery from "./pages/Gallery";
-import DevAdminButton from "./components/DevAdminButton";
-import TrackOrder from "./pages/TrackOrder";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import SearchPage from "./pages/SearchPage";
-import { AuthProvider } from "./lib/AuthContext";
-import LoginPage from "./pages/Login";
-import MyOrdersPage from "./pages/MyOrders";
-import OrderDetails from "./pages/OrderDetails";
-import ProfilePage from "./pages/Profile";
+import { useState } from "react"
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom"
+import Index from "./pages/Index"
+import Cart from "./pages/Cart"
+import AboutUs from "./pages/AboutUs"
+import ProductsPage from "./pages/ProductPage"
+import NotFound from "./pages/NotFound"
+import { CartProvider } from "./contexts/CartContext"
+import { WishlistProvider } from "./contexts/WishlistContext"
+import { InventoryProvider } from "./contexts/InventoryContext"
+import Wishlist from "./pages/Wishlist"
+import Inventory from "./Inventory/Inventory"
+import AdminLogin from "./pages/AdminLogin"
+import ProtectedRoute from "./components/ProtectedRoute"
+import ProductDetails from "./pages/ProductDetails"
+import ScrollToTop from "./components/ScrollToTop"
+import { Header } from "./components/Header"
+import Footer from "./components/Footer"
+import { useCart } from "./contexts/CartContext"
+import { useLocation } from "react-router-dom"
+import PrivacyPolicyPage from "./components/PrivacyPolicyPage"
+import TermsAndConditionsPage from "./components/TermsAndConditionsPage"
+import Gallery from "./pages/Gallery"
+import DevAdminButton from "./components/DevAdminButton"
+import TrackOrder from "./pages/TrackOrder"
+import OrderConfirmation from "./pages/OrderConfirmation"
+import SearchPage from "./pages/SearchPage"
+import { AuthProvider } from "./lib/AuthContext"
+import LoginPage from "./pages/Login"
+import MyOrdersPage from "./pages/MyOrders"
+import OrderDetails from "./pages/OrderDetails"
+import ProfilePage from "./pages/Profile"
+import { ProtectedWishlistRoute } from "./components/ProtectedWishlistRoute"
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const AppContent = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { cart } = useCart();
-  const isInventoryRoute = location.pathname.startsWith("/inventory");
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { cart } = useCart()
+  const isInventoryRoute = location.pathname.startsWith("/inventory")
 
   return (
     <>
@@ -57,7 +58,14 @@ const AppContent = () => {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist />} />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedWishlistRoute>
+              <Wishlist />
+            </ProtectedWishlistRoute>
+          }
+        />
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -65,7 +73,10 @@ const AppContent = () => {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/track-order" element={<TrackOrder />} />
-        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={<OrderConfirmation />}
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/my-orders" element={<MyOrdersPage />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -74,7 +85,7 @@ const AppContent = () => {
         <Route
           path="/inventory/*"
           element={
-            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+            <ProtectedRoute allowedRoles={["super_admin", "admin"]}>
               <Inventory />
             </ProtectedRoute>
           }
@@ -86,8 +97,8 @@ const AppContent = () => {
       {!isInventoryRoute && <Footer />}
       <DevAdminButton />
     </>
-  );
-};
+  )
+}
 
 const App = () => {
   return (
@@ -99,7 +110,12 @@ const App = () => {
           <CartProvider>
             <InventoryProvider>
               <WishlistProvider>
-                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <BrowserRouter
+                  future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                  }}
+                >
                   <AppContent />
                 </BrowserRouter>
               </WishlistProvider>
@@ -108,7 +124,7 @@ const App = () => {
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App

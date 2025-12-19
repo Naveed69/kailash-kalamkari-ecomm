@@ -8,9 +8,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useWishlist } from "@/contexts/WishlistContext"
 import logo from "@/assets/Logo/kklogo.png"
 import AboutUs from "@/pages/AboutUs"
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useToast } from "@/components/ui/use-toast";
+import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/AuthContext"
 
 import {
@@ -46,8 +46,6 @@ export const Header = ({
   const wishlistCount = wishlist.length
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-
-
   const navItems = [
     { label: "Home", href: "/" },
     { label: "Products", href: "/products" },
@@ -59,7 +57,7 @@ export const Header = ({
     // Admin login navigation
     navigate("/adminLogin")
   }
-  const { toast } = useToast();
+  const { toast } = useToast()
 
   const handleLogout = async () => {
     await logout()
