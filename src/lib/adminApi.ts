@@ -1,48 +1,52 @@
-import { supabase } from "@/lib/supabaseClient";
-import type { Product } from "@/components/ProductCard";
+import { supabase } from "@/lib/supabaseClient"
+import type { Product } from "@/components/ProductCard"
 
 const sanitizePayload = (payload: Partial<Product>) => {
-  const p: any = { ...payload };
+  const p: any = { ...payload }
   // remove undefined fields
-  Object.keys(p).forEach((k) => p[k] === undefined && delete p[k]);
+  Object.keys(p).forEach((k) => p[k] === undefined && delete p[k])
 
   // coerce numeric fields
-  if (p.price !== undefined) p.price = p.price === "" ? null : Number(p.price);
-  if (p.originalPrice !== undefined) p.originalPrice = p.originalPrice === "" ? null : Number(p.originalPrice);
+  if (p.price !== undefined) p.price = p.price === "" ? null : Number(p.price)
+  if (p.originalPrice !== undefined)
+    p.originalPrice = p.originalPrice === "" ? null : Number(p.originalPrice)
 
   // coerce category/subCategory to numeric ids when provided
   const toNullableInt = (v: any) => {
-    if (v === undefined || v === null || v === "") return null;
+    if (v === undefined || v === null || v === "") return null
     // treat booleans or boolean-like strings as null (unlikely to be valid ids)
-    if (typeof v === "boolean") return null;
+    if (typeof v === "boolean") return null
     if (typeof v === "string") {
-      const trimmed = v.trim();
+      const trimmed = v.trim()
       // explicit boolean-like strings
-      if (trimmed === "true" || trimmed === "false") return null;
-      const n = Number(trimmed);
-      return Number.isNaN(n) ? null : n;
+      if (trimmed === "true" || trimmed === "false") return null
+      const n = Number(trimmed)
+      return Number.isNaN(n) ? null : n
     }
-    if (typeof v === "number") return Number.isFinite(v) ? v : null;
-    return null;
-  };
+    if (typeof v === "number") return Number.isFinite(v) ? v : null
+    return null
+  }
 
-  if (p.category !== undefined) p.category = toNullableInt(p.category);
-  if (p.subCategory !== undefined) p.subCategory = toNullableInt(p.subCategory);
+  if (p.category !== undefined) p.category = toNullableInt(p.category)
+  if (p.subCategory !== undefined) p.subCategory = toNullableInt(p.subCategory)
 
   // colors: accept string (comma separated) or array
   if (p.colors !== undefined) {
     if (typeof p.colors === "string") {
-      p.colors = p.colors.split(",").map((s: string) => s.trim()).filter(Boolean);
+      p.colors = p.colors
+        .split(",")
+        .map((s: string) => s.trim())
+        .filter(Boolean)
     } else if (!Array.isArray(p.colors)) {
-      p.colors = [String(p.colors)];
+      p.colors = [String(p.colors)]
     }
   }
 
   // inStock to boolean
-  if (p.inStock !== undefined) p.inStock = Boolean(p.inStock);
+  if (p.inStock !== undefined) p.inStock = Boolean(p.inStock)
 
   // Remove id when inserting
-  if (p.id !== undefined) delete p.id;
+  if (p.id !== undefined) delete p.id
 
   // Map camelCase keys used in UI to snake_case column names in Postgres (common convention)
   const keyMap: Record<string, string> = {
@@ -55,333 +59,454 @@ const sanitizePayload = (payload: Partial<Product>) => {
     quantity: "stock_quantity",
     images: "images",
     // add more mappings if your DB uses different column names
-  };
+  }
 
-  const mapped: any = {};
+  const mapped: any = {}
   Object.keys(p).forEach((k) => {
-    const mappedKey = keyMap[k] ?? k;
+    const mappedKey = keyMap[k] ?? k
     // ensure any *_id columns are numbers or null
     if (mappedKey.endsWith("_id")) {
-      const val = p[k];
+      const val = p[k]
       if (val === null || val === undefined) {
-        mapped[mappedKey] = null;
+        mapped[mappedKey] = null
       } else if (typeof val === "number") {
-        mapped[mappedKey] = Number.isFinite(val) ? val : null;
+        mapped[mappedKey] = Number.isFinite(val) ? val : null
       } else {
         // try to coerce strings like "123" to numbers, otherwise null
-        const coerced = Number(val);
-        mapped[mappedKey] = Number.isNaN(coerced) ? null : coerced;
+        const coerced = Number(val)
+        mapped[mappedKey] = Number.isNaN(coerced) ? null : coerced
       }
     } else {
-      mapped[mappedKey] = p[k];
+      mapped[mappedKey] = p[k]
     }
-  });
+  })
 
-  return mapped as Partial<Product>;
-};
+  return mapped as Partial<Product>
+}
 
 const findInvalidIdField = (obj: Record<string, any>) => {
   for (const key of Object.keys(obj)) {
     if (key.endsWith("_id")) {
-      const v = obj[key];
+      const v = obj[key]
       if (v !== null && typeof v !== "number") {
-        return { field: key, value: v };
+        return { field: key, value: v }
       }
     }
   }
-  return null;
-};
+  return null
+}
 
 // Keep typings simple to avoid complex generic constraints from the Supabase client
-export const getProducts = async (): Promise<{ data: Product[] | null; error: any }> => {
-  const { data, error } = await supabase.from("products").select("*");
-  return { data: (data as Product[]) ?? null, error };
-};
+export const getProducts = async (): Promise<{
+  data: Product[] | null
+  error: any
+}> => {
+  const { data, error } = await supabase.from("products").select("*")
+  return { data: (data as Product[]) ?? null, error }
+}
 
-export const getProductById = async (id: string): Promise<{ data: Product | null; error: any }> => {
+export const getProductById = async (
+  id: string
+): Promise<{ data: Product | null; error: any }> => {
   // use maybeSingle so PostgREST 406 (no rows) isn't treated as an exception
-  const { data, error } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle()
   // If there was no error but also no data, return a friendly not-found error
   if (!error && !data) {
-    return { data: null, error: { message: "Product not found", code: "NOT_FOUND", status: 404 } };
+    return {
+      data: null,
+      error: { message: "Product not found", code: "NOT_FOUND", status: 404 },
+    }
   }
-  return { data: (data as Product) ?? null, error };
-};
+  return { data: (data as Product) ?? null, error }
+}
 
-export const createProduct = async (payload: Partial<Product>): Promise<{ data: Product | null; error: any }> => {
-  const sanitized = sanitizePayload(payload);
+export const createProduct = async (
+  payload: Partial<Product>
+): Promise<{ data: Product | null; error: any }> => {
+  const sanitized = sanitizePayload(payload)
   // Validate id fields before attempting insert
-  const invalid = findInvalidIdField(sanitized as Record<string, any>);
+  const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
-    const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(invalid.value)}`;
-    console.error("Validation error before insert:", message);
-    return { data: null, error: { message, details: null, hint: "Ensure *_id fields are numeric or null", code: "VALIDATION", status: 400 } };
+    const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(
+      invalid.value
+    )}`
+    return {
+      data: null,
+      error: {
+        message,
+        details: null,
+        hint: "Ensure *_id fields are numeric or null",
+        code: "VALIDATION",
+        status: 400,
+      },
+    }
   }
-  console.debug("createProduct - sanitized payload:", sanitized);
   // Try initial insert
-  const attemptInsert = async (obj: any) => await supabase.from("products").insert([obj]).select().single();
+  const attemptInsert = async (obj: any) =>
+    await supabase.from("products").insert([obj]).select().single()
 
-  const { data, error, status } = await attemptInsert(sanitized);
-  if (!error) return { data: (data as Product) ?? null, error: null };
-
-  console.warn("Supabase insert error - first attempt:", { message: error.message, details: error.details, hint: error.hint, code: error.code, status });
+  const { data, error, status } = await attemptInsert(sanitized)
+  if (!error) return { data: (data as Product) ?? null, error: null }
 
   // If PostgREST says a column is missing, try reasonable fallbacks (map `category` to category_id / category_name)
-  const missingMatch = typeof error?.message === "string" && error.message.match(/Could not find the '(.+?)' column/);
+  const missingMatch =
+    typeof error?.message === "string" &&
+    error.message.match(/Could not find the '(.+?)' column/)
   if (missingMatch) {
-    const missingCol = missingMatch[1];
-    console.debug("Detected missing column from PostgREST message:", missingCol);
+    const missingCol = missingMatch[1]
 
     // Build fallback attempts
-    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = [];
+    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = []
 
     // If UI provided `category`, try mapping to `category_id` (numeric) and `category_name` (text)
     if (sanitized.category !== undefined) {
       fallbacks.push({
         desc: "map category -> category_id",
         mapper: (src) => {
-          const copy = { ...src };
-          const val = copy.category;
-          delete copy.category;
-          const coerced = Number(val);
-          copy["category_id"] = Number.isNaN(coerced) ? null : coerced;
-          return copy;
+          const copy = { ...src }
+          const val = copy.category
+          delete copy.category
+          const coerced = Number(val)
+          copy["category_id"] = Number.isNaN(coerced) ? null : coerced
+          return copy
         },
-      });
+      })
 
       fallbacks.push({
         desc: "map category -> category_name",
         mapper: (src) => {
-          const copy = { ...src };
-          copy["category_name"] = copy.category;
-          delete copy.category;
-          return copy;
+          const copy = { ...src }
+          copy["category_name"] = copy.category
+          delete copy.category
+          return copy
         },
-      });
+      })
     }
 
     // Generic fallback: remove the offending column if it exists in payload
     fallbacks.push({
       desc: `remove ${missingCol}`,
       mapper: (src) => {
-        const copy = { ...src };
-        if (copy[missingCol] !== undefined) delete copy[missingCol];
-        return copy;
+        const copy = { ...src }
+        if (copy[missingCol] !== undefined) delete copy[missingCol]
+        return copy
       },
-    });
+    })
 
     for (const fb of fallbacks) {
       try {
-        const attemptPayload = fb.mapper(sanitized);
-        console.debug("Retrying insert with fallback:", fb.desc, attemptPayload);
-        const r = await attemptInsert(attemptPayload);
+        const attemptPayload = fb.mapper(sanitized)
+        const r = await attemptInsert(attemptPayload)
         if (!r.error) {
-          console.info("Insert successful after fallback:", fb.desc);
-          return { data: (r.data as Product) ?? null, error: null };
+          return { data: (r.data as Product) ?? null, error: null }
         }
-        console.warn("Fallback attempt failed:", fb.desc, r.error?.message ?? r.error);
       } catch (err) {
-        console.error("Error during fallback attempt:", err);
+        // Ignore individual fallback failures so the loop can continue
       }
     }
   }
 
   // Still failing - return structured error
-  console.error("Supabase insert final error:", { message: error.message, details: error.details, hint: error.hint, code: error.code, status });
   return {
     data: null,
-    error: { message: error.message, details: error.details, hint: error.hint, code: error.code, status },
-  };
-};
+    error: {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+      status,
+    },
+  }
+}
 
-export const updateProduct = async (id: string, payload: Partial<Product>): Promise<{ data: Product | null; error: any }> => {
-  const sanitized = sanitizePayload(payload);
+export const updateProduct = async (
+  id: string,
+  payload: Partial<Product>
+): Promise<{ data: Product | null; error: any }> => {
+  const sanitized = sanitizePayload(payload)
   // Validate id fields before attempting update
-  const invalid = findInvalidIdField(sanitized as Record<string, any>);
+  const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
-    const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(invalid.value)}`;
-    console.error("Validation error before update:", message);
-    return { data: null, error: { message, details: null, hint: "Ensure *_id fields are numeric or null", code: "VALIDATION", status: 400 } };
+    const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(
+      invalid.value
+    )}`
+    return {
+      data: null,
+      error: {
+        message,
+        details: null,
+        hint: "Ensure *_id fields are numeric or null",
+        code: "VALIDATION",
+        status: 400,
+      },
+    }
   }
-  console.debug("updateProduct - sanitized payload:", sanitized);
-  const attemptUpdate = async (obj: any) => await supabase.from("products").update(obj).eq("id", id).select().maybeSingle();
+  const attemptUpdate = async (obj: any) =>
+    await supabase
+      .from("products")
+      .update(obj)
+      .eq("id", id)
+      .select()
+      .maybeSingle()
 
-  const { data, error, status } = await attemptUpdate(sanitized);
+  const { data, error, status } = await attemptUpdate(sanitized)
   if (!error) {
-    if (!data) return { data: null, error: { message: "Product not found", code: "NOT_FOUND", status: 404 } };
-    return { data: (data as Product) ?? null, error: null };
+    if (!data)
+      return {
+        data: null,
+        error: { message: "Product not found", code: "NOT_FOUND", status: 404 },
+      }
+    return { data: (data as Product) ?? null, error: null }
   }
 
-  console.warn("Supabase update error - first attempt:", { message: error.message, details: error.details, hint: error.hint, code: error.code, status });
-
-  const missingMatch = typeof error?.message === "string" && error.message.match(/Could not find the '(.+?)' column/);
+  const missingMatch =
+    typeof error?.message === "string" &&
+    error.message.match(/Could not find the '(.+?)' column/)
   if (missingMatch) {
-    const missingCol = missingMatch[1];
-    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = [];
+    const missingCol = missingMatch[1]
+    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = []
 
     if (sanitized.category !== undefined) {
       fallbacks.push({
         desc: "map category -> category_id",
         mapper: (src) => {
-          const copy = { ...src };
-          const val = copy.category;
-          delete copy.category;
-          const coerced = Number(val);
-          copy["category_id"] = Number.isNaN(coerced) ? null : coerced;
-          return copy;
+          const copy = { ...src }
+          const val = copy.category
+          delete copy.category
+          const coerced = Number(val)
+          copy["category_id"] = Number.isNaN(coerced) ? null : coerced
+          return copy
         },
-      });
+      })
+
       fallbacks.push({
         desc: "map category -> category_name",
         mapper: (src) => {
-          const copy = { ...src };
-          copy["category_name"] = copy.category;
-          delete copy.category;
-          return copy;
+          const copy = { ...src }
+          copy["category_name"] = copy.category
+          delete copy.category
+          return copy
         },
-      });
+      })
     }
 
     fallbacks.push({
       desc: `remove ${missingCol}`,
       mapper: (src) => {
-        const copy = { ...src };
-        if (copy[missingCol] !== undefined) delete copy[missingCol];
-        return copy;
+        const copy = { ...src }
+        if (copy[missingCol] !== undefined) delete copy[missingCol]
+        return copy
       },
-    });
+    })
 
     for (const fb of fallbacks) {
       try {
-        const attemptPayload = fb.mapper(sanitized);
-        console.debug("Retrying update with fallback:", fb.desc, attemptPayload);
-        const r = await attemptUpdate(attemptPayload);
+        const attemptPayload = fb.mapper(sanitized)
+        const r = await attemptUpdate(attemptPayload)
         if (!r.error) {
-          console.info("Update successful after fallback:", fb.desc);
-          return { data: (r.data as Product) ?? null, error: null };
+          return { data: (r.data as Product) ?? null, error: null }
         }
-        console.warn("Fallback update attempt failed:", fb.desc, r.error?.message ?? r.error);
       } catch (err) {
-        console.error("Error during fallback update attempt:", err);
+        // no-op: we only care if a fallback succeeds
       }
     }
   }
 
-  console.error("Supabase update final error:", { message: error.message, details: error.details, hint: error.hint, code: error.code, status });
-  return { data: null, error: { message: error.message, details: error.details, hint: error.hint, code: error.code, status } };
-};
+  return {
+    data: null,
+    error: {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+      status,
+    },
+  }
+}
 
-export const deleteProduct = async (id: string): Promise<{ data: any; error: any }> => {
-  const { data, error } = await supabase.from("products").delete().eq("id", id);
-  return { data, error };
-};
+export const deleteProduct = async (
+  id: string
+): Promise<{ data: any; error: any }> => {
+  const { data, error } = await supabase.from("products").delete().eq("id", id)
+  return { data, error }
+}
 
-export const getCategories = async (): Promise<{ data: any[] | null; error: any }> => {
-  const { data, error } = await supabase.from("categories").select("*");
-  return { data: data ?? null, error };
-};
+export const getCategories = async (): Promise<{
+  data: any[] | null
+  error: any
+}> => {
+  const { data, error } = await supabase.from("categories").select("*")
+  return { data: data ?? null, error }
+}
 
 // Fetch all sub categories from the database
-export const getSubCategories = async (): Promise<{ data: any[] | null; error: any }> => {
-  const { data, error } = await supabase.from("sub_categories").select("*");
-  
+export const getSubCategories = async (): Promise<{
+  data: any[] | null
+  error: any
+}> => {
+  const { data, error } = await supabase.from("sub_categories").select("*")
+
   // Map subCatName to name for frontend consistency
-  const mappedData = data?.map(item => ({
-    ...item,
-    name: item.subCatName
-  })) || null;
+  const mappedData =
+    data?.map((item) => ({
+      ...item,
+      name: item.subCatName,
+      image_url: item.image_url ?? null,
+    })) || null
 
-  return { data: mappedData, error };
-};
+  return { data: mappedData, error }
+}
 
-export const uploadImage = async (file: File): Promise<{ url: string | null; error: any }> => {
+export const uploadImage = async (
+  file: File
+): Promise<{ url: string | null; error: any }> => {
   try {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const fileExt = file.name.split(".").pop()
+    const fileName = `${Math.random()
+      .toString(36)
+      .substring(2)}_${Date.now()}.${fileExt}`
+    const filePath = `${fileName}`
 
     const { error: uploadError } = await supabase.storage
       .from("products")
-      .upload(filePath, file);
+      .upload(filePath, file)
 
     if (uploadError) {
-      throw uploadError;
+      throw uploadError
     }
 
-    const { data } = supabase.storage.from("products").getPublicUrl(filePath);
-    return { url: data.publicUrl, error: null };
+    const { data } = supabase.storage.from("products").getPublicUrl(filePath)
+    return { url: data.publicUrl, error: null }
   } catch (error: any) {
-    console.error("Error uploading image:", error);
-    return { url: null, error };
+    return { url: null, error }
   }
-};
+}
 
 // Category CRUD operations
-export const createCategory = async (payload: { name: string; description?: string }): Promise<{ data: any | null; error: any }> => {
-  const { data, error } = await supabase.from("categories").insert([payload]).select().single();
-  return { data, error };
-};
+export const createCategory = async (payload: {
+  name: string
+  description?: string
+}): Promise<{ data: any | null; error: any }> => {
+  const { data, error } = await supabase
+    .from("categories")
+    .insert([payload])
+    .select()
+    .single()
+  return { data, error }
+}
 
-export const updateCategory = async (id: number, payload: { name?: string; description?: string }): Promise<{ data: any | null; error: any }> => {
-  const { data, error } = await supabase.from("categories").update(payload).eq("id", id).select().single();
-  return { data, error };
-};
+export const updateCategory = async (
+  id: number,
+  payload: { name?: string; description?: string }
+): Promise<{ data: any | null; error: any }> => {
+  const { data, error } = await supabase
+    .from("categories")
+    .update(payload)
+    .eq("id", id)
+    .select()
+    .single()
+  return { data, error }
+}
 
-export const deleteCategory = async (id: number): Promise<{ data: any; error: any }> => {
-  const { data, error } = await supabase.from("categories").delete().eq("id", id);
-  return { data, error };
-};
+export const deleteCategory = async (
+  id: number
+): Promise<{ data: any; error: any }> => {
+  const { data, error } = await supabase
+    .from("categories")
+    .delete()
+    .eq("id", id)
+  return { data, error }
+}
 
 // SubCategory CRUD operations
-export const createSubCategory = async (payload: { name: string; description?: string; category_id: number }): Promise<{ data: any | null; error: any }> => {
+export const createSubCategory = async (payload: {
+  name: string
+  description?: string
+  category_id: number
+  image_url?: string | null
+}): Promise<{ data: any | null; error: any }> => {
   // Map 'name' to 'subCatName' for database
   const dbPayload = {
     subCatName: payload.name,
-    category_id: payload.category_id
-  };
-  const { data, error } = await supabase.from("sub_categories").insert([dbPayload]).select().single();
-  
+    category_id: payload.category_id,
+    image_url: payload.image_url ?? null,
+  }
+  const { data, error } = await supabase
+    .from("sub_categories")
+    .insert([dbPayload])
+    .select()
+    .single()
+
   // Map back for frontend consistency
   if (data) {
-    data.name = data.subCatName;
+    data.name = data.subCatName
+    data.image_url = data.image_url ?? null
   }
-  return { data, error };
-};
+  return { data, error }
+}
 
-export const updateSubCategory = async (id: number, payload: { name?: string; description?: string; category_id?: number }): Promise<{ data: any | null; error: any }> => {
-  const dbPayload: any = {};
-  if (payload.name) dbPayload.subCatName = payload.name;
-  if (payload.category_id) dbPayload.category_id = payload.category_id;
+export const updateSubCategory = async (
+  id: number,
+  payload: {
+    name?: string
+    description?: string
+    category_id?: number
+    image_url?: string | null
+  }
+): Promise<{ data: any | null; error: any }> => {
+  const dbPayload: any = {}
+  if (payload.name) dbPayload.subCatName = payload.name
+  if (payload.category_id) dbPayload.category_id = payload.category_id
+  if (payload.image_url !== undefined) dbPayload.image_url = payload.image_url
 
-  const { data, error } = await supabase.from("sub_categories").update(dbPayload).eq("id", id).select().single();
-  
+  const { data, error } = await supabase
+    .from("sub_categories")
+    .update(dbPayload)
+    .eq("id", id)
+    .select()
+    .single()
+
   if (data) {
-    data.name = data.subCatName;
+    data.name = data.subCatName
+    data.image_url = data.image_url ?? null
   }
-  return { data, error };
-};
+  return { data, error }
+}
 
-export const deleteSubCategory = async (id: number): Promise<{ data: any; error: any }> => {
-  const { data, error } = await supabase.from("sub_categories").delete().eq("id", id);
-  return { data, error };
-};
+export const deleteSubCategory = async (
+  id: number
+): Promise<{ data: any; error: any }> => {
+  const { data, error } = await supabase
+    .from("sub_categories")
+    .delete()
+    .eq("id", id)
+  return { data, error }
+}
 
 // Helper functions for cascade operations
-export const unlinkProductsFromCategory = async (categoryId: number): Promise<{ error: any }> => {
+export const unlinkProductsFromCategory = async (
+  categoryId: number
+): Promise<{ error: any }> => {
   const { error } = await supabase
     .from("products")
     .update({ category_id: null, sub_category_id: null })
-    .eq("category_id", categoryId);
-  return { error };
-};
+    .eq("category_id", categoryId)
+  return { error }
+}
 
-export const unlinkProductsFromSubCategory = async (subCategoryId: number): Promise<{ error: any }> => {
+export const unlinkProductsFromSubCategory = async (
+  subCategoryId: number
+): Promise<{ error: any }> => {
   const { error } = await supabase
     .from("products")
     .update({ sub_category_id: null })
-    .eq("sub_category_id", subCategoryId);
-  return { error };
-};
+    .eq("sub_category_id", subCategoryId)
+  return { error }
+}
 
 // ============================================
 // DUPLICATE PREVENTION FUNCTIONS
@@ -398,31 +523,26 @@ export const findProductByName = async (
   excludeId?: number | string
 ): Promise<{ data: Product | null; error: any }> => {
   try {
-    const trimmedName = name.trim().toLowerCase();
-    
-    let query = supabase
-      .from("products")
-      .select("*")
-      .ilike("name", trimmedName);
-    
+    const trimmedName = name.trim().toLowerCase()
+
+    let query = supabase.from("products").select("*").ilike("name", trimmedName)
+
     // Exclude specific ID if provided (for edit mode)
     if (excludeId) {
-      query = query.neq("id", excludeId);
+      query = query.neq("id", excludeId)
     }
-    
-    const { data, error } = await query.maybeSingle();
-    
+
+    const { data, error } = await query.maybeSingle()
+
     if (error) {
-      console.error("Error checking product name:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
-    
-    return { data: (data as Product) ?? null, error: null };
+
+    return { data: (data as Product) ?? null, error: null }
   } catch (error) {
-    console.error("Exception in findProductByName:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Check if a product with the given barcode already exists
@@ -436,32 +556,30 @@ export const findProductByBarcode = async (
 ): Promise<{ data: Product | null; error: any }> => {
   try {
     if (!barcode || barcode.trim() === "") {
-      return { data: null, error: null };
+      return { data: null, error: null }
     }
-    
+
     let query = supabase
       .from("products")
       .select("*")
-      .eq("barcode", barcode.trim());
-    
+      .eq("barcode", barcode.trim())
+
     // Exclude specific ID if provided (for edit mode)
     if (excludeId) {
-      query = query.neq("id", excludeId);
+      query = query.neq("id", excludeId)
     }
-    
-    const { data, error} = await query.maybeSingle();
-    
+
+    const { data, error } = await query.maybeSingle()
+
     if (error) {
-      console.error("Error checking barcode:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
-    
-    return { data: (data as Product) ?? null, error: null };
+
+    return { data: (data as Product) ?? null, error: null }
   } catch (error) {
-    console.error("Exception in findProductByBarcode:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Check for duplicate product by name OR barcode
@@ -474,35 +592,42 @@ export const checkDuplicateProduct = async (
   name: string,
   barcode?: string,
   excludeId?: number | string
-): Promise<{ data: Product | null; error: any; duplicateType?: 'name' | 'barcode' }> => {
+): Promise<{
+  data: Product | null
+  error: any
+  duplicateType?: "name" | "barcode"
+}> => {
   try {
     // Check name first
-    const nameCheck = await findProductByName(name, excludeId);
+    const nameCheck = await findProductByName(name, excludeId)
     if (nameCheck.error) {
-      return { data: null, error: nameCheck.error };
+      return { data: null, error: nameCheck.error }
     }
     if (nameCheck.data) {
-      return { data: nameCheck.data, error: null, duplicateType: 'name' };
+      return { data: nameCheck.data, error: null, duplicateType: "name" }
     }
-    
+
     // If barcode provided, check barcode
     if (barcode && barcode.trim() !== "") {
-      const barcodeCheck = await findProductByBarcode(barcode, excludeId);
+      const barcodeCheck = await findProductByBarcode(barcode, excludeId)
       if (barcodeCheck.error) {
-        return { data: null, error: barcodeCheck.error };
+        return { data: null, error: barcodeCheck.error }
       }
       if (barcodeCheck.data) {
-        return { data: barcodeCheck.data, error: null, duplicateType: 'barcode' };
+        return {
+          data: barcodeCheck.data,
+          error: null,
+          duplicateType: "barcode",
+        }
       }
     }
-    
+
     // No duplicates found
-    return { data: null, error: null };
+    return { data: null, error: null }
   } catch (error) {
-    console.error("Exception in checkDuplicateProduct:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Update stock quantity for a product
@@ -516,42 +641,45 @@ export const updateProductStock = async (
 ): Promise<{ data: Product | null; error: any }> => {
   try {
     // First get current stock
-    const { data: product, error: fetchError } = await getProductById(productId.toString());
-    
+    const { data: product, error: fetchError } = await getProductById(
+      productId.toString()
+    )
+
     if (fetchError || !product) {
-      return { data: null, error: fetchError || { message: "Product not found" } };
+      return {
+        data: null,
+        error: fetchError || { message: "Product not found" },
+      }
     }
-    
-    const currentStock = product.stock_quantity || product.quantity || 0;
-    const newStock = currentStock + additionalQuantity;
-    
+
+    const currentStock = product.stock_quantity || product.quantity || 0
+    const newStock = currentStock + additionalQuantity
+
     // Prevent negative stock
     if (newStock < 0) {
       return {
         data: null,
-        error: { message: "Stock cannot be negative", code: "INVALID_STOCK" }
-      };
+        error: { message: "Stock cannot be negative", code: "INVALID_STOCK" },
+      }
     }
-    
+
     // Update stock
     const { data, error } = await supabase
       .from("products")
       .update({ stock_quantity: newStock })
       .eq("id", productId)
       .select()
-      .single();
-    
+      .single()
+
     if (error) {
-      console.error("Error updating stock:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
-    
-    return { data: (data as Product) ?? null, error: null };
+
+    return { data: (data as Product) ?? null, error: null }
   } catch (error) {
-    console.error("Exception in updateProductStock:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Mark an order as shipped with tracking details
@@ -570,23 +698,21 @@ export const shipOrder = async (
         status: "shipped",
         shipped_at: new Date().toISOString(),
         shipping_company: shippingDetails.shipping_company,
-        tracking_id: shippingDetails.tracking_id
+        tracking_id: shippingDetails.tracking_id,
       })
       .eq("id", orderId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error shipping order:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in shipOrder:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Mark an order as delivered manually
@@ -601,23 +727,21 @@ export const deliverOrder = async (
       .from("orders")
       .update({
         status: "delivered",
-        delivered_at: new Date().toISOString()
+        delivered_at: new Date().toISOString(),
       })
       .eq("id", orderId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error marking order as delivered:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in deliverOrder:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 // ============================================
 // PACKING SESSION MANAGEMENT
@@ -640,16 +764,15 @@ export const createPackingSession = async (
       .select("*")
       .eq("order_id", orderId)
       .eq("status", "in_progress")
-      .maybeSingle();
+      .maybeSingle()
 
     if (checkError) {
-      console.error("Error checking existing session:", checkError);
-      return { data: null, error: checkError };
+      return { data: null, error: checkError }
     }
 
     // Return existing session if found
     if (existingSession) {
-      return { data: existingSession, error: null };
+      return { data: existingSession, error: null }
     }
 
     // Create new session
@@ -659,28 +782,26 @@ export const createPackingSession = async (
         order_id: orderId,
         admin_email: adminEmail,
         scan_progress: {},
-        status: "in_progress"
+        status: "in_progress",
       })
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error creating packing session:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
     // Update order status to in_packing
     await supabase
       .from("orders")
       .update({ status: "in_packing" })
-      .eq("id", orderId);
+      .eq("id", orderId)
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in createPackingSession:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Update scan progress for a packing session
@@ -698,19 +819,17 @@ export const updatePackingScanProgress = async (
       .update({ scan_progress: scanProgress })
       .eq("id", sessionId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error updating scan progress:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in updatePackingScanProgress:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Complete a packing session
@@ -726,47 +845,50 @@ export const completePackingSession = async (
       .from("packing_sessions")
       .select("*")
       .eq("id", sessionId)
-      .single();
+      .single()
 
     if (fetchError || !session) {
-      return { data: null, error: fetchError || { message: "Session not found" } };
+      return {
+        data: null,
+        error: fetchError || { message: "Session not found" },
+      }
     }
 
-    const startedAt = new Date(session.started_at);
-    const completedAt = new Date();
-    const durationMinutes = Math.round((completedAt.getTime() - startedAt.getTime()) / 60000);
+    const startedAt = new Date(session.started_at)
+    const completedAt = new Date()
+    const durationMinutes = Math.round(
+      (completedAt.getTime() - startedAt.getTime()) / 60000
+    )
 
     const { data, error } = await supabase
       .from("packing_sessions")
       .update({
         status: "completed",
         completed_at: completedAt.toISOString(),
-        packing_duration_minutes: durationMinutes
+        packing_duration_minutes: durationMinutes,
       })
       .eq("id", sessionId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error completing packing session:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
     // Update order status to packed and set packed_at timestamp
     await supabase
       .from("orders")
-      .update({ 
+      .update({
         status: "packed",
-        packed_at: completedAt.toISOString()
+        packed_at: completedAt.toISOString(),
       })
-      .eq("id", session.order_id);
+      .eq("id", session.order_id)
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in completePackingSession:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Cancel a packing session
@@ -782,36 +904,37 @@ export const cancelPackingSession = async (
       .from("packing_sessions")
       .select("*")
       .eq("id", sessionId)
-      .single();
+      .single()
 
     if (fetchError || !session) {
-      return { data: null, error: fetchError || { message: "Session not found" } };
+      return {
+        data: null,
+        error: fetchError || { message: "Session not found" },
+      }
     }
 
-    const { data, error} = await supabase
+    const { data, error } = await supabase
       .from("packing_sessions")
       .update({ status: "cancelled" })
       .eq("id", sessionId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error cancelling packing session:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
     // Revert order status to paid
     await supabase
       .from("orders")
       .update({ status: "paid" })
-      .eq("id", session.order_id);
+      .eq("id", session.order_id)
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in cancelPackingSession:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Get active packing session for an order
@@ -827,61 +950,61 @@ export const getActivePackingSession = async (
       .select("*")
       .eq("order_id", orderId)
       .eq("status", "in_progress")
-      .maybeSingle();
+      .maybeSingle()
 
     if (error) {
-      console.error("Error getting active packing session:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in getActivePackingSession:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Get order statistics for dashboard
  * @returns Order statistics
  */
-export const getOrderStatistics = async (): Promise<{ data: any; error: any }> => {
+export const getOrderStatistics = async (): Promise<{
+  data: any
+  error: any
+}> => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString();
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = today.toISOString()
 
     // Get counts by status
     const { data: orders, error } = await supabase
       .from("orders")
-      .select("status, total_amount, created_at");
+      .select("status, total_amount, created_at")
 
     if (error) {
-      console.error("Error fetching order statistics:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
     const stats = {
       total: orders?.length || 0,
-      todayCount: orders?.filter(o => o.created_at >= todayStr).length || 0,
-      todayRevenue: orders
-        ?.filter(o => o.created_at >= todayStr)
-        .reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0,
-      pending: orders?.filter(o => o.status === "pending").length || 0,
-      paid: orders?.filter(o => o.status === "paid").length || 0,
-      inPacking: orders?.filter(o => o.status === "in_packing").length || 0,
-      packed: orders?.filter(o => o.status === "packed").length || 0,
-      shipped: orders?.filter(o => o.status === "shipped").length || 0,
-      delivered: orders?.filter(o => o.status === "delivered").length || 0,
-      cancelled: orders?.filter(o => o.status === "cancelled").length || 0,
-    };
+      todayCount: orders?.filter((o) => o.created_at >= todayStr).length || 0,
+      todayRevenue:
+        orders
+          ?.filter((o) => o.created_at >= todayStr)
+          .reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0,
+      pending: orders?.filter((o) => o.status === "pending").length || 0,
+      paid: orders?.filter((o) => o.status === "paid").length || 0,
+      inPacking: orders?.filter((o) => o.status === "in_packing").length || 0,
+      packed: orders?.filter((o) => o.status === "packed").length || 0,
+      shipped: orders?.filter((o) => o.status === "shipped").length || 0,
+      delivered: orders?.filter((o) => o.status === "delivered").length || 0,
+      cancelled: orders?.filter((o) => o.status === "cancelled").length || 0,
+    }
 
-    return { data: stats, error: null };
+    return { data: stats, error: null }
   } catch (error) {
-    console.error("Exception in getOrderStatistics:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 /**
  * Get a single order by ID with all related details
@@ -896,19 +1019,17 @@ export const getOrderById = async (
       .from("orders")
       .select("*")
       .eq("id", orderId)
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error fetching order:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in getOrderById:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 export const updateOrderStatus = async (
   orderId: number | string,
@@ -920,19 +1041,17 @@ export const updateOrderStatus = async (
       .update({ status })
       .eq("id", orderId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error updating order status:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in updateOrderStatus:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
 
 export const cancelOrder = async (
   orderId: number | string,
@@ -945,22 +1064,20 @@ export const cancelOrder = async (
     // Let's just update status for now as per schema knowledge limitations.
     const { data, error } = await supabase
       .from("orders")
-      .update({ 
+      .update({
         status: "cancelled",
         // cancellation_reason: reason // Uncomment if column exists
       })
       .eq("id", orderId)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error("Error cancelling order:", error);
-      return { data: null, error };
+      return { data: null, error }
     }
 
-    return { data, error: null };
+    return { data, error: null }
   } catch (error) {
-    console.error("Exception in cancelOrder:", error);
-    return { data: null, error };
+    return { data: null, error }
   }
-};
+}
