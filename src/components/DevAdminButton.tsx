@@ -27,7 +27,7 @@ const DevAdminButton = () => {
       return true
     }
     // Allow if explicitly enabled via environment variable
-    if (showDevButton === "true") {
+    if (import.meta.env.VITE_SHOW_DEV_BUTTON  === "true") {
       return true
     }
 

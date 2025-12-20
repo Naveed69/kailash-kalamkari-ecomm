@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn } from 'lucide-react';
-
+import { Link, useNavigate } from "react-router-dom"
 // Simulate 36 gallery images (add more real/realistic sources and alt/category for demo)
 const galleryImages = [
     {
@@ -228,13 +228,21 @@ const galleryImages = [
     }
 ];
 
-const INITIAL_IMAGES_COUNT = 10;
+let INITIAL_IMAGES_COUNT = 10;
 
-const Gallery = () => {
+const Gallery = ({isFromHome =false}) => {
     const [selectedImage, setSelectedImage] = useState<number | null>(null);
+    
     const [visibleCount, setVisibleCount] = useState(INITIAL_IMAGES_COUNT);
-
-    const showMore = () => setVisibleCount(Math.min(visibleCount + 10, galleryImages.length));
+     const navigate = useNavigate()
+    if(isFromHome ){
+        INITIAL_IMAGES_COUNT=3
+    }
+    const showMore = () => {
+        if (isFromHome) 
+            navigate("/gallery")
+        setVisibleCount(Math.min(visibleCount + 10, galleryImages.length));
+    }
 
     return (
         <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">

@@ -21,6 +21,7 @@ import { CategoryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
+import Gallery from "./Gallery";
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
@@ -635,7 +636,9 @@ const Index = () => {
       )}
 
       {/* Our Journey Section */}
-      {isAboutUsActive && <OurJourneySection />}
+      {/* {isAboutUsActive && <OurJourneySection />} */}
+
+      <Gallery isFromHome={true}/>
 
       {/* Reviews Section */}
       {isAboutUsActive && <ReviewsSection />}
