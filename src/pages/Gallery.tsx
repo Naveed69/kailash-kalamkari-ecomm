@@ -232,12 +232,12 @@ let INITIAL_IMAGES_COUNT = 10;
 
 const Gallery = ({isFromHome =false}) => {
     const [selectedImage, setSelectedImage] = useState<number | null>(null);
-    
-    const [visibleCount, setVisibleCount] = useState(INITIAL_IMAGES_COUNT);
-     const navigate = useNavigate()
     if(isFromHome ){
         INITIAL_IMAGES_COUNT=3
     }
+    const [visibleCount, setVisibleCount] = useState(INITIAL_IMAGES_COUNT);
+     const navigate = useNavigate()
+    
     const showMore = () => {
         if (isFromHome) 
             navigate("/gallery")
