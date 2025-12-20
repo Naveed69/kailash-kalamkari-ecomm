@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Package, ChevronRight, ShoppingBag, LogOut } from 'lucide-react';
 
 const MyOrdersPage: React.FC = () => {
-  const { user, signOut, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = React.useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = React.useState(true);
@@ -39,8 +39,9 @@ const MyOrdersPage: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await signOut();
-    navigate('/');
+    await logout();
+    console.log("Navigating to login now")
+    navigate('/login');
   };
 
   if (loading || !user) {

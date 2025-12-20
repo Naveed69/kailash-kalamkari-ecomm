@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/AuthContext';
 
 interface CartItem extends Product {
+  cartItemId: string;
   quantity: number;
 }
 
@@ -14,19 +15,19 @@ type CartState = {
 };
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: Product }
+  | { type: 'ADD_ITEM'; payload: { product: Product, quantity: number } }
   | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'UPDATE_QUANTITY'; payload: { cartItemId: string; quantity: number } }
   | { type: 'CLEAR_CART' };
 
 interface CartContextType {
   cart: CartState;
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
-  isInCart: (productId: string) => boolean;
-  getItemQuantity: (productId: string) => number;
+  isInCart: (cartItemId: string) => boolean;
+  getItemQuantity: (cartItemId: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -34,59 +35,56 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      
+      const { product, quantity } = action.payload;
+      const cartItemId = `${product.id}-${product.selectedColor || ''}`;
+      const existingItem = state.items.find(item => item.cartItemId === cartItemId);
+
       if (existingItem) {
         const updatedItems = state.items.map(item =>
-          item.id === action.payload.id
-            ? { 
-                ...item, 
-                quantity: item.quantity + 1,
-                // Update color if a new one is provided
-                ...(action.payload as any).selectedColor && { selectedColor: (action.payload as any).selectedColor }
-              }
+          item.cartItemId === cartItemId
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
         
         return {
           ...state,
           items: updatedItems,
-          totalItems: state.totalItems + 1,
-          totalPrice: state.totalPrice + action.payload.price,
+          totalItems: state.totalItems + quantity,
+          totalPrice: state.totalPrice + (product.price * quantity),
         };
       }
       
       return {
         ...state,
-        items: [...state.items, { ...action.payload, quantity: 1 }],
-        totalItems: state.totalItems + 1,
-        totalPrice: state.totalPrice + action.payload.price,
+        items: [...state.items, { ...product, quantity, cartItemId }],
+        totalItems: state.totalItems + quantity,
+        totalPrice: state.totalPrice + (product.price * quantity),
       };
     }
     
     case 'REMOVE_ITEM': {
-      const itemToRemove = state.items.find(item => item.id === action.payload);
+      const itemToRemove = state.items.find(item => item.cartItemId === action.payload);
       if (!itemToRemove) return state;
       
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload),
+        items: state.items.filter(item => item.cartItemId !== action.payload),
         totalItems: state.totalItems - itemToRemove.quantity,
         totalPrice: state.totalPrice - (itemToRemove.price * itemToRemove.quantity),
       };
     }
     
     case 'UPDATE_QUANTITY': {
-      const { id, quantity } = action.payload;
+      const { cartItemId, quantity } = action.payload;
       if (quantity < 1) return state;
       
-      const itemToUpdate = state.items.find(item => item.id === id);
+      const itemToUpdate = state.items.find(item => item.cartItemId === cartItemId);
       if (!itemToUpdate) return state;
       
       const quantityDiff = quantity - itemToUpdate.quantity;
       
       const updatedItems = state.items.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item.cartItemId === cartItemId ? { ...item, quantity } : item
       );
       
       return {
@@ -135,8 +133,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const addToCart = (product: Product) => {
-    dispatch({ type: 'ADD_ITEM', payload: product });
+  const addToCart = (product: Product, quantity = 1) => {
+    dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
     
     // Smart login prompts based on user state
     if (!user) {
@@ -174,24 +172,24 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const removeFromCart = (productId: string) => {
-    dispatch({ type: 'REMOVE_ITEM', payload: productId });
+  const removeFromCart = (cartItemId: string) => {
+    dispatch({ type: 'REMOVE_ITEM', payload: cartItemId });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
+  const updateQuantity = (cartItemId: string, quantity: number) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { cartItemId, quantity } });
   };
 
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   };
 
-  const isInCart = (productId: string) => {
-    return cart.items.some(item => item.id === productId);
+  const isInCart = (cartItemId: string) => {
+    return cart.items.some(item => item.cartItemId === cartItemId);
   };
 
-  const getItemQuantity = (productId: string) => {
-    const item = cart.items.find(item => item.id === productId);
+  const getItemQuantity = (cartItemId: string) => {
+    const item = cart.items.find(item => item.cartItemId === cartItemId);
     return item ? item.quantity : 0;
   };
 
@@ -219,3 +217,4 @@ export const useCart = () => {
   }
   return context;
 };
+

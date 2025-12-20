@@ -1,61 +1,99 @@
-import { Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Shield } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useAuth } from "@/lib/AuthContext"
+import { useToast } from "@/components/ui/use-toast"
 
 const DevAdminButton = () => {
-  const navigate = useNavigate();
-  const [isDevelopment, setIsDevelopment] = useState(false);
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const { toast } = useToast()
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+
+  // Determine if the button should be shown
+  // Shows on: localhost, Vercel preview deployments, or if VITE_SHOW_DEV_BUTTON is set
+  // Hides on: Hostinger production (or any other domain)
+  const shouldShowButton = () => {
+    const showDevButton = import.meta.env.VITE_SHOW_DEV_BUTTON
+    const hostname = window.location.hostname
+
+    // Allow on localhost (development)
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return true
+    }
+
+    // Allow on Vercel preview/staging deployments
+    if (hostname.includes("vercel.app")) {
+      return true
+    }
+    // Allow if explicitly enabled via environment variable
+    if (import.meta.env.VITE_SHOW_DEV_BUTTON  === "true") {
+      return true
+    }
+
+    // Hide on all other domains (e.g., Hostinger production)
+    return false
+  }
+
+  // Don't render at all if not allowed
+  if (!shouldShowButton()) {
+    return null
+  }
 
   useEffect(() => {
-    // Check if in development mode
-    setIsDevelopment(import.meta.env.DEV || import.meta.env.MODE === 'development');
-  }, []);
-
-  if (!isDevelopment) return null;
+    if (isLoggingIn && user) {
+      setIsLoggingIn(false)
+      navigate("/inventory")
+    }
+  }, [user, isLoggingIn, navigate])
 
   const handleAdminClick = async () => {
+    setIsLoggingIn(true)
     try {
       // Try Supabase auth first (if user exists in Supabase Auth)
-      const { supabase } = await import("@/lib/supabaseClient");
-      
+      const { supabase } = await import("@/lib/supabaseClient")
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: "kailashkalamkari1984@gmail.com",
         password: "9951821516",
-      });
+      })
 
-      if (!error && data.user) {
-        // Supabase auth successful
-        console.log("✅ Dev admin authenticated via Supabase:", data.user);
-        localStorage.setItem("isLoggedIn", "true");
-        navigate("/inventory");
-        return;
+      if (error) {
+        toast({
+          title: "Dev Login Failed",
+          description: error.message,
+          variant: "destructive",
+        })
+        setIsLoggingIn(false)
+        return
       }
 
-      // Supabase auth failed - fallback to localStorage only
-      console.warn("⚠️ Supabase auth not configured. Using localStorage fallback.");
-      console.info("To enable Supabase auth: Create user with email 'kailashkalamkari1984@gmail.com' in Supabase Auth");
-      
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/inventory");
-      
-    } catch (err) {
-      // Any error - just use localStorage fallback
-      console.warn("Dev admin fallback to localStorage:", err);
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/inventory");
+      if (data.user) {
+        toast({
+          title: "Dev Login Successful",
+          description: "Redirecting...",
+        })
+      }
+    } catch (err: any) {
+      toast({
+        title: "Dev Error",
+        description: err.message || "Unknown error",
+        variant: "destructive",
+      })
+      setIsLoggingIn(false)
     }
-  };
+  }
 
   return (
     <button
       onClick={handleAdminClick}
-      className="fixed bottom-6 right-6 z-[9999] group"
+      className="fixed bottom-16 right-6 z-[9999] group"
       title="Admin Access (Dev Only)"
     >
       <div className="relative">
         {/* Pulse animation */}
         <div className="absolute inset-0 rounded-full bg-[#D49217] opacity-75 animate-ping"></div>
-        
+
         {/* Main button */}
         <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-[#D49217] to-[#cf972f] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
           <Shield className="w-7 h-7 text-white" />
@@ -77,7 +115,7 @@ const DevAdminButton = () => {
         </div>
       </div>
     </button>
-  );
-};
+  )
+}
 
-export default DevAdminButton;
+export default DevAdminButton

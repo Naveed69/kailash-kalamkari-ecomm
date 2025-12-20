@@ -65,14 +65,6 @@ export const WhatsAppPopup = ({
                     <MessageCircle className="h-5 w-5" />
                     Chat with us on WhatsApp
                   </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="h-6 w-6"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Send us a message and we'll respond as soon as possible!

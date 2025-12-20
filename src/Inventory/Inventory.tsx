@@ -5,7 +5,7 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
+import SidebarComp from "./components/Sidebar.tsx";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
@@ -19,7 +19,7 @@ import Categories from "./pages/Categories";
 function Inventory() {
   return (
     <div className="app">
-      <Sidebar />
+      <SidebarComp />
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Dashboard />} />

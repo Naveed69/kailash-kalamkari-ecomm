@@ -21,6 +21,7 @@ import { CategoryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
+import Gallery from "./Gallery";
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
@@ -184,18 +185,20 @@ const Index = () => {
       const product = sampleProducts.find((p) => p.id === productId);
 
       if (typeof isInWishlist === "function" && isInWishlist(productId)) {
-        // Remove from wishlist
-        if (typeof removeFromWishlist === "function") {
-          removeFromWishlist(productId);
-        }
+        if (typeof removeFromWishlist === "function") removeFromWishlist(productId);
+        toast?.({
+          title: "Removed from wishlist",
+          description: `${product?.name ?? "Item"} removed from your wishlist.`,
+        });
       } else if (product) {
-        // Add to wishlist - WishlistContext will handle the toast
-        if (typeof addToWishlist === "function") {
-          addToWishlist(product);
-        }
+        if (typeof addToWishlist === "function") addToWishlist(product);
+        toast?.({
+          title: "Added to wishlist",
+          description: `${product.name} added to your wishlist.`,
+        });
       }
     },
-    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts]
+    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts, toast]
   );
 
   // Carousel navigation
@@ -256,7 +259,7 @@ const Index = () => {
       filters.priceRange[1] >= 10000 &&
       !searchQuery;
 
-    const sortedProducts = [...sampleProducts];
+    let sortedProducts = [...sampleProducts];
 
     if (noFiltersApplied) {
       sortedProducts.sort((a, b) => {
@@ -273,7 +276,7 @@ const Index = () => {
       return sortedProducts;
     }
 
-    const filtered = sampleProducts.filter((product) => {
+    let filtered = sampleProducts.filter((product) => {
       if (
         searchQuery &&
         !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -459,7 +462,7 @@ const Index = () => {
               </div>
 
               {/* Mobile View Nav Bar */}
-              <div className="block lg:hidden w-full sticky top-[70px] z-40">
+              <div className="block lg:hidden w-full sticky top-[90px] z-40">
                 <MobileNavbar
                   filters={filters}
                   onFiltersChange={setFilters}
@@ -633,7 +636,9 @@ const Index = () => {
       )}
 
       {/* Our Journey Section */}
-      {isAboutUsActive && <OurJourneySection />}
+      {/* {isAboutUsActive && <OurJourneySection />} */}
+
+      <Gallery isFromHome={true}/>
 
       {/* Reviews Section */}
       {isAboutUsActive && <ReviewsSection />}
