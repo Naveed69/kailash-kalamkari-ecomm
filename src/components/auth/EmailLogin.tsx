@@ -3,14 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Key } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 interface EmailLoginProps {
   showHeader?: boolean;
@@ -48,7 +48,7 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
           title: 'Success',
           description: 'Successfully signed in!',
         });
-        navigate('/inventory/dashboard');
+        navigate('/');
       } else {
         // Sign up
         await createUserWithEmailAndPassword(auth, email, password);
@@ -58,7 +58,7 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
         });
         // Auto sign in after sign up
         await signInWithEmailAndPassword(auth, email, password);
-        navigate('/inventory/dashboard');
+        navigate('/');
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
@@ -110,7 +110,12 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
                   className="text-sm text-primary hover:underline"
                   onClick={() => {/* Add forgot password logic */}}
                 >
+                <Link 
+                  to="/forgot-password"
+                  className="text-[#D49217] hover:text-[#cf972ffa] text-sm"
+                >
                   Forgot password?
+                </Link>
                 </button>
               )}
             </div>
@@ -142,7 +147,7 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
           </Button>
           
           <div className="text-center text-sm">
-            <button
+            {!isLogin && <button
               type="button"
               className="text-primary hover:underline"
               onClick={() => setIsLogin(!isLogin)}
@@ -151,8 +156,32 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
               {isLogin 
                 ? "Don't have an account? Sign up" 
                 : 'Already have an account? Sign in'}
-            </button>
+            </button>}
+            
           </div>
+
+          {/* Passwordless Sign-in Option */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground mb-4">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <Link to="/login/email-link">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              type="button"
+            >
+              <Key className="mr-2 h-4 w-4" />
+              Sign in with Email Link
+            </Button>
+          </Link>
         </form>
       </CardContent>
     </Card>

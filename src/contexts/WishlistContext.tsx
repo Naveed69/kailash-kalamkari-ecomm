@@ -63,7 +63,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         // 3. Sync local items to DB
         if (itemsToSync.length > 0) {
           await Promise.all(
-            itemsToSync.map((id) => wishlistApi.addToWishlist(user.id, id))
+            itemsToSync.map((id) => wishlistApi.addToWishlist(user.uid, id))
           )
         }
 
@@ -153,7 +153,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
     // Save to DB
     try {
-      await wishlistApi.addToWishlist(user.id, product.id)
+      await wishlistApi.addToWishlist(user.uid, product.id)
     } catch (error) {
       console.error("Failed to save to wishlist DB:", error)
       // Optionally revert state if failed, but for now keep optimistic
@@ -171,7 +171,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
     if (user) {
       try {
-        await wishlistApi.removeFromWishlist(user.id, productId)
+        await wishlistApi.removeFromWishlist(user.uid, productId)
       } catch (error) {
         console.error("Failed to remove from wishlist DB:", error)
       }
