@@ -25,7 +25,7 @@ const Sidebar = () => {
   const handleLogout = async () => {
     await logout()
     localStorage.removeItem("isLoggedIn") // Clear legacy auth just in case
-    navigate("/login")
+    navigate("/admin")
   }
 
   const menuItems = [
@@ -102,7 +102,7 @@ const Sidebar = () => {
         </nav>
       </div>
       <div className="sidebar-footer">
-        <button className="logout-btn" onClick={handleLogout}>
+        <button className="logout-btn" onClick={()=>handleLogout()}>
           <FiLogOut className="logout-icon" />
           <span>Logout</span>
         </button>

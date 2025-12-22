@@ -1,30 +1,29 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// const firebaseKey = process.env.PUBLIC_FIREBASE_API_KEY
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "kalamkari-7da33.firebaseapp.com",
-  projectId: "kalamkari-7da33",
-  storageBucket: "kalamkari-7da33.appspot.com",
-  messagingSenderId: "749889824034",
-  appId: "1:749889824034:web:0b4a2d6dfd9a747ed3f17b",
-  measurementId: "G-RQ2XL2N2L4"
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
-let app: FirebaseApp;
-let auth: Auth;
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
 
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-} else {
-  app = getApp();
-  auth = getAuth(app);
+// Configure auth for email link authentication (development only)
+if (import.meta.env.DEV) {
+  // Note: In production, you'll need to configure this properly in Firebase Console
+  // This is just for development testing
 }
 
-export { app, auth };
+const db = getFirestore(app);
 
-// Add any additional Firebase services you need here
+export { app, auth, db };
+
 export * from 'firebase/auth';

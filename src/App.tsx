@@ -30,11 +30,15 @@ import TrackOrder from "./pages/TrackOrder"
 import OrderConfirmation from "./pages/OrderConfirmation"
 import SearchPage from "./pages/SearchPage"
 import { AuthProvider } from "./lib/AuthContext"
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import LoginPage from "./pages/Login"
 import MyOrdersPage from "./pages/MyOrders"
 import OrderDetails from "./pages/OrderDetails"
 import ProfilePage from "./pages/Profile"
 import { ProtectedWishlistRoute } from "./components/ProtectedWishlistRoute"
+import EmailLinkLogin from "./components/auth/EmailLinkLogin";
+import EmailLinkFinish from "./components/auth/EmailLinkFinish";
+import ForgotPassword from "./components/auth/ForgotPassword";
 
 const queryClient = new QueryClient()
 
@@ -78,6 +82,9 @@ const AppContent = () => {
           element={<OrderConfirmation />}
         />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/email-link" element={<EmailLinkLogin />} />
+        <Route path="/login/finish" element={<EmailLinkFinish />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/my-orders" element={<MyOrdersPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/order/:id" element={<OrderDetails />} />
@@ -85,7 +92,7 @@ const AppContent = () => {
         <Route
           path="/inventory/*"
           element={
-            <ProtectedRoute allowedRoles={["super_admin", "admin"]}>
+            <ProtectedRoute>
               <Inventory />
             </ProtectedRoute>
           }
@@ -107,20 +114,17 @@ const App = () => {
         <Toaster />
         <Sonner />
         <AuthProvider>
-          <CartProvider>
-            <InventoryProvider>
-              <WishlistProvider>
-                <BrowserRouter
-                  future={{
-                    v7_startTransition: true,
-                    v7_relativeSplatPath: true,
-                  }}
-                >
-                  <AppContent />
-                </BrowserRouter>
-              </WishlistProvider>
-            </InventoryProvider>
-          </CartProvider>
+          <AdminAuthProvider>
+            <CartProvider>
+              <InventoryProvider>
+                <WishlistProvider>
+                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                    <AppContent />
+                  </BrowserRouter>
+                </WishlistProvider>
+              </InventoryProvider>
+            </CartProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

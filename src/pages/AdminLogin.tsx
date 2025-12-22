@@ -1,163 +1,289 @@
+// AdminLogin.tsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/lib/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, Lock, Mail, ShoppingCart } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<'email' | 'otp'>('email');
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signInWithEmailOTP, verifyEmailOTP, role, user } = useAuth();
+  const [resetLoading, setResetLoading] = useState(false);
+  const { admin, isAdmin, signInAdmin, resetPassword } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Whitelist of allowed admin emails
-  const ALLOWED_ADMINS = ["kailashkalamkari1984@gmail.com"];
+  // Get admin emails from environment variable
+  const ALLOWED_ADMINS = import.meta.env.VITE_ADMIN_EMAILS?.split(',').map(email => email.trim().toLowerCase()) || [];
+
+  // Debug information (only show in development)
+  const isDevelopment = import.meta.env.DEV;
+  const envVariableExists = !!import.meta.env.VITE_ADMIN_EMAILS;
 
   useEffect(() => {
-    if (user && role) {
-      if (role === 'super_admin' || role === 'admin') {
-        navigate("/inventory");
-      }
+    console.log("CHECKING...", isAdmin)
+    if (admin && isAdmin) {
+      console.log('Admin authenticated, navigating to inventory...');
+      navigate("/inventory/dashboard", { replace: true });
     }
-  }, [user, role, navigate]);
+  }, [admin, isAdmin, navigate]);
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const trimmedEmail = email.trim().toLowerCase();
-    
-    if (!trimmedEmail) {
+
+    // Validation
+    if (!trimmedEmail || !password) {
       toast({
-        title: "Error",
-        description: "Please enter your email address.",
+        title: "Validation Error",
+        description: "Please enter both email and password.",
         variant: "destructive",
       });
       return;
     }
 
-    // Strict frontend whitelist check
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if email is in allowed admin list
     if (!ALLOWED_ADMINS.includes(trimmedEmail)) {
       toast({
         title: "Access Denied",
-        description: "This email is not authorized to access the admin panel.",
+        description: "This email is not authorized for admin access. Please contact the system administrator.",
         variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-    const { error } = await signInWithEmailOTP(trimmedEmail);
-    setLoading(false);
+    try {
+      const success = await signInAdmin(trimmedEmail, password);
 
-    if (error) {
+      if (success) {
+        toast({
+          title: "Login Successful",
+          description: `Welcome back!`,
+        });
+        // Navigation will happen automatically via the useEffect
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-    } else {
-      setStep('otp');
-      toast({
-        title: "OTP Sent",
-        description: "Please check your email for the login code.",
-      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp) {
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedEmail) {
       toast({
-        title: "Error",
-        description: "Please enter the OTP.",
+        title: "Email Required",
+        description: "Please enter your email address first.",
         variant: "destructive",
       });
       return;
     }
 
-    setLoading(true);
-    const { error } = await verifyEmailOTP(email, otp);
-    setLoading(false);
-
-    if (error) {
+    // Check if email is in allowed admin list
+    if (!ALLOWED_ADMINS.includes(trimmedEmail)) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Access Denied",
+        description: "Password reset is only available for authorized admin emails.",
         variant: "destructive",
       });
-    } else {
-      // Role check will happen in useEffect, but we can also check here if we wait for state update
-      // or just let the effect handle redirection.
-      // We'll let the effect handle it, but we might want to show a success message.
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      await resetPassword(trimmedEmail);
       toast({
-        title: "Login Successful",
-        description: "Verifying access...",
+        title: "Reset Email Sent",
+        description: "Check your email for password reset instructions.",
       });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !loading) {
+      handleLogin(e as any);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-2xl shadow-md w-80">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Admin Login</h2>
-        
-        {step === 'email' ? (
-          <form onSubmit={handleSendOtp}>
-            <input
-              type="email"
-              placeholder="Admin Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              className="w-full bg-[#D49217] text-white py-2 rounded-lg hover:bg-[#cf972ffa] transition disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? "Sending..." : "Send Login Code"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOtp}>
-             <p className="text-sm text-gray-600 mb-4 text-center">
-              Enter the code sent to {email}
-            </p>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#cf972fff]"
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              className="w-full bg-[#D49217] text-white py-2 rounded-lg hover:bg-[#cf972ffa] transition disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? "Verifying..." : "Verify & Login"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep('email')}
-              className="w-full mt-2 text-sm text-gray-500 hover:text-gray-700"
-              disabled={loading}
-            >
-              Back to Email
-            </button>
-          </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+      <div className="w-full max-w-md">
+        {/* Debug info - only show in development */}
+        {/* {isDevelopment && envVariableExists && (
+          <Alert className="mb-4 bg-blue-50 border-blue-200">
+            <AlertDescription className="text-xs">
+              <strong>Debug Info:</strong> Found {ALLOWED_ADMINS.length} admin email(s) in environment
+            </AlertDescription>
+          </Alert>
         )}
 
-        <div className="mt-4 text-sm text-muted-foreground text-center">
-          or{" "}
-          <Link to="/" className="text-[#D49217] hover:underline">
-            Continue Shopping
-          </Link>
-        </div>
+        {isDevelopment && !envVariableExists && (
+          <Alert className="mb-4 bg-amber-50 border-amber-200">
+            <AlertDescription className="text-xs">
+              <strong>Warning:</strong> VITE_ADMIN_EMAILS environment variable not found
+            </AlertDescription>
+          </Alert>
+        )} */}
+
+        <Card className="shadow-xl border-gray-200">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center mb-2">
+              <div className="p-2 bg-[#D49217]/10 rounded-full">
+                <Lock className="h-8 w-8 text-[#D49217]" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">
+              Admin Portal
+            </CardTitle>
+            <CardDescription className="text-center">
+              Restricted access for authorized administrators only
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Admin Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="pl-10 h-11"
+                    disabled={loading}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={handleForgotPassword}
+                    disabled={resetLoading || loading}
+                    className="h-auto p-0 text-xs text-gray-500 hover:text-[#D49217]"
+                  >
+                    {resetLoading ? "Sending..." : "Forgot password?"}
+                  </Button>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="pl-10 pr-10 h-11"
+                    disabled={loading}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-11 bg-[#D49217] hover:bg-[#cf972ffa] text-white font-medium"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm text-muted-foreground">
+              This portal is restricted to authorized personnel only.
+            </div>
+
+            <div className="w-full border-t pt-4">
+              <Link to="/">
+                <Button
+                  variant="outline"
+                  className="w-full h-10 border-gray-300 hover:bg-gray-50"
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Continue Shopping
+                </Button>
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+
+        
       </div>
     </div>
   );
