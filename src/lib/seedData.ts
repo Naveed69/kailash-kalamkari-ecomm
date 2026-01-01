@@ -1,4 +1,5 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "@/backend/supabase/client";
+import { Category, SubCategory, Product } from "@/shared/types";
 
 export const seedCategories = async () => {
   
