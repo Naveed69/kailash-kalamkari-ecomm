@@ -20,11 +20,14 @@ import {
   CreditCard,
   ArrowRight,
   Lock,
+  QrCode,
+  Copy,
+  Check,
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 // import { EmailLoginModal } from "@/components/auth/EmailLoginModal";
@@ -38,8 +41,17 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 import { supabase } from "@/lib/supabaseClient"
+import Logo from "@/assets/Logo/AccountQRCode.png"
+const QR_SRC = Logo
 
 // Indian states list
 const INDIAN_STATES = [
@@ -110,6 +122,9 @@ export default function CartPage() {
     pincode: "",
     landmark: "",
   })
+  const [showUpiQr, setShowUpiQr] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "upi">("razorpay")
 
   const [error, setError] = useState<{ [key: string]: string }>({})
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -173,12 +188,111 @@ export default function CartPage() {
     })
   }
 
+  const handleUpiPayment = async () => {
+    try {
+      // Show loading state
+      setShowUpiQr(true);
+
+      console.log('Starting UPI payment process...');
+      console.log('Order details:', {
+        customer_name: orderDetails.name,
+        total_amount: cart.totalPrice,
+        item_count: cart.items.length
+      });
+
+      // Validate required fields
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      if (!orderDetails.name || !orderDetails.phone || !orderDetails.addressLine1 ||
+        !orderDetails.city || !orderDetails.state || !orderDetails.pincode) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      console.log('Creating order in database...');
+      const { data: orderData, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            customer_name: orderDetails.name,
+            customer_phone: orderDetails.phone,
+            customer_email: orderDetails.email || null,
+            address_line1: orderDetails.addressLine1,
+            address_line2: orderDetails.addressLine2 || null,
+            city: orderDetails.city,
+            state: orderDetails.state,
+            pincode: orderDetails.pincode,
+            landmark: orderDetails.landmark || null,
+            customer_address: `${orderDetails.addressLine1}, ${orderDetails.addressLine2 ? orderDetails.addressLine2 + ", " : ""
+              }${orderDetails.city}, ${orderDetails.state} - ${orderDetails.pincode
+              }${orderDetails.landmark
+                ? " (Near: " + orderDetails.landmark + ")"
+                : ""
+              }`,
+            total_amount: cart.totalPrice,
+            items: cart.items.map(item => ({
+              ...item,
+              // Ensure each item has required fields
+              id: item.id || 'unknown',
+              name: item.name || 'Unnamed Item',
+              price: item.price || 0,
+              quantity: item.quantity || 1
+            })),
+            status: "pending",
+            user_id: user.uid,
+            user_phone: user.phoneNumber || orderDetails.phone,
+            payment_method: "upi_qr",
+            created_at: new Date().toISOString()
+          },
+        ])
+        .select()
+        .single(); // Use single() since we're only expecting one record
+
+      if (orderError) {
+        console.error('Database error:', orderError);
+        throw new Error(`Failed to create order: ${orderError.message}`);
+      }
+
+      console.log('Order created successfully:', orderData);
+      const createdOrder = orderData;
+
+      toast({
+        title: "UPI Payment Instructions",
+        description: "Please scan the QR code or use the UPI ID to complete your payment.",
+        variant: "default",
+      });
+
+    } catch (err: any) {
+      console.error('Error in handleUpiPayment:', err);
+      toast({
+        title: "Order Creation Failed",
+        description: err.message || "Failed to create order. Please try again.",
+        variant: "destructive",
+      });
+      setShowUpiQr(false); // Hide the QR code modal if there's an error
+    }
+  };
+  const copyUpiId = () => {
+    navigator.clipboard.writeText("9742493219@ybl") // Replace with your actual UPI ID
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   const handlePlaceOrder = async () => {
     // Check if user is logged in
     if (!user) {
       navigate("/login", { state: { from: "/cart" } })
       return
     }
+
+    // Handle UPI payment flow
+    if (paymentMethod === "upi") {
+      await handleUpiPayment()
+      return
+    }
+
+    // Continue with Razorpay flow for other payment methods
 
     // Validation
     if (
@@ -326,22 +440,19 @@ export default function CartPage() {
                 pincode: orderDetails.pincode,
                 landmark: orderDetails.landmark || null,
                 // Legacy fallback (concatenated address)
-                customer_address: `${orderDetails.addressLine1}, ${
-                  orderDetails.addressLine2
-                    ? orderDetails.addressLine2 + ", "
-                    : ""
-                }${orderDetails.city}, ${orderDetails.state} - ${
-                  orderDetails.pincode
-                }${
-                  orderDetails.landmark
+                customer_address: `${orderDetails.addressLine1}, ${orderDetails.addressLine2
+                  ? orderDetails.addressLine2 + ", "
+                  : ""
+                  }${orderDetails.city}, ${orderDetails.state} - ${orderDetails.pincode
+                  }${orderDetails.landmark
                     ? " (Near: " + orderDetails.landmark + ")"
                     : ""
-                }`,
+                  }`,
                 total_amount: cart.totalPrice,
                 items: freshItems, // Use fresh items with barcodes
                 status: "paid",
-                user_id: user.id, // Link order to user
-                user_phone: user.phone || orderDetails.phone,
+                user_id: user.uid, // Link order to user
+                user_phone: user.phoneNumber || orderDetails.phone,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
@@ -844,12 +955,85 @@ export default function CartPage() {
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
 
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <Lock className="w-3 h-3" />
-                    <span>Secured by Razorpay</span>
+                  <div className="space-y-4 w-full">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Payment Method</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant={paymentMethod === "razorpay" ? "default" : "outline"}
+                          className="h-auto py-2"
+                          onClick={() => setPaymentMethod("razorpay")}
+                        >
+                          <div className="text-left">
+                            <p className="text-sm font-medium">Razorpay</p>
+                            <p className="text-xs text-muted-foreground">Cards, UPI, Net Banking</p>
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={paymentMethod === "upi" ? "default" : "outline"}
+                          className="h-auto py-2"
+                          onClick={() => setPaymentMethod("upi")}
+                        >
+                          <div className="text-left">
+                            <p className="text-sm font-medium">UPI</p>
+                            <p className="text-xs text-muted-foreground">Scan QR to Pay</p>
+                          </div>
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                      <Lock className="w-3 h-3" />
+                      <span>Secured by {paymentMethod === "razorpay" ? "Razorpay" : "Your Bank"}</span>
+                    </div>
                   </div>
                 </CardFooter>
               </Card>
+
+              {/* UPI QR Code Modal */}
+              <Dialog open={showUpiQr} onOpenChange={setShowUpiQr}>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Pay with UPI</DialogTitle>
+                    <DialogDescription>
+                      Scan the QR code or use the UPI ID below to complete your payment of ₹{cart.totalPrice.toFixed(2)}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="p-4 border rounded-lg bg-white">
+                      <img
+                        src={QR_SRC}
+                        alt="UPI QR Code"
+                        className="w-64 h-64 object-contain"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <p className="text-sm text-muted-foreground mb-1">Or send money to UPI ID:</p>
+                      <div className="flex items-center justify-between p-2 border rounded-md bg-muted/50">
+                        <code className="font-mono text-sm">9742493219@ybl</code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2"
+                          onClick={copyUpiId}
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground text-center pt-2">
+                      <p>After payment, your order will be confirmed automatically.</p>
+                      <p>For any issues, contact support with your order details.</p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4">

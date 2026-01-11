@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Loader2, 
-  ArrowLeft, 
-  Package, 
-  Truck, 
-  MapPin, 
-  Phone, 
-  CheckCircle2, 
-  Clock, 
+import {
+  Loader2,
+  ArrowLeft,
+  Package,
+  Truck,
+  MapPin,
+  Phone,
+  CheckCircle2,
+  Clock,
   CreditCard,
   ExternalLink,
   Copy,
@@ -79,7 +79,7 @@ const OrderDetails: React.FC = () => {
         .from('orders')
         .select('*')
         .eq('id', id)
-        .eq('user_id', user?.id)
+        .eq('user_id', user?.uid)
         .single();
 
       if (error) throw error;
@@ -98,7 +98,7 @@ const OrderDetails: React.FC = () => {
 
   const handleCustomerConfirmation = async () => {
     if (!order) return;
-    
+
     if (!window.confirm("Are you sure you received this order? This will mark it as Delivered.")) {
       return;
     }
@@ -107,7 +107,7 @@ const OrderDetails: React.FC = () => {
     try {
       const { error } = await supabase
         .from("orders")
-        .update({ 
+        .update({
           status: 'delivered',
           delivered_at: new Date().toISOString()
         })
@@ -161,23 +161,23 @@ const OrderDetails: React.FC = () => {
 
   // --- Timeline Logic ---
   const timelineSteps = [
-    { 
-      id: 'placed', 
-      label: 'Order Placed', 
+    {
+      id: 'placed',
+      label: 'Order Placed',
       date: order.created_at,
       icon: Package,
       statusMatch: ['pending', 'paid', 'in_packing', 'packed', 'shipped', 'out_for_delivery', 'delivered']
     },
-    { 
-      id: 'processing', 
-      label: 'Processing', 
-      date: null, 
+    {
+      id: 'processing',
+      label: 'Processing',
+      date: null,
       icon: Clock,
       statusMatch: ['in_packing', 'packed', 'shipped', 'out_for_delivery', 'delivered']
     },
-    { 
-      id: 'packed', 
-      label: 'Packed', 
+    {
+      id: 'packed',
+      label: 'Packed',
       date: order.packed_at,
       icon: CheckCircle2,
       statusMatch: ['packed', 'shipped', 'out_for_delivery', 'delivered']
@@ -348,18 +348,18 @@ const OrderDetails: React.FC = () => {
               </CardHeader>
               <CardContent className="divide-y divide-slate-100">
                 {order.items.map((item, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="flex gap-4 py-4 cursor-pointer hover:bg-slate-50 transition-colors rounded-lg px-2 -mx-2"
                     onClick={() => navigate(`/product/${item.id}`)}
                   >
                     <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                       <img 
-                         src={item.image} 
-                         alt={item.name} 
-                         className="h-full w-full object-cover"
-                         onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
-                       />
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                        onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
+                      />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                       <div>
