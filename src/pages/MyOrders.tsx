@@ -29,7 +29,7 @@ const MyOrdersPage: React.FC = () => {
     const { data, error } = await supabase
       .from('orders')
       .select('*')
-      .eq('user_id', user?.id)
+      .eq('user_id', user?.uid)
       .order('created_at', { ascending: false });
 
     if (!error) {
@@ -55,7 +55,7 @@ const MyOrdersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50/50 py-8 font-sans">
       <div className="container mx-auto px-4 max-w-3xl">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
@@ -97,9 +97,9 @@ const MyOrdersPage: React.FC = () => {
                   {/* Image Thumbnail (First Item) */}
                   <div className="h-16 w-16 bg-slate-100 rounded-md overflow-hidden flex-shrink-0 border border-slate-100">
                     {order.items && order.items.length > 0 ? (
-                      <img 
-                        src={order.items[0].image} 
-                        alt="Order Item" 
+                      <img
+                        src={order.items[0].image}
+                        alt="Order Item"
                         className="h-full w-full object-cover"
                         onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
                       />
@@ -114,15 +114,14 @@ const MyOrdersPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-slate-900 text-sm">Order #{order.id}</span>
-                      <Badge className={`text-[10px] px-1.5 py-0 capitalize shadow-none font-normal border ${
-                        order.status === 'paid' ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100' :
-                        order.status === 'in_packing' ? 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100' :
-                        order.status === 'packed' ? 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100' :
-                        order.status === 'shipped' ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100' :
-                        order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100' :
-                        order.status === 'cancelled' ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100' :
-                        'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
-                      }`}>
+                      <Badge className={`text-[10px] px-1.5 py-0 capitalize shadow-none font-normal border ${order.status === 'paid' ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100' :
+                          order.status === 'in_packing' ? 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100' :
+                            order.status === 'packed' ? 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100' :
+                              order.status === 'shipped' ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100' :
+                                order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100' :
+                                  order.status === 'cancelled' ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100' :
+                                    'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
+                        }`}>
                         {order.status === 'in_packing' ? 'Processing' : order.status.replace(/_/g, ' ')}
                       </Badge>
                     </div>

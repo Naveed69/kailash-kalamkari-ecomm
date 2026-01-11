@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { 
-  onAuthStateChanged, 
-  User, 
+import {
+  onAuthStateChanged,
+  User,
   signOut as firebaseSignOut,
   sendSignInLinkToEmail,
   signInWithEmailLink,
   isSignInWithEmailLink,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +23,8 @@ interface AuthContextType {
   sendEmailLink: (email: string) => Promise<void>;
   signInWithEmail: (email: string, link: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<void>;
+  setupRecaptcha: (containerId: string) => void;
+  signInWithPhone: (phoneNumber: string) => Promise<ConfirmationResult>;
 }
 
 // Create the context with a default undefined value
@@ -34,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const { toast } = useToast();
 
- useEffect(() => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
@@ -70,10 +75,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      
+
       // Save email in localStorage to complete sign-in
       window.localStorage.setItem('emailForSignIn', email);
-      
+
       toast({
         title: "Email Link Sent",
         description: "Check your email for the sign-in link.",
@@ -93,15 +98,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signInWithEmail = async (email: string, link: string): Promise<boolean> => {
     try {
       const result = await signInWithEmailLink(auth, email, link);
-      
+
       // Clear email from localStorage
       window.localStorage.removeItem('emailForSignIn');
-      
+
       toast({
         title: "Welcome!",
         description: "You have been successfully signed in.",
       });
-      
+
       return true;
     } catch (error) {
       console.error("Error signing in with email link:", error);
@@ -123,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       await sendPasswordResetEmail(auth, email, actionCodeSettings);
-      
+
       toast({
         title: "Password Reset Email Sent",
         description: "Check your email for the password reset link.",
@@ -139,6 +144,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Setup Recaptcha for Phone Auth
+  const setupRecaptcha = (containerId: string) => {
+    if ((window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier.clear();
+    }
+
+    (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+      size: 'invisible',
+      callback: (response: any) => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+      },
+      'expired-callback': () => {
+        // Response expired. Ask user to solve reCAPTCHA again.
+      }
+    });
+  };
+
+  // Sign in with Phone Number (Send OTP)
+  const signInWithPhone = async (phoneNumber: string): Promise<ConfirmationResult> => {
+    try {
+      const appVerifier = (window as any).recaptchaVerifier;
+      if (!appVerifier) {
+        throw new Error("Recaptcha not initialized");
+      }
+
+      // Normalize phone number: always ensure it starts with + and contains only digits after that
+      const normalizedPhone = '+' + phoneNumber.replace(/\D/g, '');
+
+      console.log("Sending OTP to:", normalizedPhone);
+
+      const result = await signInWithPhoneNumber(auth, normalizedPhone, appVerifier);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your phone for the verification code.",
+      });
+      return result;
+    } catch (error: any) {
+      console.error("Error sending phone OTP:", error);
+
+      let errorMessage = "Failed to send OTP. Please try again.";
+
+      if (error.code === 'auth/invalid-phone-number') {
+        errorMessage = "The phone number is invalid. Please ensure it includes the country code (e.g., +91).";
+      } else if (error.code === 'auth/operation-not-allowed') {
+        errorMessage = "Phone authentication is not enabled. Please contact support.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Too many requests. Please try again later.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -146,6 +211,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sendEmailLink,
     signInWithEmail,
     resetPassword,
+    setupRecaptcha,
+    signInWithPhone,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
