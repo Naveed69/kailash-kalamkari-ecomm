@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { 
-  User, 
-  onAuthStateChanged, 
+import {
+  User,
+  onAuthStateChanged,
   signOut as firebaseSignOut,
   signInWithEmailAndPassword,
   sendPasswordResetEmail
@@ -29,27 +29,36 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const checkAdminStatus = (user: User) => {
       // Check if user email is in environment variable admin list
-      const adminEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(',').map(email => email.trim().toLowerCase()) || [];
+      const envEmails = import.meta.env.VITE_ADMIN_EMAILS;
+
+      if (!envEmails) {
+        console.error('CRITICAL: VITE_ADMIN_EMAILS environment variable is not defined!');
+        setIsAdmin(false);
+        return false;
+      }
+
+      const adminEmails = envEmails.split(',').map(email => email.trim().toLowerCase());
       const userEmail = user.email?.toLowerCase() || '';
       const isEmailInList = adminEmails.includes(userEmail);
-      
-      console.log('Admin access check:', {
+
+      console.log('Admin access check result:', {
         userEmail,
-        adminEmails,
-        isEmailInList
+        authorizedEmailsCount: adminEmails.length,
+        isAuthorized: isEmailInList,
+        envVariablePresent: !!envEmails
       });
-      
+
       setIsAdmin(isEmailInList);
       return isEmailInList;
     };
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('Auth state changed, user:', user?.email);
-      
+
       if (user) {
         const adminStatus = checkAdminStatus(user);
         setAdmin(user);
-        
+
         // Only sign out if user is not in admin list
         if (!adminStatus) {
           console.log('User not in admin list, giving only user access...');
@@ -121,11 +130,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <AdminAuthContext.Provider value={{ 
-      admin, 
-      loading, 
-      isAdmin, 
-      logout, 
+    <AdminAuthContext.Provider value={{
+      admin,
+      loading,
+      isAdmin,
+      logout,
       signInAdmin,
       resetPassword
     }}>

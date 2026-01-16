@@ -11,7 +11,6 @@ import ProductsPage from "./pages/ProductPage"
 import NotFound from "./pages/NotFound"
 import { CartProvider } from "./contexts/CartContext"
 import { WishlistProvider } from "./contexts/WishlistContext"
-import { InventoryProvider } from "./contexts/InventoryContext"
 import Wishlist from "./pages/Wishlist"
 import Inventory from "./Inventory/Inventory"
 import AdminLogin from "./pages/AdminLogin"
@@ -116,13 +115,11 @@ const App = () => {
         <AuthProvider>
           <AdminAuthProvider>
             <CartProvider>
-              <InventoryProvider>
-                <WishlistProvider>
-                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                    <AppContent />
-                  </BrowserRouter>
-                </WishlistProvider>
-              </InventoryProvider>
+              <WishlistProvider>
+                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  <AppContent />
+                </BrowserRouter>
+              </WishlistProvider>
             </CartProvider>
           </AdminAuthProvider>
         </AuthProvider>

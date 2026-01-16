@@ -82,13 +82,27 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedPhone = phoneNumber.trim();
+    let trimmedPhone = phoneNumber.trim().replace(/\s/g, '');
+
     if (!trimmedPhone) return;
 
-    if (!trimmedPhone.startsWith('+')) {
+    // Validation: Check if it's a 10-digit number without country code
+    const isTenDigits = /^\d{10}$/.test(trimmedPhone);
+    const hasCountryCode = trimmedPhone.startsWith('+');
+
+    if (!hasCountryCode && isTenDigits) {
+      trimmedPhone = '+91' + trimmedPhone;
+    } else if (!hasCountryCode) {
       toast({
         title: 'Invalid Format',
-        description: 'Please include the country code starting with + (e.g., +91).',
+        description: 'Please enter a 10-digit phone number or include country code starting with +.',
+        variant: 'destructive',
+      });
+      return;
+    } else if (hasCountryCode && trimmedPhone.length < 10) {
+      toast({
+        title: 'Invalid Format',
+        description: 'Phone number is too short.',
         variant: 'destructive',
       });
       return;
@@ -214,7 +228,7 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="+91 12345 67890"
+                      placeholder="1234567890"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       disabled={loading}
@@ -223,7 +237,7 @@ export const EmailLogin: React.FC<EmailLoginProps> = ({
                     />
                   </div>
                   <p className="text-xs text-gray-500">
-                    Include country code (e.g., +91 for India)
+                    Enter your 10-digit mobile number.
                   </p>
                 </div>
 

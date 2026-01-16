@@ -142,10 +142,10 @@ export default function CartPage() {
     // Validation
     if (name === "phone") {
       const regex = /^\d{10}$/
-      if (value && !regex.test(value)) {
+      if (value && !regex.test(value.replace(/\s/g, ""))) {
         setError((prev) => ({
           ...prev,
-          phone: "Invalid 10 digit mobile number",
+          phone: "Please enter a valid 10-digit mobile number",
         }))
       } else {
         setError((prev) => ({ ...prev, phone: "" }))
@@ -210,13 +210,19 @@ export default function CartPage() {
         throw new Error('Please fill in all required fields');
       }
 
+      // Normalize phone number
+      let normalizedPhone = orderDetails.phone.trim().replace(/\s/g, '');
+      if (normalizedPhone.length === 10 && !normalizedPhone.startsWith('+')) {
+        normalizedPhone = '+91' + normalizedPhone;
+      }
+
       console.log('Creating order in database...');
       const { data: orderData, error: orderError } = await supabase
         .from("orders")
         .insert([
           {
             customer_name: orderDetails.name,
-            customer_phone: orderDetails.phone,
+            customer_phone: normalizedPhone,
             customer_email: orderDetails.email || null,
             address_line1: orderDetails.addressLine1,
             address_line2: orderDetails.addressLine2 || null,
@@ -241,7 +247,7 @@ export default function CartPage() {
             })),
             status: "pending",
             user_id: user.uid,
-            user_phone: user.phoneNumber || orderDetails.phone,
+            user_phone: user.phoneNumber || normalizedPhone,
             payment_method: "upi_qr",
             created_at: new Date().toISOString()
           },
@@ -310,6 +316,12 @@ export default function CartPage() {
         variant: "destructive",
       })
       return
+    }
+
+    // Normalize phone number
+    let normalizedPhone = orderDetails.phone.trim().replace(/\s/g, '');
+    if (normalizedPhone.length === 10 && !normalizedPhone.startsWith('+')) {
+      normalizedPhone = '+91' + normalizedPhone;
     }
 
     if (error.phone || error.pincode || error.email) {
@@ -430,7 +442,7 @@ export default function CartPage() {
             .insert([
               {
                 customer_name: orderDetails.name,
-                customer_phone: orderDetails.phone,
+                customer_phone: normalizedPhone,
                 customer_email: orderDetails.email || null,
                 // New structured address fields
                 address_line1: orderDetails.addressLine1,
@@ -452,7 +464,7 @@ export default function CartPage() {
                 items: freshItems, // Use fresh items with barcodes
                 status: "paid",
                 user_id: user.uid, // Link order to user
-                user_phone: user.phoneNumber || orderDetails.phone,
+                user_phone: user.phoneNumber || normalizedPhone,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
@@ -531,7 +543,7 @@ export default function CartPage() {
       },
       prefill: {
         name: orderDetails.name,
-        contact: orderDetails.phone,
+        contact: normalizedPhone,
         email: orderDetails.email,
       },
       notes: {

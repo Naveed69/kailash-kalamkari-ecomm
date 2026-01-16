@@ -6,16 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
-import { 
-  Search, 
-  Package, 
-  Truck, 
-  CheckCircle2, 
-  Clock, 
-  MapPin, 
-  Phone, 
-  AlertCircle, 
-  ExternalLink, 
+import {
+  Search,
+  Package,
+  Truck,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Phone,
+  AlertCircle,
+  ExternalLink,
   HelpCircle,
   Box
 } from "lucide-react";
@@ -33,6 +33,7 @@ interface Order {
   delivered_at?: string;
   items: any[];
   customer_name: string;
+  customer_phone: string;
   address_line1?: string;
   city?: string;
   state?: string;
@@ -49,7 +50,7 @@ const TrackOrder = () => {
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!orderId || !phone) {
       toast({
         title: "Missing Information",
@@ -59,17 +60,32 @@ const TrackOrder = () => {
       return;
     }
 
+    const trimmedPhone = phone.trim().replace(/\s/g, '');
+    if (!/^\d{10}$/.test(trimmedPhone) && !trimmedPhone.startsWith('+')) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid 10-digit mobile number",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     setOrder(null);
 
     try {
-      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+      let normalizedPhone = phone.trim().replace(/\s/g, '');
+      if (normalizedPhone.length === 10 && !normalizedPhone.startsWith('+')) {
+        normalizedPhone = '+91' + normalizedPhone;
+      }
+
+      const cleanPhoneForSearch = normalizedPhone.replace(/\D/g, '').slice(-10);
 
       const { data, error } = await supabase
         .from("orders")
         .select("*")
         .eq("id", orderId)
-        .ilike("customer_phone", `%${cleanPhone}%`)
+        .ilike("customer_phone", `%${cleanPhoneForSearch}%`)
         .single();
 
       if (error) {
@@ -94,7 +110,7 @@ const TrackOrder = () => {
 
   const handleCustomerConfirmation = async () => {
     if (!order) return;
-    
+
     if (!window.confirm("Are you sure you received this order? This will mark it as Delivered.")) {
       return;
     }
@@ -103,7 +119,7 @@ const TrackOrder = () => {
     try {
       const { error } = await supabase
         .from("orders")
-        .update({ 
+        .update({
           status: 'delivered',
           delivered_at: new Date().toISOString()
         })
@@ -147,7 +163,7 @@ const TrackOrder = () => {
     minDate.setDate(shippedDate.getDate() + 3);
     const maxDate = new Date(shippedDate);
     maxDate.setDate(shippedDate.getDate() + 5);
-    
+
     return `${minDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} - ${maxDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`;
   };
 
@@ -167,8 +183,8 @@ const TrackOrder = () => {
                 <label className="text-sm font-semibold text-slate-700">Order ID</label>
                 <div className="relative">
                   <Package className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    placeholder="e.g. 1234" 
+                  <Input
+                    placeholder="e.g. 1234"
                     value={orderId}
                     onChange={(e) => setOrderId(e.target.value)}
                     className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500"
@@ -179,16 +195,16 @@ const TrackOrder = () => {
                 <label className="text-sm font-semibold text-slate-700">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    placeholder="e.g. 9876543210" 
+                  <Input
+                    placeholder="10-digit mobile number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500"
                   />
                 </div>
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading}
                 className="bg-amber-600 hover:bg-amber-700 text-white w-full md:w-auto font-medium shadow-sm"
               >
@@ -201,7 +217,7 @@ const TrackOrder = () => {
         {/* Order Details */}
         {order && (
           <div className="grid gap-6 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            
+
             {/* Left Column: Timeline & Status */}
             <div className="md:col-span-2 space-y-6">
               <Card className="shadow-sm border-slate-200">
@@ -212,9 +228,9 @@ const TrackOrder = () => {
                         Order #{order.id}
                         <Badge className={
                           order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                          order.status === 'shipped' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' :
-                          order.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-200' :
-                          'bg-amber-100 text-amber-700 border-amber-200'
+                            order.status === 'shipped' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' :
+                              order.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-200' :
+                                'bg-amber-100 text-amber-700 border-amber-200'
                         }>
                           {order.status.replace('_', ' ').toUpperCase()}
                         </Badge>
@@ -293,7 +309,7 @@ const TrackOrder = () => {
                   <AlertCircle className="h-4 w-4 text-blue-600" />
                   <AlertTitle className="text-blue-800 font-semibold">Live Tracking Not Available In-App</AlertTitle>
                   <AlertDescription className="text-blue-700 mt-1 text-sm">
-                    Your parcel is with <strong>{order.shipping_company || 'DTDC'}</strong>. 
+                    Your parcel is with <strong>{order.shipping_company || 'DTDC'}</strong>.
                     Please use the AWB number below to track directly on their website.
                   </AlertDescription>
                 </Alert>
@@ -322,8 +338,8 @@ const TrackOrder = () => {
 
                     {order.tracking_id && (
                       <div className="flex flex-col gap-3">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
                           onClick={() => window.open(`https://www.google.com/search?q=${order.shipping_company}+tracking+${order.tracking_id}`, '_blank')}
                         >
@@ -348,8 +364,8 @@ const TrackOrder = () => {
                         <h3 className="font-semibold text-emerald-900">Have you received this order?</h3>
                         <p className="text-sm text-emerald-700">Help us close this order by confirming delivery.</p>
                       </div>
-                      <Button 
-                        onClick={handleCustomerConfirmation} 
+                      <Button
+                        onClick={handleCustomerConfirmation}
                         disabled={markingDelivered}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm whitespace-nowrap"
                       >
