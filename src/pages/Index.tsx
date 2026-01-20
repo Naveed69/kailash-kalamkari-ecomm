@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { MainCategories } from "@/components/ui/categoryFilter";
 
-import carouselImage1 from "@/assets/carousel/KANCHIPURAM PATTU SAREES.png";
-import carouselImage2 from "@/assets/carousel/KANCHIPURAM PATTU SAREES2.png";
-import carouselImage3 from "@/assets/carousel/BANGALORE SILK SAREES.png";
-import carouselImage4 from "@/assets/carousel/BANGALORE SILK SAREES2.png";
+import carouselImage1 from "@/assets/carousel/Video/video1.mp4";
+import carouselImage2 from "@/assets/carousel/Video/video2.mp4";
+import carouselImage3 from "@/assets/carousel/Video/video3.mp4";
+import carouselImage4 from "@/assets/carousel/Video/video4.mp4";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
 
 import { useInventory } from "@/contexts/InventoryContext";
@@ -62,7 +62,7 @@ interface FilterState {
 // Carousel slides static data
 const carouselSlides = [
   {
-    image: carouselImage3,
+    video: carouselImage3,
     title: "Bangalore Silk Sarees",
     description:
       "Luxurious silk sarees handwoven in Bangalore, perfect for grand occasions.",
@@ -72,7 +72,7 @@ const carouselSlides = [
     },
   },
   {
-    image: carouselImage4,
+    video: carouselImage4,
     title: "Traditional Silks",
     description:
       "Celebrate traditions with elegant silk sarees featuring timeless motifs.",
@@ -82,7 +82,7 @@ const carouselSlides = [
     },
   },
   {
-    image: carouselImage1,
+    video: carouselImage1,
     title: "Kanchipuram Pattu Sarees",
     description:
       "Authentic Kanchipuram silk sarees with intricate handwoven designs.",
@@ -92,7 +92,7 @@ const carouselSlides = [
     },
   },
   {
-    image: carouselImage2,
+    video: carouselImage2,
     title: "Modern Kanchipuram",
     description:
       "Discover modern interpretations of Kanchipuram sarees with contemporary flair.",
@@ -346,11 +346,15 @@ const Index = () => {
                   `}
                   style={{ zIndex: index === current ? 2 : 1 }}
                 >
-                  <img
-                    src={slide.image}
-                    alt={`carousel-${index}`}
-                    className="w-full h-full object-cover"
-                  />
+                  <video
+                  src={slide.video}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/30 to-transparent"></div>
                   {/* Content overlay per slide */}
@@ -398,22 +402,7 @@ const Index = () => {
             </div>
 
             {/* Carousel Controls */}
-            <button
-              onClick={prevSlide}
-              className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20"
-              aria-label="Previous Slide"
-              type="button"
-            >
-              {"<"}
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20"
-              aria-label="Next Slide"
-              type="button"
-            >
-              {">"}
-            </button>
+           
             {/* Carousel Dots */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
               {carouselSlides.map((_, index) => (
