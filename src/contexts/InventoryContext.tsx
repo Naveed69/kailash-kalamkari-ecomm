@@ -54,11 +54,11 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
         getProducts(),
       ])
 
-      console.log("📦 Inventory Data Fetched:", {
-        categories: catsResult.data?.length,
-        subCategories: subCatsResult.data?.length,
-        products: prodsResult.data?.length,
-      })
+      // console.log("📦 Inventory Data Fetched:", {
+      //   categories: catsResult.data?.length,
+      //   subCategories: subCatsResult.data?.length,
+      //   products: prodsResult.data?.length,
+      // })
 
       if (catsResult.error) throw new Error(catsResult.error.message)
       if (subCatsResult.error) throw new Error(subCatsResult.error.message)
@@ -110,7 +110,7 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
       }))
 
       setProducts(transformedProds)
-      console.log("✅ Products State Updated:", transformedProds.length)
+      // console.log("✅ Products State Updated:", transformedProds.length)
 
       // Build nested structure for backward compatibility / specific UI needs
       const nestedCategories: Category[] = rawCats.map((cat: any) => {
