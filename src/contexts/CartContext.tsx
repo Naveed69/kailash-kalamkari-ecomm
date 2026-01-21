@@ -258,6 +258,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateQuantity = async (cartItemId: string, quantity: number) => {
+    console.log("Updating quantity:", cartItemId, quantity);
     if (quantity < 1) return;
 
     const item = cart.items.find(i => i.cartItemId === cartItemId);

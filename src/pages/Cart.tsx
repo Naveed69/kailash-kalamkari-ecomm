@@ -639,7 +639,7 @@ export default function CartPage() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <div className="bg-slate-100 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
-                      1
+                      {cart.totalItems}
                     </div>
                     <CardTitle className="text-lg">Cart Items</CardTitle>
                   </div>
@@ -708,47 +708,48 @@ export default function CartPage() {
                           </div>
                         </div>
 
-                        <div className="flex justify-between items-end mt-4">
-                          {/* Quantity Control */}
-                          <div className="flex items-center border rounded-md bg-white shadow-sm">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 rounded-none"
-                              onClick={() =>
-                                updateQuantity(
-                                  item.id,
-                                  Math.max(1, item.quantity - 1)
-                                )
-                              }
-                              disabled={item.quantity <= 1}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <div className="w-10 text-center text-sm font-medium border-x h-8 flex items-center justify-center">
-                              {item.quantity}
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 rounded-none"
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
-                              }
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </div>
+                    
+                  <div className="flex justify-between items-end mt-4">
+                    {/* Quantity Control */}
+                    <div className="flex items-center border rounded-md bg-white shadow-sm">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-none"
+                        onClick={() =>
+                          updateQuantity(
+                            item.cartItemId,  // Changed from item.id
+                            Math.max(1, item.quantity - 1)
+                          )
+                        }
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <div className="w-10 text-center text-sm font-medium border-x h-8 flex items-center justify-center">
+                        {item.quantity}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-none"
+                        onClick={() =>
+                          updateQuantity(item.cartItemId, item.quantity + 1)  // Changed from item.id
+                        }
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
 
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-muted-foreground hover:text-red-500 hover:bg-red-50"
-                          >
-                            Remove
-                          </Button>
-                        </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFromCart(item.cartItemId)}  // Changed from item.id
+                      className="text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                    >
+                      Remove
+                    </Button>
+                  </div>
                       </div>
                     </div>
                   ))}
