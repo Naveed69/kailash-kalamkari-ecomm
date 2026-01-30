@@ -1,4 +1,7 @@
 import React from 'react';
+import { v5 as uuidv5 } from 'uuid';
+
+const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,11 +28,15 @@ const MyOrdersPage: React.FC = () => {
 
   const fetchOrders = async () => {
     setLoadingOrders(true);
+
     const { supabase } = await import('@/lib/supabaseClient');
+    // Use consistent UUID
+    const dbUserId = user ? uuidv5(user.uid, USER_ID_NAMESPACE) : null;
+
     const { data, error } = await supabase
       .from('orders')
       .select('*')
-      .eq('user_id', user?.uid)
+      .eq('user_id', dbUserId)
       .order('created_at', { ascending: false });
 
     if (!error) {
@@ -115,12 +122,12 @@ const MyOrdersPage: React.FC = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-slate-900 text-sm">Order #{order.id}</span>
                       <Badge className={`text-[10px] px-1.5 py-0 capitalize shadow-none font-normal border ${order.status === 'paid' ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100' :
-                          order.status === 'in_packing' ? 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100' :
-                            order.status === 'packed' ? 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100' :
-                              order.status === 'shipped' ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100' :
-                                order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100' :
-                                  order.status === 'cancelled' ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100' :
-                                    'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
+                        order.status === 'in_packing' ? 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100' :
+                          order.status === 'packed' ? 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100' :
+                            order.status === 'shipped' ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100' :
+                              order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100' :
+                                order.status === 'cancelled' ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100' :
+                                  'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
                         }`}>
                         {order.status === 'in_packing' ? 'Processing' : order.status.replace(/_/g, ' ')}
                       </Badge>

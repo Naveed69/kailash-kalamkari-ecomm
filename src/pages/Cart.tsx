@@ -1,4 +1,46 @@
 import { Button } from "@/components/ui/button"
+import { v5 as uuidv5 } from 'uuid';
+
+const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
+// Helper to ensure user exists in DB to satisfy Foreign Key constraints
+const ensureUserExists = async (userId: string, userDetails: any) => {
+  // Try 'profiles' table first (common Supabase pattern)
+  const profileData = {
+    id: userId,
+    email: userDetails.email || null,
+    full_name: userDetails.name || null,
+    phone: userDetails.phone || null,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert(profileData, { onConflict: 'id' });
+
+  if (!profileError) return true;
+
+  // If 'profiles' fails (e.g. table doesn't exist), try 'users' table
+  console.log("Upsert to profiles failed, trying users table...", profileError.message);
+  const userData = {
+    id: userId,
+    email: userDetails.email || null,
+    name: userDetails.name || null,
+    phone_number: userDetails.phone || null,
+  };
+
+  const { error: userError } = await supabase
+    .from('users')
+    .upsert(userData, { onConflict: 'id' });
+
+  if (userError) {
+    console.error("Failed to ensure user exists in public tables:", userError);
+    // We continue anyway; if FK is to auth.users, this will still fail, but we tried.
+    return false;
+  }
+  return true;
+};
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -217,6 +259,16 @@ export default function CartPage() {
       }
 
       console.log('Creating order in database...');
+      // Use deterministic UUID
+      const dbUserId = uuidv5(user.uid, USER_ID_NAMESPACE);
+
+      // Ensure user exists in DB before creating order
+      await ensureUserExists(dbUserId, {
+        name: orderDetails.name,
+        email: orderDetails.email,
+        phone: normalizedPhone
+      });
+
       const { data: orderData, error: orderError } = await supabase
         .from("orders")
         .insert([
@@ -246,7 +298,7 @@ export default function CartPage() {
               quantity: item.quantity || 1
             })),
             status: "pending",
-            user_id: user.uid,
+            user_id: dbUserId,
             user_phone: user.phoneNumber || normalizedPhone,
             payment_method: "upi_qr",
             created_at: new Date().toISOString()
@@ -280,7 +332,7 @@ export default function CartPage() {
     }
   };
   const copyUpiId = () => {
-    navigator.clipboard.writeText("9742493219@ybl") // Replace with your actual UPI ID
+    navigator.clipboard.writeText("7013242312@axl") // Replace with your actual UPI ID
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -349,6 +401,41 @@ export default function CartPage() {
       amount: cart.totalPrice * 100, // Amount in paise
       currency: "INR",
       name: "Kailash Kalamkari",
+      config: {
+        display: {
+          blocks: {
+            upi: {
+              name: "Pay via UPI",
+              instruments: [
+                {
+                  method: "upi",
+                },
+              ],
+            },
+            other: {
+              name: "Other Payment Modes",
+              instruments: [
+                {
+                  method: "card",
+                },
+                {
+                  method: "netbanking",
+                },
+                {
+                  method: "wallet",
+                },
+                {
+                  method: "upi",
+                },
+              ],
+            },
+          },
+          sequence: ["block.upi", "block.other"],
+          preferences: {
+            show_default_blocks: false,
+          },
+        },
+      },
       description: "Order Payment",
       image: "https://via.placeholder.com/128", // Replace with actual logo if available
       handler: async function (response: any) {
@@ -437,6 +524,15 @@ export default function CartPage() {
           }
 
           // Create order with fresh item data
+          const dbUserId = uuidv5(user.uid, USER_ID_NAMESPACE);
+
+          // Ensure user exists in DB before creating order
+          await ensureUserExists(dbUserId, {
+            name: orderDetails.name,
+            email: orderDetails.email,
+            phone: normalizedPhone
+          });
+
           const { data: orderData, error: orderError } = await supabase
             .from("orders")
             .insert([
@@ -463,7 +559,7 @@ export default function CartPage() {
                 total_amount: cart.totalPrice,
                 items: freshItems, // Use fresh items with barcodes
                 status: "paid",
-                user_id: user.uid, // Link order to user
+                user_id: dbUserId, // Link order to user
                 user_phone: user.phoneNumber || normalizedPhone,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
@@ -639,7 +735,7 @@ export default function CartPage() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <div className="bg-slate-100 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
-                      {cart.totalItems}
+                      1
                     </div>
                     <CardTitle className="text-lg">Cart Items</CardTitle>
                   </div>
@@ -658,7 +754,7 @@ export default function CartPage() {
                 <div className="divide-y">
                   {cart.items.map((item) => (
                     <div
-                      key={item.id}
+                      key={item.cartItemId}
                       className="p-4 sm:p-6 flex gap-4 sm:gap-6 hover:bg-slate-50/50 transition-colors"
                     >
                       {/* Product Image - Clickable */}
@@ -708,48 +804,69 @@ export default function CartPage() {
                           </div>
                         </div>
 
-                    
-                  <div className="flex justify-between items-end mt-4">
-                    {/* Quantity Control */}
-                    <div className="flex items-center border rounded-md bg-white shadow-sm">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-none"
-                        onClick={() =>
-                          updateQuantity(
-                            item.cartItemId,  // Changed from item.id
-                            Math.max(1, item.quantity - 1)
-                          )
-                        }
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <div className="w-10 text-center text-sm font-medium border-x h-8 flex items-center justify-center">
-                        {item.quantity}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-none"
-                        onClick={() =>
-                          updateQuantity(item.cartItemId, item.quantity + 1)  // Changed from item.id
-                        }
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
+                        <div className="flex justify-between items-end mt-4">
+                          {/* Quantity Control */}
+                          <div className="flex items-center border rounded-md bg-white shadow-sm">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-none"
+                              onClick={() =>
+                                updateQuantity(
+                                  item.cartItemId,
+                                  Math.max(1, Number(item.quantity) - 1)
+                                )
+                              }
+                              disabled={Number(item.quantity) <= 1}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <div className="w-14 border-x h-8 flex items-center justify-center bg-white">
+                              <Input
+                                type="number"
+                                min={1}
+                                max={(item as any).maxStock ?? 100}
+                                className="w-full text-center border-none h-8 p-0 focus-visible:ring-0 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  let val = parseInt(e.target.value);
+                                  const max = Number((item as any).maxStock ?? 100);
+                                  if (isNaN(val) || val < 1) val = 1;
+                                  if (val > max) {
+                                    toast({
+                                      title: "Stock Limit Reached",
+                                      description: `Max quantity available is ${max}`,
+                                      variant: "destructive"
+                                    });
+                                    val = max;
+                                  }
+                                  updateQuantity(item.cartItemId, val);
+                                }}
+                              />
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-none"
+                              onClick={() =>
+                                updateQuantity(item.cartItemId, Number(item.quantity) + 1)
+                              }
+                              disabled={Number(item.quantity) >= ((item as any).maxStock !== undefined ? Number((item as any).maxStock) : 100)}
+                              title={item.quantity >= ((item as any).maxStock ?? 100) ? `Max stock reached (${(item as any).maxStock})` : "Add one"}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFromCart(item.cartItemId)}  // Changed from item.id
-                      className="text-muted-foreground hover:text-red-500 hover:bg-red-50"
-                    >
-                      Remove
-                    </Button>
-                  </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromCart(item.cartItemId)}
+                            className="text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                          >
+                            Remove
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -980,7 +1097,7 @@ export default function CartPage() {
                         >
                           <div className="text-left">
                             <p className="text-sm font-medium">Razorpay</p>
-                            <p className="text-xs text-muted-foreground">Cards, UPI, Net Banking</p>
+                            <p className="text-xs text-muted-foreground">Cards, UPI, Net Banking, Wallet</p>
                           </div>
                         </Button>
                         <Button
@@ -1025,7 +1142,7 @@ export default function CartPage() {
                     <div className="w-full">
                       <p className="text-sm text-muted-foreground mb-1">Or send money to UPI ID:</p>
                       <div className="flex items-center justify-between p-2 border rounded-md bg-muted/50">
-                        <code className="font-mono text-sm">9742493219@ybl</code>
+                        <code className="font-mono text-sm">7013242312@axl</code>
                         <Button
                           variant="ghost"
                           size="sm"

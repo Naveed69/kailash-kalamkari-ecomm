@@ -23,6 +23,9 @@ import {
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import { v5 as uuidv5 } from 'uuid';
+
+const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
 // --- Types ---
 interface OrderItem {
@@ -74,12 +77,16 @@ const OrderDetails: React.FC = () => {
 
   const fetchOrderDetails = async () => {
     setLoadingOrder(true);
+
     try {
+      // Use consistent UUID
+      const dbUserId = user ? uuidv5(user.uid, USER_ID_NAMESPACE) : null;
+
       const { data, error } = await supabase
         .from('orders')
         .select('*')
         .eq('id', id)
-        .eq('user_id', user?.uid)
+        .eq('user_id', dbUserId)
         .single();
 
       if (error) throw error;

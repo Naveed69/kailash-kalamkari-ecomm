@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useRef } from 'react';
 import { Product } from '@/components/ProductCard';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/AuthContext';
@@ -8,6 +8,7 @@ import { useInventory } from '@/contexts/InventoryContext';
 interface CartItem extends Product {
   cartItemId: string;
   quantity: number;
+  maxStock?: number;
 }
 
 type CartState = {
@@ -69,7 +70,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             : item
         );
       } else {
-        updatedItems = [...state.items, { ...product, quantity, cartItemId }];
+        updatedItems = [...state.items, { ...product, quantity, cartItemId, maxStock: product.quantity }];
       }
 
       const { totalItems, totalPrice } = calculateTotals(updatedItems);
@@ -124,6 +125,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { toast } = useToast();
   const { user } = useAuth();
   const { products } = useInventory();
+  const prevUserRef = useRef<any>(null); // Track previous user to detect logout
 
   // Initialize from localStorage if available
   const initializer = (initialValue: CartState): CartState => {
@@ -142,17 +144,32 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     totalPrice: 0,
   }, initializer);
 
+  // Clear cart on logout
+  useEffect(() => {
+    if (prevUserRef.current && !user) {
+      dispatch({ type: 'CLEAR_CART' });
+      localStorage.removeItem('cart');
+    }
+    prevUserRef.current = user;
+  }, [user]);
+
   // DB Sync Effect
   useEffect(() => {
+    let isMounted = true;
     const syncCartWithDb = async () => {
+      // If no user, or products not yet loaded, we cannot sync fully.
       if (!user || products.length === 0) return;
 
       try {
+        console.log(`[CartContext] Syncing cart for user ${user.uid} with ${products.length} products available.`);
+
         // 1. Fetch user's cart from DB
         const dbItems = await cartApi.getUserCart(user.uid);
+        console.log(`[CartContext] Fetched ${dbItems?.length || 0} items from DB.`);
 
-        // 2. Identify local items to sync to DB (migration)
+        // 2. Identify local items to sync to DB (migration - handling guest cart to user cart merge)
         if (cart.items.length > 0) {
+          console.log(`[CartContext] Merging ${cart.items.length} local items to DB.`);
           const syncPromises = cart.items.map(item =>
             cartApi.upsertCartItem({
               user_id: user.uid,
@@ -163,31 +180,49 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             })
           );
           await Promise.all(syncPromises);
-
-          // Clear local storage choice: we'll keep it as a fallback but DB is source of truth now
         }
 
-        // 3. Merge DB items with full product details from Inventory
-        const mergedItems: CartItem[] = dbItems.map(dbItem => {
+        // 3. Re-fetch or Merge (For simplicity/correctness, we'll re-fetch if we migrated, or just use dbItems + mapped local if we trust it. 
+        // Safer to treat DB as source of truth after migration.
+        // Let's re-fetch if we performed migration to get clean state? 
+        // Or just map the logic. Let's assume dbItems + what we just pushed is what we want. 
+        // Actually simplest is: Push local -> Fetch All -> Set.
+
+        let finalDbItems = dbItems;
+        if (cart.items.length > 0) {
+          finalDbItems = await cartApi.getUserCart(user.uid);
+        }
+
+        // 4. Merge DB items with full product details from Inventory
+        const mergedItems: CartItem[] = finalDbItems.map(dbItem => {
           const product = products.find(p => p.id === dbItem.product_id);
-          if (!product) return null;
+          if (!product) {
+            console.warn(`[CartContext] Product ID ${dbItem.product_id} found in cart but not in inventory. Skipping.`);
+            return null;
+          }
 
           return {
-            ...product,
-            cartItemId: dbItem.cart_item_id,
-            quantity: dbItem.quantity,
+            ...product, // Spread original product details
+            cartItemId: dbItem.cart_item_id, // Restore cart persistence ID
+            quantity: dbItem.quantity, // Restore persisted quantity
+            maxStock: product.quantity, // Ensure maxStock is set from current inventory
             selectedColor: dbItem.selected_color
           } as CartItem;
         }).filter(Boolean) as CartItem[];
 
-        dispatch({ type: 'SET_CART', payload: mergedItems });
+        if (isMounted) {
+          console.log(`[CartContext] Setting final cart with ${mergedItems.length} items.`);
+          dispatch({ type: 'SET_CART', payload: mergedItems });
+        }
       } catch (error) {
-        console.error("Failed to sync cart with DB:", error);
+        console.error("[CartContext] Failed to sync cart with DB:", error);
       }
     };
 
     syncCartWithDb();
-  }, [user, products.length === 0]); // Run on user login or when products are loaded
+
+    return () => { isMounted = false; };
+  }, [user, products.length]); // Re-run if user changes or products finish loading/update
 
   // Save to localStorage whenever cart changes (as a temporary fallback/speed optimization)
   useEffect(() => {
@@ -258,7 +293,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateQuantity = async (cartItemId: string, quantity: number) => {
-    // console.log("Updating quantity:", cartItemId, quantity);
     if (quantity < 1) return;
 
     const item = cart.items.find(i => i.cartItemId === cartItemId);
