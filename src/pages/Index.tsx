@@ -23,6 +23,17 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import Heritage from "@/assets/Heritage/Heritage.jpeg";
 import Gallery from "./Gallery";
 
+const CF_HASH = "xGnXvGVZkNr8ZNcbFxAROQ";
+
+export const getCFImage = (
+  id: string | null | undefined,
+  variant: "thumb" | "medium" | "full" = "medium",
+) => {
+  if (!id) return "/placeholder.svg";
+  if (id.startsWith("http://") || id.startsWith("https://")) return id;
+  return `https://imagedelivery.net/${CF_HASH}/${id}/${variant}`;
+};
+
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
   category: string;
@@ -613,7 +624,7 @@ const Index = () => {
               </div>
               <div className="relative animate-slide-in-right">
                 <img
-                  src={Heritage}
+                  src={getCFImage("cb1eba23-5f89-4d3d-a2a4-487e70cd0400", "thumb")}
                   alt="Kalamkari craftsmanship"
                   className="rounded-lg shadow-lg w-full h-[400px] object-cover"
                 />
