@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Package, Truck, MapPin, Phone, User, Download, ArrowLeft } from "lucide-react";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 interface OrderItem {
   id: string;
@@ -123,16 +124,15 @@ const OrderConfirmation = () => {
           <CardContent className="p-0">
             {/* Items */}
             <div className="divide-y divide-slate-100">
-              {order.items.map((item, index) => (
-                <div key={index} className="flex gap-4 p-4 hover:bg-slate-50/50 transition-colors">
+              {order.items.map((item) => (
+                <div key={item.id} className="flex gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                   <div className="h-16 w-16 bg-slate-100 rounded-md overflow-hidden border border-slate-200 flex-shrink-0">
-                    {item.image && (
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
+                    <CloudflareImage
+                      imageRef={item.image ?? null}
+                      variant="thumb"
+                      alt={item.name}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-slate-900 text-sm truncate">{item.name}</h4>

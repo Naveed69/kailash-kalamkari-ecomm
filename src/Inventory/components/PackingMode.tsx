@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 import Barcode from "react-barcode";
 import { 
   createPackingSession, 
@@ -418,15 +419,14 @@ const PackingMode: React.FC<PackingModeProps> = ({ order, onComplete, onCancel }
                 <CardContent className="p-4">
                   <div className="flex gap-3">
                     {/* Product Image */}
-                    {item.image && (
-                      <div className="flex-shrink-0">
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded-lg border-2 border-slate-200 shadow-sm"
-                        />
-                      </div>
-                    )}
+                    <div className="flex-shrink-0">
+                      <CloudflareImage
+                        imageRef={item.image ?? null}
+                        variant="thumb"
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-lg border-2 border-slate-200 shadow-sm"
+                      />
+                    </div>
                     
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">

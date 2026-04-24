@@ -24,6 +24,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { v5 as uuidv5 } from 'uuid';
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
@@ -354,18 +355,18 @@ const OrderDetails: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="divide-y divide-slate-100">
-                {order.items.map((item, idx) => (
+                {order.items.map((item) => (
                   <div
-                    key={idx}
+                    key={item.id}
                     className="flex gap-4 py-4 cursor-pointer hover:bg-slate-50 transition-colors rounded-lg px-2 -mx-2"
                     onClick={() => navigate(`/product/${item.id}`)}
                   >
                     <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                      <img
-                        src={item.image}
+                      <CloudflareImage
+                        imageRef={item.image ?? null}
+                        variant="thumb"
                         alt={item.name}
                         className="h-full w-full object-cover"
-                        onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
                       />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-between py-1">

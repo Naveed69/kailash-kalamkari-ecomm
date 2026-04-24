@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 interface OrderItem {
   id: string;
@@ -230,13 +231,14 @@ const OrderDetailsAdmin: React.FC<OrderDetailsAdminProps> = ({
                 </div>
               </div>
               <div className="divide-y divide-slate-100">
-                {(order.items || []).map((item, index) => (
-                  <div key={index} className="p-4 flex gap-4 hover:bg-gradient-to-r hover:from-slate-50/50 hover:to-blue-50/20 transition-all duration-300 group/item">
+                {(order.items || []).map((item) => (
+                  <div key={item.id} className="p-4 flex gap-4 hover:bg-gradient-to-r hover:from-slate-50/50 hover:to-blue-50/20 transition-all duration-300 group/item">
                     <div className="relative h-16 w-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg overflow-hidden border-2 border-slate-200 flex-shrink-0 shadow-md group-hover/item:shadow-xl group-hover/item:scale-105 transition-all duration-300">
-                      <img 
-                        src={item.image || "/placeholder.svg"} 
+                      <CloudflareImage
+                        imageRef={item.image ?? null}
+                        variant="thumb"
                         alt={item.name}
-                        className="h-full w-full object-cover" 
+                        className="h-full w-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-between">

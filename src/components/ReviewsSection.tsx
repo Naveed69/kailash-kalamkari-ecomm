@@ -84,8 +84,7 @@ const KalamkariCard = ({
       alt={feedback}
       className="w-full h-full object-cover"
       onError={(e) => {
-        e.currentTarget.src =
-          "https://placehold.co/800x600/8B4513/ffffff?text=Kalamkari+Saree";
+        e.currentTarget.src = "/placeholder.svg";
       }}
     />
     <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
@@ -96,9 +95,7 @@ const KalamkariCard = ({
           className="w-10 h-10 rounded-full border-2 border-white/90 shadow-md"
           alt={name}
           onError={(e) => {
-            e.currentTarget.src =
-              "https://placehold.co/40x40/EFEFEF/333333?text=" +
-              name.charAt(0);
+            e.currentTarget.src = "/placeholder.svg";
           }}
         />
         <span className="font-semibold text-sm drop-shadow-md">{name}</span>

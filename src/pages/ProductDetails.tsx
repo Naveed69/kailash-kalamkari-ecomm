@@ -30,6 +30,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 // --- Components ---
 
@@ -50,6 +52,9 @@ const ProductDetails = () => {
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>("");
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [shouldMountZoom, setShouldMountZoom] = useState(false);
+  const [fullImageRef, setFullImageRef] = useState<string | null>(null);
 
   // Find Product
   const product = products.find((p) => p.id === id);
@@ -62,15 +67,28 @@ const ProductDetails = () => {
       .slice(0, 4);
   }, [product, products]);
 
-  // Image Gallery Logic (Handling single image vs array)
-  // In a real app, product.images would be an array. 
-  // Here we simulate a gallery if only one image exists, or use the array if it exists.
-  const galleryImages = useMemo(() => {
-    if (!product) return [];
-    // @ts-ignore - checking if images array exists in future data model
-    if (product.images && Array.isArray(product.images)) return product.images;
-    // Fallback: Repeat image to simulate gallery for UI demo (remove slice in production if real data)
-    return [product.image, product.image, product.image, product.image].slice(0, 4);
+  // Image Gallery Logic (migration-safe)
+  // - If product.images exists, use it
+  // - Else use [product.image]
+  // - De-dupe to avoid duplicate requests/decodes
+  const galleryImageRefs = useMemo(() => {
+    if (!product) return [] as string[];
+
+    const fromImages = Array.isArray(product.images) ? product.images : [];
+
+    const base = (fromImages.length > 0 ? fromImages : [product.image]).filter(
+      (v): v is string => typeof v === "string" && v.trim().length > 0,
+    );
+
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const ref of base) {
+      const trimmed = ref.trim();
+      if (seen.has(trimmed)) continue;
+      seen.add(trimmed);
+      out.push(trimmed);
+    }
+    return out;
   }, [product]);
 
   // Scroll to top on product change
@@ -142,6 +160,19 @@ const ProductDetails = () => {
     }, 1000);
   };
 
+  const activeImageRef = useMemo(() => {
+    if (!product) return null;
+    return galleryImageRefs[selectedImageIndex] ?? product.image ?? null;
+  }, [product, galleryImageRefs, selectedImageIndex]);
+
+  // When zoom is open, allow switching the zoomed image as the user changes thumbnails.
+  // When zoom is closed, do not change the full image ref (prevents accidental full loads).
+  useEffect(() => {
+    if (!zoomOpen) return;
+    if (!activeImageRef) return;
+    setFullImageRef((prev) => (prev === activeImageRef ? prev : activeImageRef));
+  }, [zoomOpen, activeImageRef]);
+
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
@@ -178,11 +209,40 @@ const ProductDetails = () => {
           <div className="md:col-span-6 lg:col-span-7 space-y-4">
             {/* Main Image */}
             <div className="relative aspect-[3/4] md:aspect-square lg:aspect-[4/3] bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 group">
-              <img 
-                src={galleryImages[selectedImageIndex]} 
+              <CloudflareImage
+                imageRef={activeImageRef}
+                variant="medium"
                 alt={product.name}
+                loading="eager"
                 className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110 cursor-zoom-in"
+                onClick={() => {
+                  if (!activeImageRef) return;
+                  setShouldMountZoom(true);
+                  setFullImageRef((prev) => (prev === activeImageRef ? prev : activeImageRef));
+                  setZoomOpen(true);
+                }}
               />
+
+              {/* Zoom Modal (full loads only after click/tap) */}
+              {shouldMountZoom && (
+                <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+                  <DialogContent
+                    forceMount
+                    className="max-w-5xl w-[95vw] p-0 bg-black border-black/20"
+                  >
+                    <div className="relative w-full h-[80vh] bg-black">
+                      <CloudflareImage
+                        imageRef={fullImageRef ?? null}
+                        variant="full"
+                        alt={product.name}
+                        loading="eager"
+                        decoding="async"
+                        className="w-full h-full object-contain select-none"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
               
               {/* Image Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -208,16 +268,21 @@ const ProductDetails = () => {
               
                           {/* Thumbnail Strip */}
                           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                            {galleryImages.map((img, idx) => (
+                            {galleryImageRefs.map((imgRef, idx) => (
                               <button
-                                key={idx}
+                                key={imgRef}
                                 onClick={() => setSelectedImageIndex(idx)}
                                 className={`
                                   relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all
                                   ${selectedImageIndex === idx ? "border-[#D49217] ring-2 ring-[#D49217]/20" : "border-transparent hover:border-slate-300"}
                                 `}
                               >
-                                <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                                <CloudflareImage
+                                  imageRef={imgRef}
+                                  variant="thumb"
+                                  alt={`View ${idx + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
                               </button>
                             ))}
                           </div>
@@ -487,34 +552,39 @@ const ProductDetails = () => {
                           </div>
                           
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                            {relatedProducts.map((related) => (
-                              <Link key={related.id} to={`/product/${related.id}`} className="group">
-                                <Card className="border-none shadow-none bg-transparent">
-                                  <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-100 mb-3 relative">
-                                    <img 
-                                      src={related.image} 
-                                      alt={related.name}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
+                            {relatedProducts.map((related) => {
+                              const relatedImageRef =
+                                related.images?.[0] ?? related.image ?? null;
+                              return (
+                                <Link key={related.id} to={`/product/${related.id}`} className="group">
+                                  <Card className="border-none shadow-none bg-transparent">
+                                    <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-100 mb-3 relative">
+                                      <CloudflareImage
+                                        imageRef={relatedImageRef}
+                                        variant="thumb"
+                                        alt={related.name}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                      />
                                     {!related.inStock && (
                                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                         <span className="text-white text-xs font-bold px-2 py-1 bg-black/50 rounded">Out of Stock</span>
                                       </div>
                                     )}
-                                  </div>
-                                  <h3 className="font-medium text-slate-900 line-clamp-1 group-hover:text-[#D49217] transition-colors">
-                                    {related.name}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground mb-1">{related.category}</p>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-bold text-slate-900">₹{related.price.toLocaleString("en-IN")}</span>
-                                    {related.originalPrice && (
-                                      <span className="text-xs text-muted-foreground line-through">₹{related.originalPrice.toLocaleString("en-IN")}</span>
-                                    )}
-                                  </div>
-                                </Card>
-                              </Link>
-                            ))}
+                                    </div>
+                                    <h3 className="font-medium text-slate-900 line-clamp-1 group-hover:text-[#D49217] transition-colors">
+                                      {related.name}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground mb-1">{related.category}</p>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-bold text-slate-900">₹{related.price.toLocaleString("en-IN")}</span>
+                                      {related.originalPrice && (
+                                        <span className="text-xs text-muted-foreground line-through">₹{related.originalPrice.toLocaleString("en-IN")}</span>
+                                      )}
+                                    </div>
+                                  </Card>
+                                </Link>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

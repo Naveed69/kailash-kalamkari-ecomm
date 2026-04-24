@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -434,12 +435,13 @@ const Orders = () => {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2 overflow-hidden">
-                        {order.items.slice(0, 3).map((item, i) => (
-                          <div key={i} className="h-8 w-8 rounded-full ring-2 ring-white bg-slate-100 overflow-hidden border border-slate-200">
-                            <img 
-                              className="h-full w-full object-cover"
-                              src={item.image || "/placeholder.svg"}
+                        {order.items.slice(0, 3).map((item) => (
+                          <div key={item.id} className="h-8 w-8 rounded-full ring-2 ring-white bg-slate-100 overflow-hidden border border-slate-200">
+                            <CloudflareImage
+                              imageRef={item.image ?? null}
+                              variant="thumb"
                               alt={item.name}
+                              className="h-full w-full object-cover"
                             />
                           </div>
                         ))}

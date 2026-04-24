@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -504,6 +505,8 @@ const ProductList = () => {
             ) : (
               filteredAndSortedProducts.map((product) => {
                 const isVisible = product.isVisible !== false; // Default to true if undefined
+                const productImageRef =
+                  (product as any).images?.[0] ?? product.image ?? null;
                 return (
                 <TableRow 
                   key={product.id} 
@@ -511,8 +514,9 @@ const ProductList = () => {
                 >
                   <TableCell className="pl-6 py-4" onClick={() => navigate(`/inventory/products/${product.id}`)}>
                     <div className="h-16 w-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden">
-                      <img
-                        src={product.image || product.images?.[0] || "https://placehold.co/400x400?text=No+Image"}
+                      <CloudflareImage
+                        imageRef={productImageRef}
+                        variant="thumb"
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />

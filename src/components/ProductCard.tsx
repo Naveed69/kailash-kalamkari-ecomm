@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useInventory } from "@/contexts/InventoryContext";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 export interface Product {
   id: string;
@@ -12,6 +11,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
+  images?: string[];
   category?: string; // Made optional since it's inferred from parent
   categoryName?: string;
   subCategory?: string; // Made optional
@@ -41,18 +41,16 @@ export const ProductCard = ({
   isWishlisted,
   isInCart = false,
 }: ProductCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  const primaryImageRef = product.images?.[0] ?? product.image ?? null;
   return (
     <Card
       className="group overflow-hidden border-border hover:shadow-lg transition-all duration-300 bg-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-     
     >
       <div className="relative overflow-hidden">
-        <img
-          src={product.image}
+        <CloudflareImage
+          imageRef={primaryImageRef}
+          variant="thumb"
           alt={product.name}
           className="w-full h-64 object-cover transition-transform hover:cursor-pointer duration-300 group-hover:scale-105"
            onClick={() => navigate(`/product/${product.id}`)}

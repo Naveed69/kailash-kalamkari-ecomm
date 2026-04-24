@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Package, ChevronRight, ShoppingBag, LogOut } from 'lucide-react';
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 const MyOrdersPage: React.FC = () => {
   const { user, logout, loading } = useAuth();
@@ -103,18 +104,12 @@ const MyOrdersPage: React.FC = () => {
                 >
                   {/* Image Thumbnail (First Item) */}
                   <div className="h-16 w-16 bg-slate-100 rounded-md overflow-hidden flex-shrink-0 border border-slate-100">
-                    {order.items && order.items.length > 0 ? (
-                      <img
-                        src={order.items[0].image}
-                        alt="Order Item"
-                        className="h-full w-full object-cover"
-                        onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center">
-                        <Package className="h-6 w-6 text-slate-300" />
-                      </div>
-                    )}
+                    <CloudflareImage
+                      imageRef={order.items?.[0]?.image ?? null}
+                      variant="thumb"
+                      alt="Order Item"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
                   {/* Order Details */}

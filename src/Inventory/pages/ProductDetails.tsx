@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -74,8 +75,8 @@ const ProductDetails = () => {
     );
   }
 
-  const images = product.images || (product.image ? [product.image] : []);
-  const currentImage = images[currentImageIndex] || "https://placehold.co/600x600?text=No+Image";
+  const images = (product as any).images || (product.image ? [product.image] : []);
+  const currentImageRef = (images?.[currentImageIndex] as string | undefined) ?? null;
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 bg-slate-50/50 min-h-screen font-sans">
@@ -116,9 +117,11 @@ const ProductDetails = () => {
           {/* Main Image */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group">
             <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
-              <img
-                src={currentImage}
+              <CloudflareImage
+                imageRef={currentImageRef}
+                variant="medium"
                 alt={product.name}
+                loading="eager"
                 className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>
@@ -129,7 +132,7 @@ const ProductDetails = () => {
             <div className="grid grid-cols-5 gap-3">
               {images.map((img: string, index: number) => (
                 <button
-                  key={index}
+                  key={img}
                   onClick={() => setCurrentImageIndex(index)}
                   className={`aspect-square rounded-xl overflow-hidden transition-all duration-300 ${
                     currentImageIndex === index
@@ -137,8 +140,9 @@ const ProductDetails = () => {
                       : "ring-1 ring-slate-200 hover:ring-slate-300 opacity-60 hover:opacity-100"
                   }`}
                 >
-                  <img
-                    src={img}
+                  <CloudflareImage
+                    imageRef={img ?? null}
+                    variant="thumb"
                     alt={`${product.name} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />

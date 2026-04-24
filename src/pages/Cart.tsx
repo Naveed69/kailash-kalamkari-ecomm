@@ -42,6 +42,7 @@ const ensureUserExists = async (userId: string, userDetails: any) => {
 };
 
 import { Input } from "@/components/ui/input"
+import { CloudflareImage } from "@/components/images/CloudflareImage"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -437,7 +438,7 @@ export default function CartPage() {
         },
       },
       description: "Order Payment",
-      image: "https://via.placeholder.com/128", // Replace with actual logo if available
+      image: "/logo192.png",
       handler: async function (response: any) {
         try {
           // Fetch fresh product data with barcodes from database
@@ -762,8 +763,9 @@ export default function CartPage() {
                         to={`/product/${item.id}`}
                         className="w-24 h-24 sm:w-32 sm:h-32 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border hover:border-[#D49217] transition-colors cursor-pointer"
                       >
-                        <img
-                          src={item.image}
+                        <CloudflareImage
+                          imageRef={item.image ?? null}
+                          variant="thumb"
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />

@@ -25,14 +25,14 @@ interface InventoryContextType {
   fetchData: () => Promise<void>
   updateProduct: (
     productId: string,
-    updatedProduct: Partial<Product>
+    updatedProduct: Partial<Product>,
   ) => Promise<void>
   deleteProduct: (productId: string) => Promise<void>
   addProduct: (product: any) => Promise<void>
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(
-  undefined
+  undefined,
 )
 
 export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
@@ -54,11 +54,14 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
         getProducts(),
       ])
 
-      // console.log("📦 Inventory Data Fetched:", {
-      //   categories: catsResult.data?.length,
-      //   subCategories: subCatsResult.data?.length,
-      //   products: prodsResult.data?.length,
-      // })
+      console.log("📦 Inventory Data Fetched:", {
+        categories: catsResult.data?.length,
+        subCategories: subCatsResult.data?.length,
+        products: prodsResult.data?.length,
+        productsError: prodsResult.error,
+        categoriesError: catsResult.error,
+        subCategoriesError: subCatsResult.error,
+      })
 
       if (catsResult.error) throw new Error(catsResult.error.message)
       if (subCatsResult.error) throw new Error(subCatsResult.error.message)
@@ -68,8 +71,35 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
       const rawSubCats = subCatsResult.data || []
       const rawProds = (prodsResult.data || []) as any[]
 
+      const parseImagesField = (value: any): string[] => {
+        if (Array.isArray(value)) {
+          return value
+            .filter((v) => typeof v === "string" && v.trim().length > 0)
+            .map((v) => v.trim())
+        }
+        if (typeof value === "string") {
+          const trimmed = value.trim()
+          if (!trimmed) return []
+          if (trimmed.startsWith("[")) {
+            try {
+              const parsed = JSON.parse(trimmed)
+              if (Array.isArray(parsed)) {
+                return parsed
+                  .filter((v) => typeof v === "string" && v.trim().length > 0)
+                  .map((v) => v.trim())
+              }
+            } catch {
+              // fall through to treat as single string
+            }
+          }
+          // treat as a single image ref
+          return [trimmed]
+        }
+        return []
+      }
+
       const categoryMap = new Map(
-        rawCats.map((cat: any) => [String(cat.id), cat.name])
+        rawCats.map((cat: any) => [String(cat.id), cat.name]),
       )
 
       // Transform products to match Product interface
@@ -83,6 +113,7 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
             : p.original_price
           : undefined,
         image: p.image || "",
+        images: parseImagesField(p.images),
         category: p.category_id ? String(p.category_id) : undefined,
         categoryName: p.category_id
           ? categoryMap.get(String(p.category_id))
@@ -92,10 +123,10 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
         colors: Array.isArray(p.colors)
           ? p.colors
           : typeof p.colors === "string"
-          ? p.colors.startsWith("[")
-            ? JSON.parse(p.colors)
-            : [p.colors]
-          : [],
+            ? p.colors.startsWith("[")
+              ? JSON.parse(p.colors)
+              : [p.colors]
+            : [],
         inStock:
           typeof p.in_stock === "string"
             ? p.in_stock === "true" || p.in_stock === "1"
@@ -110,18 +141,18 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
       }))
 
       setProducts(transformedProds)
-      // console.log("✅ Products State Updated:", transformedProds.length)
+      console.log("✅ Products State Updated:", transformedProds.length)
 
       // Build nested structure for backward compatibility / specific UI needs
       const nestedCategories: Category[] = rawCats.map((cat: any) => {
         const catSubCats = rawSubCats.filter(
-          (sc: any) => sc.category_id === cat.id
+          (sc: any) => sc.category_id === cat.id,
         )
 
         const mappedSubCats: SubCategory[] = catSubCats.map((sc: any) => {
           // Products in this subcategory
           const scProds = transformedProds.filter(
-            (p: any) => p.subCategory === String(sc.id)
+            (p: any) => p.subCategory === String(sc.id),
           )
 
           return {
@@ -143,7 +174,7 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
 
       setCategories(nestedCategories)
     } catch (err) {
-      console.error("Error fetching inventory:", err)
+      console.error("❌ Error fetching inventory:", err)
       setError(err instanceof Error ? err.message : "Failed to fetch inventory")
     } finally {
       setLoading(false)
@@ -153,7 +184,7 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
   // Update product
   const updateProduct = async (
     productId: string,
-    updatedProduct: Partial<Product>
+    updatedProduct: Partial<Product>,
   ) => {
     setLoading(true)
     try {

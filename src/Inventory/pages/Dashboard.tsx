@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 import { 
   Plus, 
   Package, 
@@ -345,12 +346,15 @@ const Dashboard = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    topProducts.map((product, idx) => (
-                      <TableRow 
-                        key={product.id}
-                        className="cursor-pointer hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0"
-                        onClick={() => navigate(`/inventory/products/${product.id}`)}
-                      >
+                    topProducts.map((product, idx) => {
+                      const productImageRef =
+                        (product as any).images?.[0] ?? product.image ?? null
+                      return (
+                        <TableRow 
+                          key={product.id}
+                          className="cursor-pointer hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0"
+                          onClick={() => navigate(`/inventory/products/${product.id}`)}
+                        >
                         <TableCell className="py-4">
                           <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">
                             {idx + 1}
@@ -359,8 +363,9 @@ const Dashboard = () => {
                         <TableCell className="py-4">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
-                              <img 
-                                src={product.image || "/placeholder.svg"} 
+                              <CloudflareImage
+                                imageRef={productImageRef}
+                                variant="thumb"
                                 alt={product.name}
                                 className="h-full w-full object-cover"
                               />
@@ -370,8 +375,9 @@ const Dashboard = () => {
                         </TableCell>
                         <TableCell className="font-medium text-slate-700 py-4">{product.total_sold} units</TableCell>
                         <TableCell className="font-bold text-green-600 py-4">{formatCurrency(product.revenue)}</TableCell>
-                      </TableRow>
-                    ))
+                        </TableRow>
+                      )
+                    })
                   )}
                 </TableBody>
               </Table>

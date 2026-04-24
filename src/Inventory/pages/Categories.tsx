@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { Plus, Pencil, Trash2, Loader2, Upload, X } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, X } from "lucide-react"
 import {
   getCategories,
   getSubCategories,
@@ -42,10 +42,9 @@ import {
   deleteSubCategory,
   unlinkProductsFromCategory,
   unlinkProductsFromSubCategory,
-  uploadImage,
 } from "@/lib/adminApi"
 import { seedCategories } from "@/lib/seedData"
-import imageCompression from "browser-image-compression"
+import { CloudflareImage } from "@/components/images/CloudflareImage"
 
 const Categories = () => {
   const { toast } = useToast()
@@ -63,14 +62,6 @@ const Categories = () => {
   const [editingSubCategory, setEditingSubCategory] = useState<any>(null)
   const defaultSubCategoryForm = { name: "", category_id: "", image_url: "" }
   const [subCategoryForm, setSubCategoryForm] = useState(defaultSubCategoryForm)
-  const [subCategoryImageFile, setSubCategoryImageFile] = useState<File | null>(
-    null
-  )
-  const [subCategoryImagePreview, setSubCategoryImagePreview] = useState<
-    string | null
-  >(null)
-  const [subCategoryImageCompressing, setSubCategoryImageCompressing] =
-    useState(false)
 
   // Delete Confirmation State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -255,13 +246,9 @@ const Categories = () => {
   }
 
   // SubCategory CRUD
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-
   const resetSubCategoryDialogState = () => {
     setEditingSubCategory(null)
     setSubCategoryForm(defaultSubCategoryForm)
-    setSubCategoryImageFile(null)
-    setSubCategoryImagePreview(null)
     setSubCategoryDialog(false)
   }
 
@@ -281,57 +268,15 @@ const Categories = () => {
         category_id: subCategory.category_id?.toString() ?? "",
         image_url: subCategory.image_url ?? "",
       })
-      setSubCategoryImageFile(null)
-      setSubCategoryImagePreview(subCategory.image_url ?? null)
     } else {
       setEditingSubCategory(null)
       setSubCategoryForm(defaultSubCategoryForm)
-      setSubCategoryImageFile(null)
-      setSubCategoryImagePreview(null)
     }
     setSubCategoryDialog(true)
   }
 
-  const handleSubCategoryImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    setSubCategoryImageCompressing(true)
-    try {
-      const options = {
-        maxSizeMB: 0.4,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-        initialQuality: 0.75,
-      }
-      const compressed = await imageCompression(file, options)
-      setSubCategoryImageFile(compressed)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setSubCategoryImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(compressed)
-    } catch (error) {
-      console.error("Failed to process subcategory image:", error)
-      toast({
-        title: "Image error",
-        description: "Unable to process the selected image.",
-        variant: "destructive",
-      })
-    } finally {
-      setSubCategoryImageCompressing(false)
-    }
-  }
-
   const handleClearSubCategoryImage = () => {
-    setSubCategoryImageFile(null)
-    setSubCategoryImagePreview(null)
     setSubCategoryForm((prev) => ({ ...prev, image_url: "" }))
-  }
-
-  const handleSubCategoryImageBoxClick = () => {
-    fileInputRef.current?.click()
   }
 
   const handleSaveSubCategory = async () => {
@@ -346,22 +291,7 @@ const Categories = () => {
     }
 
     setLoading(true)
-    let imageUrl = subCategoryForm.image_url || null
-
-    if (subCategoryImageFile) {
-      const { url, error } = await uploadImage(subCategoryImageFile)
-      if (error || !url) {
-        setLoading(false)
-        toast({
-          title: "Upload failed",
-          description: error?.message || "Unable to upload image",
-          variant: "destructive",
-          duration: 5000,
-        })
-        return
-      }
-      imageUrl = url
-    }
+    const imageUrl = subCategoryForm.image_url?.trim() || null
 
     const payload = {
       name: subCategoryForm.name.trim(),
@@ -752,45 +682,29 @@ const Categories = () => {
                 Used on the storefront subcategory tiles. Recommended size
                 600x600px.
               </p>
-              <div
-                className="mt-3 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center bg-slate-50/40 hover:border-slate-300 transition cursor-pointer relative"
-                onClick={handleSubCategoryImageBoxClick}
-              >
-                {subCategoryImagePreview ? (
-                  <img
-                    src={subCategoryImagePreview}
-                    alt="Subcategory preview"
-                    className="w-full h-48 object-cover rounded-xl"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-slate-500 space-y-2">
-                    <div className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                      <Upload className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-700">
-                        Click to upload
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        PNG, JPG up to 2MB
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {subCategoryImageCompressing && (
-                  <div className="absolute inset-0 bg-white/70 rounded-2xl flex items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-slate-600" />
-                  </div>
-                )}
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleSubCategoryImageChange}
+
+              <Input
+                value={subCategoryForm.image_url}
+                onChange={(e) =>
+                  setSubCategoryForm((prev) => ({
+                    ...prev,
+                    image_url: e.target.value,
+                  }))
+                }
+                placeholder="Cloudflare Image ID (temporary). During migration, URLs still render."
+                className="mt-3"
               />
-              {(subCategoryImagePreview || subCategoryForm.image_url) && (
+
+              <div className="mt-3 h-48 w-full rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <CloudflareImage
+                  imageRef={subCategoryForm.image_url?.trim() || null}
+                  variant="thumb"
+                  alt="Subcategory preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {subCategoryForm.image_url?.trim() && (
                 <Button
                   type="button"
                   variant="ghost"

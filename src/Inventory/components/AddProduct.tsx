@@ -8,14 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Upload, X, ArrowLeft, AlertTriangle, Package } from "lucide-react";
-import { getCategories, getSubCategories, uploadImage, checkDuplicateProduct, updateProductStock } from "@/lib/adminApi";
+import { Loader2, X, ArrowLeft, AlertTriangle, Package } from "lucide-react";
+import { getCategories, getSubCategories, checkDuplicateProduct, updateProductStock } from "@/lib/adminApi";
 import { seedCategories } from "@/lib/seedData";
 import { useInventory } from "@/contexts/InventoryContext";
-
-import imageCompression from 'browser-image-compression';
 import Barcode from 'react-barcode';
 import { generateBarcode } from '@/lib/barcodeUtils';
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,12 +55,9 @@ const AddProduct = () => {
   });
 
   // UI state
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageRefInput, setImageRefInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [compressing, setCompressing] = useState(false);
-  const [compressionStats, setCompressionStats] = useState<string[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
@@ -264,116 +260,53 @@ const AddProduct = () => {
     }
   }, [formData.category, subCategories]);
 
-  // Handle multiple image uploads with compression
-  const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files || []) as File[];
-    await processFiles(files);
-  };
+  // Manual image refs (TEMPORARY): admins paste Cloudflare Image IDs.
+  // During migration, http(s) URLs (including Supabase URLs) are allowed and will render unchanged.
+  const parseImageRefs = (raw: string): string[] => {
+    const tokens = raw
+      .split(/[\s,]+/g)
+      .map((t) => t.trim())
+      .filter(Boolean)
 
-  // Process multiple files
-  const processFiles = async (files: File[]) => {
-    if (files.length === 0) return;
-
-    // Check image limit (max 5)
-    const remainingSlots = 5 - imageFiles.length;
-    if (remainingSlots <= 0) {
-      toast({
-        title: "Maximum images reached",
-        description: "You can upload a maximum of 5 images per product",
-        variant: "destructive",
-      });
-      return;
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const t of tokens) {
+      if (seen.has(t)) continue
+      seen.add(t)
+      out.push(t)
     }
+    return out
+  }
 
-    // Limit files to remaining slots
-    const filesToProcess = files.slice(0, remainingSlots);
-    if (files.length > remainingSlots) {
-      toast({
-        title: "Image limit",
-        description: `Only adding ${remainingSlots} image(s). Maximum is 5 images per product.`,
-      });
-    }
+  const addImageRefs = () => {
+    const incoming = parseImageRefs(imageRefInput)
+    if (incoming.length === 0) return
 
-    setCompressing(true);
-    const newPreviews: string[] = [];
-    const newCompressedFiles: File[] = [];
-    const newStats: string[] = [];
-
-    for (const file of filesToProcess) {
-      // Show preview immediately
-      const reader = new FileReader();
-      const previewPromise = new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-      const preview = await previewPromise;
-      newPreviews.push(preview);
-
-      // Compress with better settings
-      try {
-        const options = {
-          maxSizeMB: 0.3, // Much smaller - 300KB max instead of 1MB
-          maxWidthOrHeight: 1200, // Smaller max dimension
-          useWebWorker: true,
-          initialQuality: 0.7, // Start with 70% quality
-        };
-
-        const compressedFile = await imageCompression(file, options);
-        const originalSize = (file.size / 1024 / 1024).toFixed(2);
-        const compressedSize = (compressedFile.size / 1024 / 1024).toFixed(2);
-        const savings = ((1 - compressedFile.size / file.size) * 100).toFixed(0);
-
-        newStats.push(`${originalSize}MB → ${compressedSize}MB (-${savings}%)`);
-        newCompressedFiles.push(compressedFile);
-      } catch (error) {
-        console.error("Compression failed:", error);
-        newStats.push("Failed, using original");
-        newCompressedFiles.push(file);
+    setImagePreviews((prev) => {
+      const combined = [...prev, ...incoming]
+      const seen = new Set<string>()
+      const deduped: string[] = []
+      for (const ref of combined) {
+        const trimmed = ref.trim()
+        if (!trimmed) continue
+        if (seen.has(trimmed)) continue
+        seen.add(trimmed)
+        deduped.push(trimmed)
       }
-    }
+      return deduped.slice(0, 5)
+    })
+    setImageRefInput("")
+  }
 
-    setImageFiles(prev => [...prev, ...newCompressedFiles]);
-    setImagePreviews(prev => [...prev, ...newPreviews]);
-    setCompressionStats(prev => [...prev, ...newStats]);
-    setCompressing(false);
-  };
-
-  // Handle drag and drop
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-    await processFiles(files);
-  };
-
-  // Handle box click
-  const handleBoxClick = () => {
-    document.getElementById('image')?.click();
-  };
-
-  // Remove single image
+  // Remove single image ref
   const removeImage = (index: number) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setCompressionStats(prev => prev.filter((_, i) => i !== index));
-  };
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index))
+  }
 
   // Clear all images
   const clearAllImages = () => {
-    setImageFiles([]);
-    setImagePreviews([]);
-    setCompressionStats([]);
-  };
+    setImagePreviews([])
+  }
 
   // Handle input changes
   const handleChange = (field, value) => {
@@ -445,48 +378,16 @@ const validateForm = () => {
     setLoading(true);
 
     try {
-      let imageUrls: string[] = [];
-
-      // 1. Keep existing images that haven't been removed
-      // We need to know which previews correspond to existing URLs vs new files
-      // For simplicity, we can check if the preview string starts with "http" (existing) or "data:" (new)
-      // BUT, we also have imageFiles which are ONLY the new files.
-      // So we need to reconstruct the final list of images.
-      
-      // Strategy:
-      // - We have `imagePreviews` which shows everything currently in the UI.
-      // - If a preview is a URL (starts with http), it's an existing image we want to keep.
-      // - If it's a data URL, it corresponds to a file in `imageFiles` that needs uploading.
-      
-      // However, mapping `imageFiles` to specific previews is tricky if we deleted some in the middle.
-      // A better approach for this form:
-      // - Upload ALL new files in `imageFiles`.
-      // - Combine their new URLs with the existing URLs found in `imagePreviews`.
-      
-      // Wait, `imageFiles` contains ALL files currently selected? 
-      // No, `handleImageChange` appends to `imageFiles`. `removeImage` removes from `imageFiles`.
-      // So `imageFiles` should accurately represent the NEW files to be uploaded.
-      // But what about existing images that were pre-loaded? They are NOT in `imageFiles`.
-      // They are only in `imagePreviews`.
-      
-      // So:
-      // 1. Filter `imagePreviews` for strings starting with "http" -> these are existing images to keep.
-      const existingUrls = imagePreviews.filter(url => url.startsWith("http"));
-      
-      // 2. Upload all files in `imageFiles`
-      const newUploadPromises = imageFiles.map(file => uploadImage(file));
-      const uploadResults = await Promise.all(newUploadPromises);
-      
-      // Check for errors
-      const failedUploads = uploadResults.filter(r => r.error);
-      if (failedUploads.length > 0) {
-        throw new Error(`Failed to upload ${failedUploads.length} images`);
-      }
-      
-      const newUrls = uploadResults.map(r => r.url as string);
-      
-      // 3. Combine
-      imageUrls = [...existingUrls, ...newUrls];
+      const seen = new Set<string>()
+      const imageUrls = imagePreviews
+        .map((r) => r.trim())
+        .filter(Boolean)
+        .filter((r) => {
+          if (seen.has(r)) return false
+          seen.add(r)
+          return true
+        })
+        .slice(0, 5)
 
       // Generate unique barcode for new products
     let barcode = editingProduct?.barcode; // Keep existing barcode if updating
@@ -1007,106 +908,79 @@ const validateForm = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
+            {/* Product Images (TEMPORARY: manual Cloudflare IDs) */}
             <div className="space-y-2">
-              <Label>Product Images (Multiple)</Label>
-              {imagePreviews.length === 0 ? (
-                <div 
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer ${
-                    isDragging 
-                      ? 'border-[#D49217] bg-[#D49217]/10 scale-105' 
-                      : 'border-gray-300 hover:border-[#D49217] hover:bg-gray-50'
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={handleBoxClick}
-                >
-                  <Upload className={`mx-auto h-12 w-12 mb-4 ${isDragging ? 'text-[#D49217]' : 'text-muted-foreground'}`} />
-                  <div className="space-y-2">
-                    <p className="text-[#D49217] font-medium">
-                      {isDragging ? 'Drop images here' : 'Click to upload or drag & drop'}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      PNG, JPG, WEBP (Multiple files supported)
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Image Previews Grid */}
-                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3 pt-2">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative border rounded-lg overflow-hidden bg-gray-50">
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6 rounded-full z-10 shadow-md"
-                          onClick={() => removeImage(index)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                        <div className="aspect-square bg-white">
-                          <img
-                            src={preview}
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-full object-contain p-2"
-                          />
-                        </div>
-                        {/* Individual Compression Stats */}
-                        {compressionStats[index] && (
-                          <div className="mt-1 text-center">
-                            <p className="text-xs text-green-600 truncate">
-                              {compressionStats[index]}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              <Label>Product Images (Cloudflare Image IDs)</Label>
+              <p className="text-xs text-slate-500">
+                Temporary: upload images to Cloudflare Images and paste the Image
+                IDs here. During migration, http(s) URLs (including Supabase
+                URLs) still render unchanged.
+              </p>
 
-                  {/* Add More Button */}
-                  {imageFiles.length < 5 && (
-                    <div 
-                      className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-[#D49217] transition-colors"
-                      onClick={handleBoxClick}
+              <div className="flex flex-col gap-3">
+                <Textarea
+                  value={imageRefInput}
+                  onChange={(e) => setImageRefInput(e.target.value)}
+                  placeholder="Paste IDs/URLs (space, comma, or newline separated). Max 5."
+                  className="min-h-[90px]"
+                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    onClick={addImageRefs}
+                    disabled={!imageRefInput.trim() || imagePreviews.length >= 5}
+                    className="bg-slate-900 hover:bg-slate-800 text-white"
+                  >
+                    Add image ref(s)
+                  </Button>
+                  {imagePreviews.length > 0 && (
+                    <Button type="button" variant="outline" onClick={clearAllImages}>
+                      Clear all
+                    </Button>
+                  )}
+                  <span className="text-xs text-slate-500 ml-auto">
+                    {imagePreviews.length}/5
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-3 pt-2">
+                {imagePreviews.length === 0 ? (
+                  <div className="col-span-3 md:col-span-4 border-2 border-dashed rounded-lg p-6 bg-slate-50 flex items-center justify-center">
+                    <CloudflareImage
+                      imageRef={null}
+                      variant="thumb"
+                      alt="Placeholder"
+                      className="w-24 h-24 object-contain opacity-70"
+                    />
+                  </div>
+                ) : (
+                  imagePreviews.map((ref, index) => (
+                    <div
+                      key={ref}
+                      className="relative border rounded-lg overflow-hidden bg-gray-50"
                     >
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-[#D49217]">
-                        Add more images ({imageFiles.length}/5)
-                      </p>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 rounded-full z-10 shadow-md"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                      <div className="aspect-square bg-white">
+                        <CloudflareImage
+                          imageRef={ref}
+                          variant="thumb"
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-contain p-2"
+                        />
+                      </div>
                     </div>
-                  )}
-
-                  {/* Max images message */}
-                  {imageFiles.length >= 5 && (
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Maximum of 5 images reached
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Compressing Indicator */}
-                  {compressing && (
-                    <div className="text-center">
-                      <Loader2 className="inline mr-2 h-4 w-4 animate-spin text-blue-500" />
-                      <span className="text-sm text-blue-500">Compressing images...</span>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {/* Hidden file input - always present */}
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleImageChange}
-              />
+                  ))
+                )}
+              </div>
             </div>
 
             {/* In Stock */}
@@ -1126,17 +1000,12 @@ const validateForm = () => {
               <Button
                 type="submit"
                 className="bg-slate-900 hover:bg-slate-800 text-white h-12 px-8 rounded-xl font-semibold shadow-lg shadow-slate-900/10"
-                disabled={loading || compressing}
+                disabled={loading}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Saving...
-                  </>
-                ) : compressing ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Compressing Images...
                   </>
                 ) : (
                   isEditMode ? "Update Product" : "Add Product"
