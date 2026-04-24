@@ -101,12 +101,18 @@ export const getProducts = async (): Promise<{
   data: Product[] | null
   error: any
 }> => {
+  console.log("🌐 Fetching products from Supabase...")
   const { data, error } = await supabase.from("products").select("*")
+  console.log("🌐 Supabase response:", {
+    dataCount: data?.length,
+    error: error?.message,
+    firstItem: data?.[0]?.name,
+  })
   return { data: (data as Product[]) ?? null, error }
 }
 
 export const getProductById = async (
-  id: string
+  id: string,
 ): Promise<{ data: Product | null; error: any }> => {
   // use maybeSingle so PostgREST 406 (no rows) isn't treated as an exception
   const { data, error } = await supabase
@@ -125,14 +131,14 @@ export const getProductById = async (
 }
 
 export const createProduct = async (
-  payload: Partial<Product>
+  payload: Partial<Product>,
 ): Promise<{ data: Product | null; error: any }> => {
   const sanitized = sanitizePayload(payload)
   // Validate id fields before attempting insert
   const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
     const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(
-      invalid.value
+      invalid.value,
     )}`
     return {
       data: null,
@@ -225,14 +231,14 @@ export const createProduct = async (
 
 export const updateProduct = async (
   id: string,
-  payload: Partial<Product>
+  payload: Partial<Product>,
 ): Promise<{ data: Product | null; error: any }> => {
   const sanitized = sanitizePayload(payload)
   // Validate id fields before attempting update
   const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
     const message = `Invalid id for column ${invalid.field}: ${JSON.stringify(
-      invalid.value
+      invalid.value,
     )}`
     return {
       data: null,
@@ -329,7 +335,7 @@ export const updateProduct = async (
 }
 
 export const deleteProduct = async (
-  id: string
+  id: string,
 ): Promise<{ data: any; error: any }> => {
   const { data, error } = await supabase.from("products").delete().eq("id", id)
   return { data, error }
@@ -362,7 +368,7 @@ export const getSubCategories = async (): Promise<{
 }
 
 export const uploadImage = async (
-  file: File
+  file: File,
 ): Promise<{ url: string | null; error: any }> => {
   try {
     const fileExt = file.name.split(".").pop()
@@ -401,7 +407,7 @@ export const createCategory = async (payload: {
 
 export const updateCategory = async (
   id: number,
-  payload: { name?: string; description?: string }
+  payload: { name?: string; description?: string },
 ): Promise<{ data: any | null; error: any }> => {
   const { data, error } = await supabase
     .from("categories")
@@ -413,7 +419,7 @@ export const updateCategory = async (
 }
 
 export const deleteCategory = async (
-  id: number
+  id: number,
 ): Promise<{ data: any; error: any }> => {
   const { data, error } = await supabase
     .from("categories")
@@ -456,7 +462,7 @@ export const updateSubCategory = async (
     description?: string
     category_id?: number
     image_url?: string | null
-  }
+  },
 ): Promise<{ data: any | null; error: any }> => {
   const dbPayload: any = {}
   if (payload.name) dbPayload.subCatName = payload.name
@@ -478,7 +484,7 @@ export const updateSubCategory = async (
 }
 
 export const deleteSubCategory = async (
-  id: number
+  id: number,
 ): Promise<{ data: any; error: any }> => {
   const { data, error } = await supabase
     .from("sub_categories")
@@ -489,7 +495,7 @@ export const deleteSubCategory = async (
 
 // Helper functions for cascade operations
 export const unlinkProductsFromCategory = async (
-  categoryId: number
+  categoryId: number,
 ): Promise<{ error: any }> => {
   const { error } = await supabase
     .from("products")
@@ -499,7 +505,7 @@ export const unlinkProductsFromCategory = async (
 }
 
 export const unlinkProductsFromSubCategory = async (
-  subCategoryId: number
+  subCategoryId: number,
 ): Promise<{ error: any }> => {
   const { error } = await supabase
     .from("products")
@@ -520,7 +526,7 @@ export const unlinkProductsFromSubCategory = async (
  */
 export const findProductByName = async (
   name: string,
-  excludeId?: number | string
+  excludeId?: number | string,
 ): Promise<{ data: Product | null; error: any }> => {
   try {
     const trimmedName = name.trim().toLowerCase()
@@ -552,7 +558,7 @@ export const findProductByName = async (
  */
 export const findProductByBarcode = async (
   barcode: string,
-  excludeId?: number | string
+  excludeId?: number | string,
 ): Promise<{ data: Product | null; error: any }> => {
   try {
     if (!barcode || barcode.trim() === "") {
@@ -591,7 +597,7 @@ export const findProductByBarcode = async (
 export const checkDuplicateProduct = async (
   name: string,
   barcode?: string,
-  excludeId?: number | string
+  excludeId?: number | string,
 ): Promise<{
   data: Product | null
   error: any
@@ -637,12 +643,12 @@ export const checkDuplicateProduct = async (
  */
 export const updateProductStock = async (
   productId: number | string,
-  additionalQuantity: number
+  additionalQuantity: number,
 ): Promise<{ data: Product | null; error: any }> => {
   try {
     // First get current stock
     const { data: product, error: fetchError } = await getProductById(
-      productId.toString()
+      productId.toString(),
     )
 
     if (fetchError || !product) {
@@ -689,7 +695,7 @@ export const updateProductStock = async (
  */
 export const shipOrder = async (
   orderId: number | string,
-  shippingDetails: { shipping_company: string; tracking_id: string }
+  shippingDetails: { shipping_company: string; tracking_id: string },
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -720,7 +726,7 @@ export const shipOrder = async (
  * @returns Updated order
  */
 export const deliverOrder = async (
-  orderId: number | string
+  orderId: number | string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -755,7 +761,7 @@ export const deliverOrder = async (
  */
 export const createPackingSession = async (
   orderId: number | string,
-  adminEmail: string
+  adminEmail: string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     // Check for existing active session
@@ -811,7 +817,7 @@ export const createPackingSession = async (
  */
 export const updatePackingScanProgress = async (
   sessionId: number | string,
-  scanProgress: Record<string, number>
+  scanProgress: Record<string, number>,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -837,7 +843,7 @@ export const updatePackingScanProgress = async (
  * @returns Completed packing session
  */
 export const completePackingSession = async (
-  sessionId: number | string
+  sessionId: number | string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     // Get session to calculate duration
@@ -857,7 +863,7 @@ export const completePackingSession = async (
     const startedAt = new Date(session.started_at)
     const completedAt = new Date()
     const durationMinutes = Math.round(
-      (completedAt.getTime() - startedAt.getTime()) / 60000
+      (completedAt.getTime() - startedAt.getTime()) / 60000,
     )
 
     const { data, error } = await supabase
@@ -896,7 +902,7 @@ export const completePackingSession = async (
  * @returns Cancelled packing session
  */
 export const cancelPackingSession = async (
-  sessionId: number | string
+  sessionId: number | string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     // Get session to revert order status
@@ -942,7 +948,7 @@ export const cancelPackingSession = async (
  * @returns Active packing session or null
  */
 export const getActivePackingSession = async (
-  orderId: number | string
+  orderId: number | string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -1012,7 +1018,7 @@ export const getOrderStatistics = async (): Promise<{
  * @returns Order object
  */
 export const getOrderById = async (
-  orderId: number | string
+  orderId: number | string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -1033,7 +1039,7 @@ export const getOrderById = async (
 
 export const updateOrderStatus = async (
   orderId: number | string,
-  status: string
+  status: string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     const { data, error } = await supabase
@@ -1055,7 +1061,7 @@ export const updateOrderStatus = async (
 
 export const cancelOrder = async (
   orderId: number | string,
-  reason: string
+  reason: string,
 ): Promise<{ data: any | null; error: any }> => {
   try {
     // Try to update with cancellation_reason if column exists, otherwise just status
