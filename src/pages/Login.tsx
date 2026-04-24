@@ -7,9 +7,9 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#f0ece3] to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#f0ece3] to-slate-100 flex justify-center p-4 pt-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <img
             src={logo}
             alt="Kailash Kalamkari"
