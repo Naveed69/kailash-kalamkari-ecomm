@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { user, signOut, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -28,8 +28,8 @@ const ProfilePage = () => {
   }, [user, loading, navigate]);
 
   const handleLogout = async () => {
-    await signOut();
-    navigate('/');
+    const success = await logout();
+    if (success) navigate('/');
   };
 
   if (loading || !user) {
@@ -83,7 +83,7 @@ const ProfilePage = () => {
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone Number</label>
                 <div className="flex items-center gap-2 text-slate-900 font-medium">
                   <Phone className="w-4 h-4 text-[#D49217]" />
-                  {user.phone || user.user_metadata?.phone || 'Not provided'}
+                  {user.phoneNumber || user.user_metadata?.phone || 'Not provided'}
                 </div>
               </div>
             </div>

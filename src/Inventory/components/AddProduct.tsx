@@ -16,6 +16,11 @@ import Barcode from 'react-barcode';
 import { generateBarcode } from '@/lib/barcodeUtils';
 import { CloudflareImage } from "@/components/images/CloudflareImage";
 import {
+  deleteImageFromCloudflare,
+  isCloudflareId,
+  uploadImageToCloudflare,
+} from "@/lib/cloudflareImages";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -57,6 +62,7 @@ const AddProduct = () => {
   // UI state
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageRefInput, setImageRefInput] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
@@ -261,7 +267,8 @@ const AddProduct = () => {
   }, [formData.category, subCategories]);
 
   // Manual image refs (TEMPORARY): admins paste Cloudflare Image IDs.
-  // During migration, http(s) URLs (including Supabase URLs) are allowed and will render unchanged.
+  // Existing legacy URLs can remain on edited products, but new refs must be
+  // Cloudflare Image IDs so admin does not persist new Supabase public URLs.
   const parseImageRefs = (raw: string): string[] => {
     const tokens = raw
       .split(/[\s,]+/g)
@@ -279,7 +286,19 @@ const AddProduct = () => {
   }
 
   const addImageRefs = () => {
-    const incoming = parseImageRefs(imageRefInput)
+    const parsed = parseImageRefs(imageRefInput)
+    const incoming = parsed.filter(isCloudflareId)
+    const rejectedCount = parsed.length - incoming.length
+
+    if (rejectedCount > 0) {
+      toast({
+        title: "Only Cloudflare Image IDs are allowed",
+        description:
+          "New product images must be Cloudflare Image IDs. Legacy URLs already on existing products may remain temporarily.",
+        variant: "destructive",
+      })
+    }
+
     if (incoming.length === 0) return
 
     setImagePreviews((prev) => {
@@ -296,6 +315,64 @@ const AddProduct = () => {
       return deduped.slice(0, 5)
     })
     setImageRefInput("")
+  }
+
+  const handleCloudflareUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const selectedFiles = Array.from(event.target.files ?? [])
+    event.target.value = ""
+    if (selectedFiles.length === 0) return
+
+    const availableSlots = Math.max(0, 5 - imagePreviews.length)
+    if (availableSlots === 0) {
+      toast({
+        title: "Image limit reached",
+        description: "A product can have up to 5 images.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const filesToUpload = selectedFiles.slice(0, availableSlots)
+    const uploadedIds: string[] = []
+    setUploadingImages(true)
+
+    try {
+      for (const file of filesToUpload) {
+        const imageId = await uploadImageToCloudflare(file)
+        uploadedIds.push(imageId)
+      }
+
+      setImagePreviews((prev) => {
+        const combined = [...prev, ...uploadedIds]
+        const seen = new Set<string>()
+        const deduped: string[] = []
+        for (const ref of combined) {
+          const trimmed = ref.trim()
+          if (!trimmed) continue
+          if (seen.has(trimmed)) continue
+          seen.add(trimmed)
+          deduped.push(trimmed)
+        }
+        return deduped.slice(0, 5)
+      })
+
+      toast({
+        title: "Images uploaded",
+        description: `${uploadedIds.length} Cloudflare image ID${uploadedIds.length === 1 ? "" : "s"} added.`,
+      })
+    } catch (error) {
+      await Promise.allSettled(uploadedIds.map(deleteImageFromCloudflare))
+      toast({
+        title: "Cloudflare upload failed",
+        description:
+          error instanceof Error ? error.message : "Unable to upload images.",
+        variant: "destructive",
+      })
+    } finally {
+      setUploadingImages(false)
+    }
   }
 
   // Remove single image ref
@@ -908,20 +985,32 @@ const validateForm = () => {
               </div>
             </div>
 
-            {/* Product Images (TEMPORARY: manual Cloudflare IDs) */}
+            {/* Product Images */}
             <div className="space-y-2">
-              <Label>Product Images (Cloudflare Image IDs)</Label>
+              <Label>Product Images</Label>
               <p className="text-xs text-slate-500">
-                Temporary: upload images to Cloudflare Images and paste the Image
-                IDs here. During migration, http(s) URLs (including Supabase
-                URLs) still render unchanged.
+                Upload new images to Cloudflare Images. Existing legacy URLs on
+                edited products may remain during migration.
               </p>
 
               <div className="flex flex-col gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleCloudflareUpload}
+                  disabled={uploadingImages || imagePreviews.length >= 5}
+                />
+                {uploadingImages && (
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Uploading to Cloudflare...
+                  </div>
+                )}
                 <Textarea
                   value={imageRefInput}
                   onChange={(e) => setImageRefInput(e.target.value)}
-                  placeholder="Paste IDs/URLs (space, comma, or newline separated). Max 5."
+                  placeholder="Optional: paste Cloudflare Image IDs (space, comma, or newline separated). Max 5."
                   className="min-h-[90px]"
                 />
                 <div className="flex items-center gap-2">

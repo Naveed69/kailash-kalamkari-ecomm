@@ -16,10 +16,12 @@ import {
 import { SlidersHorizontal, X, Search } from "lucide-react"
 import { ProductFilter, FilterState } from "@/components/ui/ProductFilter"
 import { Input } from "@/components/ui/input"
+import { useRequireLogin } from "@/hooks/useRequireLogin"
 
 const ProductsPage = () => {
   const { products = [], loading, error } = useInventory()
   const { toast } = useToast()
+  const { requireLogin } = useRequireLogin()
   const { addToCart, isInCart } = useCart() || {}
   const { addToWishlist, removeFromWishlist, isInWishlist } =
     useWishlist() || {}
@@ -32,7 +34,13 @@ const ProductsPage = () => {
     isArray: Array.isArray(products),
   })
 
-  const sampleProducts = Array.isArray(products) ? products : []
+  const sampleProducts = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products.filter((product) => product.isVisible !== false)
+        : [],
+    [products],
+  )
 
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "name">(
@@ -66,13 +74,15 @@ const ProductsPage = () => {
 
   const handleAddToCart = useCallback(
     (product: Product) => {
+      if (!requireLogin("add this item to your cart", "/products")) return
       if (typeof addToCart === "function") addToCart(product)
     },
-    [addToCart],
+    [addToCart, requireLogin],
   )
 
   const handleToggleWishlist = useCallback(
     (productId: string) => {
+      if (!requireLogin("save this item to your wishlist", "/products")) return
       const product = sampleProducts.find((p) => p.id === productId)
 
       if (typeof isInWishlist === "function" && isInWishlist(productId)) {
@@ -90,7 +100,7 @@ const ProductsPage = () => {
         })
       }
     },
-    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts, toast],
+    [addToWishlist, removeFromWishlist, isInWishlist, requireLogin, sampleProducts, toast],
   )
 
   const filteredProducts = useMemo(() => {

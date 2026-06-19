@@ -8,6 +8,13 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "images:migrate:dry-run": "node scripts/migrate-cloudflare-images.mjs --dry-run",
+    "images:migrate:check-cloudflare": "node scripts/migrate-cloudflare-images.mjs --check-cloudflare",
+    "images:cloudflare:create-variants": "node scripts/create-cloudflare-image-variants.mjs",
+    "images:migrate:upload": "node scripts/migrate-cloudflare-images.mjs --upload-only",
+    "images:migrate:verify": "node scripts/migrate-cloudflare-images.mjs --verify",
+    "images:migrate:apply": "node scripts/migrate-cloudflare-images.mjs --apply",
+    "images:migrate:rollback": "node scripts/migrate-cloudflare-images.mjs --rollback",
     "preview": "vite preview"
   },
   "dependencies": {

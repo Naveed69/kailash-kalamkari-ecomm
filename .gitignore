@@ -29,3 +29,9 @@ dist-ssr
 # Environment configuration
 .env
 .env.local
+
+# Local image migration artifacts
+migration-backup.json
+migration-backups/
+scripts/migrate-cloudflare-images.map.json
+scripts/migrate-cloudflare-images.failures.jsonl

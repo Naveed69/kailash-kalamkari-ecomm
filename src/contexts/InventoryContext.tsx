@@ -103,42 +103,50 @@ export const InventoryProvider: React.FC<{ children: ReactNode }> = ({
       )
 
       // Transform products to match Product interface
-      const transformedProds: Product[] = rawProds.map((p: any) => ({
-        id: String(p.id),
-        name: p.name || "",
-        price: typeof p.price === "string" ? parseFloat(p.price) : p.price || 0,
-        originalPrice: p.original_price
-          ? typeof p.original_price === "string"
-            ? parseFloat(p.original_price)
-            : p.original_price
-          : undefined,
-        image: p.image || "",
-        images: parseImagesField(p.images),
-        category: p.category_id ? String(p.category_id) : undefined,
-        categoryName: p.category_id
-          ? categoryMap.get(String(p.category_id))
-          : undefined, // Add this
-        subCategory: p.sub_category_id ? String(p.sub_category_id) : undefined,
-        description: p.description || "",
-        colors: Array.isArray(p.colors)
-          ? p.colors
-          : typeof p.colors === "string"
-            ? p.colors.startsWith("[")
-              ? JSON.parse(p.colors)
-              : [p.colors]
-            : [],
-        inStock:
-          typeof p.in_stock === "string"
-            ? p.in_stock === "true" || p.in_stock === "1"
-            : Boolean(p.in_stock),
-        rating: p.rating,
-        dimensions: p.dimensions,
-        material: p.material,
-        quantity: p.stock_quantity || p.quantity || 0,
-        barcode: p.barcode,
-        isVisible: p.is_visible,
-        specifications: p.specifications || {},
-      }))
+      const transformedProds: Product[] = rawProds.map((p: any) => {
+        const quantity = p.stock_quantity ?? p.quantity ?? 0
+        const inStock =
+          p.in_stock === undefined || p.in_stock === null
+            ? Number(quantity) > 0
+            : typeof p.in_stock === "string"
+              ? p.in_stock === "true" || p.in_stock === "1"
+              : Boolean(p.in_stock)
+
+        return {
+          id: String(p.id),
+          name: p.name || "",
+          price:
+            typeof p.price === "string" ? parseFloat(p.price) : p.price || 0,
+          originalPrice: p.original_price
+            ? typeof p.original_price === "string"
+              ? parseFloat(p.original_price)
+              : p.original_price
+            : undefined,
+          image: p.image || "",
+          images: parseImagesField(p.images),
+          category: p.category_id ? String(p.category_id) : undefined,
+          categoryName: p.category_id
+            ? categoryMap.get(String(p.category_id))
+            : undefined, // Add this
+          subCategory: p.sub_category_id ? String(p.sub_category_id) : undefined,
+          description: p.description || "",
+          colors: Array.isArray(p.colors)
+            ? p.colors
+            : typeof p.colors === "string"
+              ? p.colors.startsWith("[")
+                ? JSON.parse(p.colors)
+                : [p.colors]
+              : [],
+          inStock,
+          rating: p.rating,
+          dimensions: p.dimensions,
+          material: p.material,
+          quantity: Number(quantity) || 0,
+          barcode: p.barcode,
+          isVisible: p.is_visible !== false,
+          specifications: p.specifications || {},
+        }
+      })
 
       setProducts(transformedProds)
       console.log("✅ Products State Updated:", transformedProds.length)

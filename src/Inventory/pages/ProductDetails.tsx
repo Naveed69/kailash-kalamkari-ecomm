@@ -121,6 +121,8 @@ const ProductDetails = () => {
                 imageRef={currentImageRef}
                 variant="medium"
                 alt={product.name}
+                width={1000}
+                height={1250}
                 loading="eager"
                 className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
               />
@@ -144,6 +146,8 @@ const ProductDetails = () => {
                     imageRef={img ?? null}
                     variant="thumb"
                     alt={`${product.name} ${index + 1}`}
+                    width={400}
+                    height={500}
                     className="w-full h-full object-cover"
                   />
                 </button>

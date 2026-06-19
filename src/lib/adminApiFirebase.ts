@@ -14,11 +14,33 @@ import {
   serverTimestamp,
   Timestamp
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getStorage } from "firebase/storage";
 import type { Product } from "@/components/ProductCard";
+import { validateImageRef } from "@/lib/imageValidation";
 
-const storage = getStorage();
+const validateImageRefArray = (
+  refs: unknown,
+  fieldName: string,
+): string[] => {
+  if (refs === null || refs === undefined || refs === "") return [];
+  if (!Array.isArray(refs)) {
+    throw new Error(`${fieldName} must be an array of image references`);
+  }
+
+  const seen = new Set<string>();
+  const validated: string[] = [];
+
+  refs.forEach((ref, index) => {
+    const value = validateImageRef(ref, {
+      allowLegacy: true,
+      fieldName: `${fieldName}[${index}]`,
+    });
+    if (!value || seen.has(value)) return;
+    seen.add(value);
+    validated.push(value);
+  });
+
+  return validated;
+};
 
 // Helper function to convert Firestore data to Product type
 const convertFirestoreData = (firestoreData: any): Product => {
@@ -52,6 +74,17 @@ const sanitizePayload = (payload: Partial<Product>) => {
   const p: any = { ...payload };
   // remove undefined fields
   Object.keys(p).forEach((k) => p[k] === undefined && delete p[k]);
+
+  if (p.image !== undefined) {
+    p.image = validateImageRef(p.image, {
+      allowLegacy: true,
+      fieldName: "image",
+    });
+  }
+
+  if (p.images !== undefined) {
+    p.images = validateImageRefArray(p.images, "images");
+  }
 
   // coerce numeric fields
   if (p.price !== undefined) p.price = p.price === "" ? null : Number(p.price);
@@ -264,21 +297,13 @@ export const getSubCategories = async (): Promise<{
 export const uploadImage = async (
   file: File
 ): Promise<{ url: string | null; error: any }> => {
-  try {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()
-      .toString(36)
-      .substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `products/${fileName}`;
-    const storageRef = ref(storage, filePath);
-
-    const snapshot = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(snapshot.ref);
-    
-    return { url, error: null };
-  } catch (error: any) {
-    return { url: null, error };
-  }
+  void file;
+  return {
+    url: null,
+    error: new Error(
+      "Firebase product image uploads are disabled. Upload images to Cloudflare Images and persist the Cloudflare Image ID.",
+    ),
+  };
 };
 
 // Category CRUD operations
@@ -350,9 +375,14 @@ export const createSubCategory = async (payload: {
   image_url?: string | null;
 }): Promise<{ data: any | null; error: any }> => {
   try {
+    const imageUrl = validateImageRef(payload.image_url ?? null, {
+      allowLegacy: true,
+      fieldName: "image_url",
+    });
     const subCategoriesCollection = collection(db, "subCategories");
     const docRef = await addDoc(subCategoriesCollection, {
       ...payload,
+      image_url: imageUrl,
       subCatName: payload.name, // Keep both for compatibility
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
@@ -361,6 +391,7 @@ export const createSubCategory = async (payload: {
     const newSubCategory = {
       id: docRef.id,
       ...payload,
+      image_url: imageUrl,
       subCatName: payload.name,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -384,6 +415,12 @@ export const updateSubCategory = async (
   try {
     const subCategoryDoc = doc(db, "subCategories", id.toString());
     const updatePayload: any = { ...payload, updatedAt: serverTimestamp() };
+    if (payload.image_url !== undefined) {
+      updatePayload.image_url = validateImageRef(payload.image_url, {
+        allowLegacy: true,
+        fieldName: "image_url",
+      });
+    }
     
     if (payload.name) {
       updatePayload.subCatName = payload.name;

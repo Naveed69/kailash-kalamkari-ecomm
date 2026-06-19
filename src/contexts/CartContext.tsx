@@ -230,54 +230,36 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [cart]);
 
   const addToCart = async (product: Product, quantity = 1) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in before adding items to your cart.",
+      });
+      return;
+    }
+
     const cartItemId = `${product.id}-${product.selectedColor || ''}`;
     const existingItem = cart.items.find(item => item.cartItemId === cartItemId);
     const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
 
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
 
-    // Sync to DB if logged in
-    if (user) {
-      try {
-        await cartApi.upsertCartItem({
-          user_id: user.uid,
-          cart_item_id: cartItemId,
-          product_id: product.id,
-          quantity: newQuantity,
-          selected_color: product.selectedColor
-        });
-      } catch (error) {
-        console.error("Failed to sync add to DB:", error);
-      }
+    try {
+      await cartApi.upsertCartItem({
+        user_id: user.uid,
+        cart_item_id: cartItemId,
+        product_id: product.id,
+        quantity: newQuantity,
+        selected_color: product.selectedColor
+      });
+    } catch (error) {
+      console.error("Failed to sync add to DB:", error);
     }
 
-    // Toast notifications
-    if (!user) {
-      const newItemCount = cart.items.length + 1;
-      if (newItemCount === 1) {
-        toast({
-          title: 'Added to cart',
-          description: `${product.name} has been added. Sign in to save your cart across devices.`,
-          duration: 4000,
-        });
-      } else if (newItemCount === 3) {
-        toast({
-          title: '✨ Save your cart!',
-          description: `You have ${newItemCount} items. Sign in to save them across devices!`,
-          duration: 6000,
-        });
-      } else {
-        toast({
-          title: 'Added to cart',
-          description: `${product.name} has been added to your cart.`,
-        });
-      }
-    } else {
-      toast({
-        title: '✅ Added to cart',
-        description: `${product.name} has been added to your cart.`,
-      });
-    }
+    toast({
+      title: '✅ Added to cart',
+      description: `${product.name} has been added to your cart.`,
+    });
   };
 
   const removeFromCart = async (cartItemId: string) => {

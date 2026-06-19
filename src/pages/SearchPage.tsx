@@ -11,14 +11,24 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ProductFilter, FilterState } from "@/components/ui/ProductFilter";
+import { Product } from "@/components/ProductCard";
+import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { products = [] } = useInventory();
+  const visibleProducts = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products.filter((product) => product.isVisible !== false)
+        : [],
+    [products]
+  );
   const initialSearchQuery = searchParams.get("query") || "";
 
   const { toast } = useToast();
+  const { requireLogin } = useRequireLogin();
   const { addToCart, isInCart } = useCart() || {};
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist() || {};
 
@@ -47,33 +57,35 @@ const SearchPage = () => {
   // Extract unique categories and colors
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
-    products.forEach(p => {
-      if (p.category) cats.add(p.category);
+    visibleProducts.forEach(p => {
+      if (p.categoryName) cats.add(p.categoryName);
     });
     return Array.from(cats);
-  }, [products]);
+  }, [visibleProducts]);
 
   const availableColors = useMemo(() => {
     const cols = new Set<string>();
-    products.forEach(p => {
+    visibleProducts.forEach(p => {
       if (Array.isArray(p.colors)) {
         p.colors.forEach(c => cols.add(c));
       }
     });
     return Array.from(cols);
-  }, [products]);
+  }, [visibleProducts]);
 
 
   const handleAddToCart = useCallback(
     (product: Product) => {
+      if (!requireLogin("add this item to your cart", `/search?query=${encodeURIComponent(searchQuery)}`)) return;
       if (typeof addToCart === "function") addToCart(product);
     },
-    [addToCart]
+    [addToCart, requireLogin, searchQuery]
   );
 
   const handleToggleWishlist = useCallback(
     (productId: string) => {
-      const product = products.find((p) => p.id === productId);
+      if (!requireLogin("save this item to your wishlist", `/search?query=${encodeURIComponent(searchQuery)}`)) return;
+      const product = visibleProducts.find((p) => p.id === productId);
 
       if (typeof isInWishlist === "function" && isInWishlist(productId)) {
         if (typeof removeFromWishlist === "function") removeFromWishlist(productId);
@@ -89,14 +101,14 @@ const SearchPage = () => {
         });
       }
     },
-    [addToWishlist, removeFromWishlist, isInWishlist, products, toast]
+    [addToWishlist, removeFromWishlist, isInWishlist, requireLogin, searchQuery, visibleProducts, toast]
   );
 
 
   const filteredProducts = useMemo(() => {
-    if (!Array.isArray(products)) return [];
+    if (!Array.isArray(visibleProducts)) return [];
 
-    const filtered = products.filter((product) => {
+    const filtered = visibleProducts.filter((product) => {
       // Search filter
       if (
         searchQuery &&
@@ -151,7 +163,7 @@ const SearchPage = () => {
       }
     });
     return filtered;
-  }, [products, searchQuery, sortBy, filters]);
+  }, [visibleProducts, searchQuery, sortBy, filters]);
 
   const clearFilters = () => {
     setFilters({

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -31,19 +31,85 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { CloudflareImage } from "@/components/images/CloudflareImage";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { isCloudflareId, resolveImageSrc } from "@/lib/cloudflareImages";
+import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 // --- Components ---
+
+const isProductDetailsDebugEnabled = () => {
+  if (import.meta.env.DEV) return true;
+  if (typeof window === "undefined") return false;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get("productDebug");
+    if (param === "1") {
+      window.localStorage.setItem("productDebug", "1");
+      return true;
+    }
+    if (param === "0") {
+      window.localStorage.removeItem("productDebug");
+      return false;
+    }
+    return window.localStorage.getItem("productDebug") === "1";
+  } catch {
+    return false;
+  }
+};
+
+const logProductDetailsDebug = (message: string, meta?: unknown) => {
+  if (!isProductDetailsDebugEnabled()) return;
+  console.info(`[ProductDetails] ${message}`, meta);
+};
+
+const logProductDetailsTable = (
+  message: string,
+  rows: Record<string, unknown>[],
+) => {
+  if (!isProductDetailsDebugEnabled()) return;
+  console.info(`[ProductDetails] ${message}`);
+  console.table(rows);
+};
+
+const classifyProductImageRef = (ref: string | null | undefined) => {
+  const trimmed = (ref ?? "").trim();
+  if (!trimmed) return "empty";
+  if (isCloudflareId(trimmed)) return "cloudflare-id";
+  if (trimmed.startsWith("https://imagedelivery.net/")) {
+    return "cloudflare-delivery-url";
+  }
+  if (trimmed.includes("supabase.co/storage")) return "supabase-storage-url";
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return "external-url";
+  }
+  if (
+    trimmed.startsWith("/") ||
+    trimmed.startsWith("data:") ||
+    trimmed.startsWith("blob:")
+  ) {
+    return "local-or-preview";
+  }
+  return "unknown";
+};
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { requireLogin } = useRequireLogin();
   
   // Contexts
   const { addToCart, isInCart, updateQuantity, getItemQuantity, removeFromCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { products = [] } = useInventory();
+  const visibleProducts = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products.filter((product) => product.isVisible !== false)
+        : [],
+    [products],
+  );
 
   // State
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -55,17 +121,53 @@ const ProductDetails = () => {
   const [zoomOpen, setZoomOpen] = useState(false);
   const [shouldMountZoom, setShouldMountZoom] = useState(false);
   const [fullImageRef, setFullImageRef] = useState<string | null>(null);
+  const [cachedFullImageRefs, setCachedFullImageRefs] = useState<string[]>([]);
+  const [zoomMagnifier, setZoomMagnifier] = useState({
+    visible: false,
+    x: 50,
+    y: 50,
+  });
+  // If true: keeps the full image mounted after first open (prevents any re-download but can use more memory).
+  // If false: unmounts full image when modal is closed (better for low-end devices; browser cache still helps).
+  const keepZoomFullImageMounted = true;
 
   // Find Product
-  const product = products.find((p) => p.id === id);
+  const product = visibleProducts.find((p) => p.id === id);
+
+  useEffect(() => {
+    logProductDetailsDebug("product lookup", {
+      routeId: id,
+      totalProducts: products.length,
+      visibleProducts: visibleProducts.length,
+      found: Boolean(product),
+      product: product
+        ? {
+            id: product.id,
+            name: product.name,
+            category: product.category,
+            inStock: product.inStock,
+            image: product.image,
+            imageSourceType: classifyProductImageRef(product.image),
+            imagesCount: Array.isArray(product.images) ? product.images.length : 0,
+            images: Array.isArray(product.images)
+              ? product.images.map((ref, index) => ({
+                  index,
+                  ref,
+                  sourceType: classifyProductImageRef(ref),
+                }))
+              : product.images,
+          }
+        : null,
+    });
+  }, [id, product, products.length, visibleProducts.length]);
 
   // Derived State
   const relatedProducts = useMemo(() => {
     if (!product) return [];
-    return products
+    return visibleProducts
       .filter((p) => p.category === product.category && p.id !== product.id)
       .slice(0, 4);
-  }, [product, products]);
+  }, [product, visibleProducts]);
 
   // Image Gallery Logic (migration-safe)
   // - If product.images exists, use it
@@ -113,6 +215,9 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (!requireLogin("add this item to your cart", `/product/${product.id}`)) {
+      return;
+    }
     
     const cartItemId = `${product.id}-${selectedColor || (product.colors && product.colors[0])}`;
     const inCart = isInCart(cartItemId);
@@ -140,8 +245,19 @@ const ProductDetails = () => {
   };
 
   const handleBuyNow = () => {
+    if (!product) return;
+    if (!requireLogin("buy this item", `/product/${product.id}`)) return;
     handleAddToCart();
     navigate("/cart");
+  };
+
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    if (!requireLogin("save this item to your wishlist", `/product/${product.id}`)) {
+      return;
+    }
+    if (isInWishlist(product.id)) removeFromWishlist(product.id);
+    else addToWishlist(product);
   };
 
   const checkDelivery = () => {
@@ -165,13 +281,93 @@ const ProductDetails = () => {
     return galleryImageRefs[selectedImageIndex] ?? product.image ?? null;
   }, [product, galleryImageRefs, selectedImageIndex]);
 
+  const zoomMagnifierImage = useMemo(
+    () => (fullImageRef ? resolveImageSrc(fullImageRef, "full") : null),
+    [fullImageRef],
+  );
+
+  const openZoom = useCallback(() => {
+    if (!activeImageRef) return;
+    setShouldMountZoom(true);
+    setFullImageRef((prev) => (prev === activeImageRef ? prev : activeImageRef));
+    setCachedFullImageRefs((prev) =>
+      prev.includes(activeImageRef) ? prev : [...prev, activeImageRef],
+    );
+    setZoomMagnifier({ visible: false, x: 50, y: 50 });
+    setZoomOpen(true);
+  }, [activeImageRef]);
+
+  const handleZoomMagnifierMove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = Math.min(
+        100,
+        Math.max(0, ((event.clientX - rect.left) / rect.width) * 100),
+      );
+      const y = Math.min(
+        100,
+        Math.max(0, ((event.clientY - rect.top) / rect.height) * 100),
+      );
+      setZoomMagnifier({ visible: true, x, y });
+    },
+    [],
+  );
+
+  const handleZoomMagnifierLeave = useCallback(() => {
+    setZoomMagnifier((current) => ({ ...current, visible: false }));
+  }, []);
+
+  useEffect(() => {
+    if (!product) return;
+    logProductDetailsDebug("image refs", {
+      productId: product.id,
+      selectedImageIndex,
+      activeImageRef,
+      galleryImageRefs,
+      resolved: {
+        thumb: activeImageRef ? resolveImageSrc(activeImageRef, "thumb") : null,
+        medium: activeImageRef ? resolveImageSrc(activeImageRef, "medium") : null,
+        full: activeImageRef ? resolveImageSrc(activeImageRef, "full") : null,
+      },
+    });
+    logProductDetailsTable(
+      "gallery image audit",
+      galleryImageRefs.map((ref, index) => ({
+        index,
+        selected: index === selectedImageIndex,
+        sourceType: classifyProductImageRef(ref),
+        imageRef: ref,
+        thumbUrl: resolveImageSrc(ref, "thumb"),
+        mediumUrl: resolveImageSrc(ref, "medium"),
+        fullUrl: resolveImageSrc(ref, "full"),
+      })),
+    );
+  }, [activeImageRef, galleryImageRefs, product, selectedImageIndex]);
+
   // When zoom is open, allow switching the zoomed image as the user changes thumbnails.
   // When zoom is closed, do not change the full image ref (prevents accidental full loads).
   useEffect(() => {
     if (!zoomOpen) return;
     if (!activeImageRef) return;
     setFullImageRef((prev) => (prev === activeImageRef ? prev : activeImageRef));
+    setCachedFullImageRefs((prev) =>
+      prev.includes(activeImageRef) ? prev : [...prev, activeImageRef],
+    );
   }, [zoomOpen, activeImageRef]);
+
+  useEffect(() => {
+    if (!product) return;
+    logProductDetailsDebug("zoom state", {
+      productId: product.id,
+      zoomOpen,
+      shouldMountZoom,
+      fullImageRef,
+      cachedFullImageRefs,
+      resolvedFullImage: fullImageRef
+        ? resolveImageSrc(fullImageRef, "full")
+        : null,
+    });
+  }, [cachedFullImageRefs, fullImageRef, product, shouldMountZoom, zoomOpen]);
 
   if (!product) {
     return (
@@ -213,32 +409,85 @@ const ProductDetails = () => {
                 imageRef={activeImageRef}
                 variant="medium"
                 alt={product.name}
+                width={1000}
+                height={1250}
                 loading="eager"
+                debugName={`product:${product.id}:main:${selectedImageIndex}`}
                 className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110 cursor-zoom-in"
-                onClick={() => {
-                  if (!activeImageRef) return;
-                  setShouldMountZoom(true);
-                  setFullImageRef((prev) => (prev === activeImageRef ? prev : activeImageRef));
-                  setZoomOpen(true);
-                }}
+                onClick={openZoom}
               />
 
               {/* Zoom Modal (full loads only after click/tap) */}
               {shouldMountZoom && (
-                <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+                <Dialog
+                  open={zoomOpen}
+                  onOpenChange={(open) => {
+                    setZoomOpen(open);
+                    if (!open && !keepZoomFullImageMounted) {
+                      setShouldMountZoom(false);
+                    }
+                    if (!open) {
+                      setZoomMagnifier((current) => ({
+                        ...current,
+                        visible: false,
+                      }));
+                    }
+                  }}
+                >
                   <DialogContent
                     forceMount
-                    className="max-w-5xl w-[95vw] p-0 bg-black border-black/20"
+                    className="max-w-6xl w-[95vw] p-0 bg-black border-black/20"
                   >
-                    <div className="relative w-full h-[80vh] bg-black">
-                      <CloudflareImage
-                        imageRef={fullImageRef ?? null}
-                        variant="full"
-                        alt={product.name}
-                        loading="eager"
-                        decoding="async"
-                        className="w-full h-full object-contain select-none"
-                      />
+                    <DialogTitle className="sr-only">
+                      Zoomed view of {product.name}
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                      Move over the product image to inspect the full-resolution Cloudflare image.
+                    </DialogDescription>
+                    <div
+                      className="relative w-full h-[82vh] bg-black cursor-crosshair overflow-hidden"
+                      onMouseMove={handleZoomMagnifierMove}
+                      onMouseLeave={handleZoomMagnifierLeave}
+                    >
+                      {cachedFullImageRefs.map((ref) => (
+                        <CloudflareImage
+                          key={ref}
+                          imageRef={ref}
+                          variant="full"
+                          context="zoom"
+                          alt={product.name}
+                          width={2000}
+                          height={2500}
+                          loading="eager"
+                          decoding="async"
+                          debugName={`product:${product.id}:zoom:${cachedFullImageRefs.indexOf(ref)}`}
+                          className="absolute inset-0 w-full h-full object-contain select-none"
+                          hidden={!zoomOpen || ref !== fullImageRef}
+                          unmountOnHide={!keepZoomFullImageMounted}
+                        />
+                      ))}
+                      {zoomMagnifier.visible && zoomMagnifierImage && (
+                        <>
+                          <div
+                            className="pointer-events-none absolute z-10 hidden h-28 w-24 -translate-x-1/2 -translate-y-1/2 border border-white/80 bg-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.38),inset_0_0_0_1px_rgba(255,255,255,0.55)] backdrop-blur-[1px] md:block md:h-44 md:w-36"
+                            style={{
+                              left: `${zoomMagnifier.x}%`,
+                              top: `${zoomMagnifier.y}%`,
+                            }}
+                          />
+                          <div
+                            className="pointer-events-none absolute right-4 top-1/2 z-20 hidden h-[min(680px,82vh)] w-[min(460px,42vw)] -translate-y-1/2 overflow-hidden rounded-lg border border-white/80 bg-white shadow-[0_22px_70px_rgba(0,0,0,0.52),inset_0_0_0_1px_rgba(255,255,255,0.55)] md:block"
+                            style={{
+                              backgroundImage: `url("${zoomMagnifierImage}")`,
+                              backgroundPosition: `${zoomMagnifier.x}% ${zoomMagnifier.y}%`,
+                              backgroundRepeat: "no-repeat",
+                              backgroundSize: "320% auto",
+                            }}
+                          >
+                            <div className="absolute inset-0 ring-1 ring-inset ring-white/50" />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -260,7 +509,7 @@ const ProductDetails = () => {
 
                             {/* Wishlist Button (Mobile Overlay) */}
                             <button 
-                              onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
+                              onClick={handleToggleWishlist}
                               className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur shadow-sm md:hidden"
                             >
                               <Heart className={`h-6 w-6 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-slate-600"}`} />
@@ -281,6 +530,9 @@ const ProductDetails = () => {
                                   imageRef={imgRef}
                                   variant="thumb"
                                   alt={`View ${idx + 1}`}
+                                  width={400}
+                                  height={500}
+                                  debugName={`product:${product.id}:thumb:${idx}`}
                                   className="w-full h-full object-cover"
                                 />
                               </button>
@@ -307,7 +559,7 @@ const ProductDetails = () => {
                                                             <Button
                                                               variant="outline"
                                                               size="icon"
-                                                              onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
+                                                              onClick={handleToggleWishlist}
                                                               className="hidden md:flex rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 hover:border-[#D49217]"
                                                             >
                                                               <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-slate-600"}`} />
@@ -563,6 +815,9 @@ const ProductDetails = () => {
                                         imageRef={relatedImageRef}
                                         variant="thumb"
                                         alt={related.name}
+                                        width={400}
+                                        height={500}
+                                        debugName={`related:${related.id}:thumb`}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                       />
                                     {!related.inStock && (

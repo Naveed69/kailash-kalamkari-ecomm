@@ -12,6 +12,7 @@ import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/AuthContext"
+import { CloudflareImage } from "@/components/images/CloudflareImage"
 
 import {
   DropdownMenu,
@@ -75,10 +76,13 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img
+            <CloudflareImage
               src={logo}
+              variant="thumb"
               alt="Logo"
-              className="w-32 h-16 cursor-pointer" // Increased width and height
+              width={128}
+              height={64}
+              className="w-32 h-16 cursor-pointer"
               onClick={() => navigate("/")}
             />
           </div>

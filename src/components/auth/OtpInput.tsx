@@ -3,17 +3,24 @@ import { Input } from '@/components/ui/input';
 
 interface OtpInputProps {
     length?: number;
-    onComplete: (otp: string) => void;
+    onComplete?: (otp: string) => void;
+    value?: string;
+    onChange?: (otp: string) => void;
     disabled?: boolean;
 }
 
 export const OtpInput: React.FC<OtpInputProps> = ({
     length = 6,
     onComplete,
+    value,
+    onChange,
     disabled = false
 }) => {
-    const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
+    const [internalOtp, setInternalOtp] = useState<string[]>(new Array(length).fill(""));
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const otp = value !== undefined
+        ? Array.from({ length }, (_, index) => value[index] ?? "")
+        : internalOtp;
 
     useEffect(() => {
         if (inputRefs.current[0]) {
@@ -26,7 +33,9 @@ export const OtpInput: React.FC<OtpInputProps> = ({
 
         const newOtp = [...otp];
         newOtp[index] = value.substring(value.length - 1);
-        setOtp(newOtp);
+        const combinedOtp = newOtp.join("");
+        if (onChange) onChange(combinedOtp);
+        else setInternalOtp(newOtp);
 
         // Move to next input if current field is filled
         if (value && index < length - 1 && inputRefs.current[index + 1]) {
@@ -34,8 +43,7 @@ export const OtpInput: React.FC<OtpInputProps> = ({
         }
 
         // Trigger onComplete if all fields are filled
-        const combinedOtp = newOtp.join("");
-        if (combinedOtp.length === length) {
+        if (combinedOtp.length === length && onComplete) {
             onComplete(combinedOtp);
         }
     };
@@ -60,10 +68,11 @@ export const OtpInput: React.FC<OtpInputProps> = ({
                 newOtp[index] = char;
             }
         });
-        setOtp(newOtp);
-
         const combinedOtp = newOtp.join("");
-        if (combinedOtp.length === length) {
+        if (onChange) onChange(combinedOtp);
+        else setInternalOtp(newOtp);
+
+        if (combinedOtp.length === length && onComplete) {
             onComplete(combinedOtp);
         }
 

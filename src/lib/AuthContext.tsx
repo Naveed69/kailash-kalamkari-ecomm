@@ -11,7 +11,7 @@ import {
   signInWithPhoneNumber,
   ConfirmationResult,
 } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+import { auth, initAppCheckOnDemand } from "@/lib/firebase"
 import { useToast } from "@/hooks/use-toast"
 import { useNavigate, useLocation } from "react-router-dom"
 
@@ -23,8 +23,11 @@ interface AuthContextType {
   sendEmailLink: (email: string) => Promise<void>
   signInWithEmail: (email: string, link: string) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
-  setupRecaptcha: (containerId: string) => void
-  signInWithPhone: (phoneNumber: string) => Promise<ConfirmationResult>
+  signInWithPhone: (
+    phoneNumber: string,
+    recaptchaContainer: string,
+  ) => Promise<{ error?: any }>
+  verifyPhoneOTP: (otp: string) => Promise<{ error?: any; user?: User }>
 }
 
 // Create the context with a default undefined value
@@ -36,6 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [confirmationResult, setConfirmationResult] =
+    useState<ConfirmationResult | null>(null)
 
   const { toast } = useToast()
 
@@ -148,10 +153,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   // Setup Recaptcha for Phone Auth
-  const setupRecaptcha = (containerId: string) => {
+  const cleanupRecaptcha = () => {
     if ((window as any).recaptchaVerifier) {
-      ;(window as any).recaptchaVerifier.clear()
+      try {
+        ;(window as any).recaptchaVerifier.clear()
+      } catch (error) {
+        console.error("Failed to clear recaptcha verifier:", error)
+      }
+      ;(window as any).recaptchaVerifier = null
     }
+  }
+
+  const setupRecaptcha = (containerId: string) => {
+    cleanupRecaptcha()
+
+    const container = document.getElementById(containerId)
+    if (container) container.innerHTML = ""
 
     ;(window as any).recaptchaVerifier = new RecaptchaVerifier(
       auth,
@@ -171,12 +188,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Sign in with Phone Number (Send OTP)
   const signInWithPhone = async (
     phoneNumber: string,
-  ): Promise<ConfirmationResult> => {
+    recaptchaContainer: string,
+  ): Promise<{ error?: any }> => {
     try {
+      await initAppCheckOnDemand()
+      setupRecaptcha(recaptchaContainer)
       const appVerifier = (window as any).recaptchaVerifier
-      if (!appVerifier) {
-        throw new Error("Recaptcha not initialized")
-      }
+      await appVerifier.render()
 
       // Keep + at start, strip non-digits only after it
       const normalizedPhone = phoneNumber.startsWith("+")
@@ -190,34 +208,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         normalizedPhone,
         appVerifier,
       )
-      toast({
-        title: "OTP Sent",
-        description: "Please check your phone for the verification code.",
-      })
-      return result
+      setConfirmationResult(result)
+      return { error: null }
     } catch (error: any) {
       console.error("Error sending phone OTP:", error)
+      cleanupRecaptcha()
+      return { error }
+    }
+  }
 
-      let errorMessage = "Failed to send OTP. Please try again."
-
-      if (error.code === "auth/invalid-phone-number") {
-        errorMessage =
-          "The phone number is invalid. Please ensure it includes the country code (e.g., +91)."
-      } else if (error.code === "auth/operation-not-allowed") {
-        errorMessage =
-          "Phone authentication is not enabled. Please contact support."
-      } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Too many requests. Please try again later."
-      } else if (error.message) {
-        errorMessage = error.message
+  const verifyPhoneOTP = async (otp: string) => {
+    try {
+      if (!confirmationResult) {
+        return {
+          error: { message: "No confirmation result. Please request OTP first." },
+        }
       }
 
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      })
-      throw error
+      const result = await confirmationResult.confirm(otp)
+      setUser(result.user)
+      return { user: result.user, error: null }
+    } catch (error: any) {
+      console.error("Error verifying phone OTP:", error)
+      return { error }
     }
   }
 
@@ -228,10 +241,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sendEmailLink,
     signInWithEmail,
     resetPassword,
-    setupRecaptcha,
     signInWithPhone,
+    verifyPhoneOTP,
   }
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  )
 }
 
 // Custom hook to use the auth context

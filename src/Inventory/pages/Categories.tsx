@@ -45,6 +45,7 @@ import {
 } from "@/lib/adminApi"
 import { seedCategories } from "@/lib/seedData"
 import { CloudflareImage } from "@/components/images/CloudflareImage"
+import { isLikelyCfImageId } from "@/lib/cloudflareImages"
 
 const Categories = () => {
   const { toast } = useToast()
@@ -290,8 +291,26 @@ const Categories = () => {
       return
     }
 
-    setLoading(true)
     const imageUrl = subCategoryForm.image_url?.trim() || null
+    const existingImageUrl = editingSubCategory?.image_url?.trim() || null
+    const isExistingLegacyValue =
+      Boolean(editingSubCategory) &&
+      Boolean(imageUrl) &&
+      imageUrl === existingImageUrl &&
+      !isLikelyCfImageId(imageUrl)
+
+    if (imageUrl && !isLikelyCfImageId(imageUrl) && !isExistingLegacyValue) {
+      toast({
+        title: "Only Cloudflare Image IDs are allowed",
+        description:
+          "New subcategory images must be Cloudflare Image IDs. Existing legacy URLs may remain temporarily while editing.",
+        variant: "destructive",
+        duration: 5000,
+      })
+      return
+    }
+
+    setLoading(true)
 
     const payload = {
       name: subCategoryForm.name.trim(),
@@ -678,10 +697,10 @@ const Categories = () => {
               <Label className="text-slate-700 font-medium">
                 Subcategory Image
               </Label>
-              <p className="text-xs text-slate-500 mt-1">
-                Used on the storefront subcategory tiles. Recommended size
-                600x600px.
-              </p>
+	              <p className="text-xs text-slate-500 mt-1">
+	                Used on storefront subcategory tiles. Paste only Cloudflare
+	                Image IDs for new images; existing legacy URLs may remain.
+	              </p>
 
               <Input
                 value={subCategoryForm.image_url}
@@ -691,7 +710,7 @@ const Categories = () => {
                     image_url: e.target.value,
                   }))
                 }
-                placeholder="Cloudflare Image ID (temporary). During migration, URLs still render."
+	                placeholder="Cloudflare Image ID only"
                 className="mt-3"
               />
 

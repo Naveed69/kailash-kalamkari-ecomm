@@ -1,0 +1,5 @@
+[functions.cloudflare-image-upload]
+verify_jwt = false
+
+[functions.cloudflare-image-delete]
+verify_jwt = false

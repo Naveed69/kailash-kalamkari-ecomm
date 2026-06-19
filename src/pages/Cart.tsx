@@ -63,9 +63,6 @@ import {
   CreditCard,
   ArrowRight,
   Lock,
-  QrCode,
-  Copy,
-  Check,
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useCart } from "@/contexts/CartContext"
@@ -73,6 +70,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
+import { useRequireLogin } from "@/hooks/useRequireLogin"
 // import { EmailLoginModal } from "@/components/auth/EmailLoginModal";
 import {
   Card,
@@ -84,17 +82,8 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 
 import { supabase } from "@/lib/supabaseClient"
-import Logo from "@/assets/Logo/AccountQRCode.png"
-const QR_SRC = Logo
 
 // Indian states list
 const INDIAN_STATES = [
@@ -154,6 +143,7 @@ export default function CartPage() {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { requireLogin } = useRequireLogin()
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({
     name: "",
     phone: "",
@@ -165,12 +155,9 @@ export default function CartPage() {
     pincode: "",
     landmark: "",
   })
-  const [showUpiQr, setShowUpiQr] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "upi">("razorpay")
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const [error, setError] = useState<{ [key: string]: string }>({})
-  const [showLoginModal, setShowLoginModal] = useState(false)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -223,135 +210,21 @@ export default function CartPage() {
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true)
+        return
+      }
       const script = document.createElement("script")
       script.src = "https://checkout.razorpay.com/v1/checkout.js"
+      script.async = true
       script.onload = () => resolve(true)
       script.onerror = () => resolve(false)
       document.body.appendChild(script)
     })
   }
 
-  const handleUpiPayment = async () => {
-    try {
-      // Show loading state
-      setShowUpiQr(true);
-
-      console.log('Starting UPI payment process...');
-      console.log('Order details:', {
-        customer_name: orderDetails.name,
-        total_amount: cart.totalPrice,
-        item_count: cart.items.length
-      });
-
-      // Validate required fields
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      if (!orderDetails.name || !orderDetails.phone || !orderDetails.addressLine1 ||
-        !orderDetails.city || !orderDetails.state || !orderDetails.pincode) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      // Normalize phone number
-      let normalizedPhone = orderDetails.phone.trim().replace(/\s/g, '');
-      if (normalizedPhone.length === 10 && !normalizedPhone.startsWith('+')) {
-        normalizedPhone = '+91' + normalizedPhone;
-      }
-
-      console.log('Creating order in database...');
-      // Use deterministic UUID
-      const dbUserId = uuidv5(user.uid, USER_ID_NAMESPACE);
-
-      // Ensure user exists in DB before creating order
-      await ensureUserExists(dbUserId, {
-        name: orderDetails.name,
-        email: orderDetails.email,
-        phone: normalizedPhone
-      });
-
-      const { data: orderData, error: orderError } = await supabase
-        .from("orders")
-        .insert([
-          {
-            customer_name: orderDetails.name,
-            customer_phone: normalizedPhone,
-            customer_email: orderDetails.email || null,
-            address_line1: orderDetails.addressLine1,
-            address_line2: orderDetails.addressLine2 || null,
-            city: orderDetails.city,
-            state: orderDetails.state,
-            pincode: orderDetails.pincode,
-            landmark: orderDetails.landmark || null,
-            customer_address: `${orderDetails.addressLine1}, ${orderDetails.addressLine2 ? orderDetails.addressLine2 + ", " : ""
-              }${orderDetails.city}, ${orderDetails.state} - ${orderDetails.pincode
-              }${orderDetails.landmark
-                ? " (Near: " + orderDetails.landmark + ")"
-                : ""
-              }`,
-            total_amount: cart.totalPrice,
-            items: cart.items.map(item => ({
-              ...item,
-              // Ensure each item has required fields
-              id: item.id || 'unknown',
-              name: item.name || 'Unnamed Item',
-              price: item.price || 0,
-              quantity: item.quantity || 1
-            })),
-            status: "pending",
-            user_id: dbUserId,
-            user_phone: user.phoneNumber || normalizedPhone,
-            payment_method: "upi_qr",
-            created_at: new Date().toISOString()
-          },
-        ])
-        .select()
-        .single(); // Use single() since we're only expecting one record
-
-      if (orderError) {
-        console.error('Database error:', orderError);
-        throw new Error(`Failed to create order: ${orderError.message}`);
-      }
-
-      console.log('Order created successfully:', orderData);
-      const createdOrder = orderData;
-
-      toast({
-        title: "UPI Payment Instructions",
-        description: "Please scan the QR code or use the UPI ID to complete your payment.",
-        variant: "default",
-      });
-
-    } catch (err: any) {
-      console.error('Error in handleUpiPayment:', err);
-      toast({
-        title: "Order Creation Failed",
-        description: err.message || "Failed to create order. Please try again.",
-        variant: "destructive",
-      });
-      setShowUpiQr(false); // Hide the QR code modal if there's an error
-    }
-  };
-  const copyUpiId = () => {
-    navigator.clipboard.writeText("7013242312@axl") // Replace with your actual UPI ID
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const handlePlaceOrder = async () => {
-    // Check if user is logged in
-    if (!user) {
-      navigate("/login", { state: { from: "/cart" } })
-      return
-    }
-
-    // Handle UPI payment flow
-    if (paymentMethod === "upi") {
-      await handleUpiPayment()
-      return
-    }
-
-    // Continue with Razorpay flow for other payment methods
+    if (!requireLogin("checkout and pay", "/cart")) return
 
     // Validation
     if (
@@ -386,9 +259,21 @@ export default function CartPage() {
       return
     }
 
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+    if (!razorpayKey) {
+      toast({
+        title: "Payment is not configured",
+        description: "Missing Razorpay key. Please contact support.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsProcessing(true)
     const res = await loadRazorpay()
 
     if (!res) {
+      setIsProcessing(false)
       toast({
         title: "Error",
         description: "Razorpay SDK failed to load. Are you online?",
@@ -398,7 +283,7 @@ export default function CartPage() {
     }
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key: razorpayKey,
       amount: cart.totalPrice * 100, // Amount in paise
       currency: "INR",
       name: "Kailash Kalamkari",
@@ -510,11 +395,13 @@ export default function CartPage() {
 
           // Check if order already exists
           const { data: existingOrder, error: existingOrderError } =
-            await supabase
-              .from("orders")
-              .select("id")
-              .eq("razorpay_order_id", response.razorpay_order_id)
-              .maybeSingle()
+            response.razorpay_order_id
+              ? await supabase
+                  .from("orders")
+                  .select("id")
+                  .eq("razorpay_order_id", response.razorpay_order_id)
+                  .maybeSingle()
+              : { data: null, error: null }
 
           if (existingOrderError) throw existingOrderError
 
@@ -563,8 +450,9 @@ export default function CartPage() {
                 user_id: dbUserId, // Link order to user
                 user_phone: user.phoneNumber || normalizedPhone,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
+                razorpay_order_id:
+                  response.razorpay_order_id || response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature || null,
               },
             ])
             .select()
@@ -619,6 +507,7 @@ export default function CartPage() {
             window.location.href = `/order-confirmation/${createdOrder.id}`
           }, 1000)
         } catch (err: any) {
+          setIsProcessing(false)
           console.error("Order processing error:", err)
           toast({
             title: "Order Processing Failed",
@@ -631,6 +520,7 @@ export default function CartPage() {
       },
       modal: {
         ondismiss: function () {
+          setIsProcessing(false)
           toast({
             title: "Payment Cancelled",
             description: "Your order was not placed. Your cart is still saved.",
@@ -657,6 +547,14 @@ export default function CartPage() {
     }
 
     const paymentObject = new (window as any).Razorpay(options)
+    paymentObject.on("payment.failed", function () {
+      setIsProcessing(false)
+      toast({
+        title: "Payment failed",
+        description: "Your order was not placed. Please try again.",
+        variant: "destructive",
+      })
+    })
     paymentObject.open()
   }
 
@@ -720,13 +618,13 @@ export default function CartPage() {
                   <p className="text-slate-600">
                     Save your cart, track orders, and checkout faster.
                   </p>
-                </div>
-                <Button
-                  onClick={() => setShowLoginModal(true)}
-                  className="bg-[#D49217] hover:bg-[#C28315] text-white whitespace-nowrap"
-                >
-                  Sign in with Email
-                </Button>
+	                </div>
+	                <Button
+	                  onClick={() => requireLogin("checkout and pay", "/cart")}
+	                  className="bg-[#D49217] hover:bg-[#C28315] text-white whitespace-nowrap"
+	                >
+	                  Sign in
+	                </Button>
               </div>
             )}
 
@@ -1072,102 +970,44 @@ export default function CartPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-6 pt-0 flex flex-col gap-4">
-                  <Button
-                    onClick={() => {
-                      if (!user) {
-                        navigate("/login", { state: { from: "/cart" } })
-                        return
-                      }
-                      handlePlaceOrder()
-                    }}
-                    className="w-full h-12 text-lg font-semibold bg-[#D49217] hover:bg-[#b87d14] shadow-md hover:shadow-lg transition-all"
-                    disabled={!!error.phone || !!error.pincode || !!error.email}
-                  >
-                    {user ? "Proceed to Pay" : "Login to Continue"}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
+	                  <Button
+	                    onClick={handlePlaceOrder}
+	                    className="w-full h-12 text-lg font-semibold bg-[#D49217] hover:bg-[#b87d14] shadow-md hover:shadow-lg transition-all"
+	                    disabled={isProcessing || !!error.phone || !!error.pincode || !!error.email}
+	                  >
+	                    {isProcessing ? "Processing..." : user ? "Proceed to Pay" : "Login to Continue"}
+	                    <ArrowRight className="ml-2 w-5 h-5" />
+	                  </Button>
 
-                  <div className="space-y-4 w-full">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Payment Method</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          type="button"
-                          variant={paymentMethod === "razorpay" ? "default" : "outline"}
-                          className="h-auto py-2"
-                          onClick={() => setPaymentMethod("razorpay")}
-                        >
-                          <div className="text-left">
-                            <p className="text-sm font-medium">Razorpay</p>
-                            <p className="text-xs text-muted-foreground">Cards, UPI, Net Banking, Wallet</p>
-                          </div>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={paymentMethod === "upi" ? "default" : "outline"}
-                          className="h-auto py-2"
-                          onClick={() => setPaymentMethod("upi")}
-                        >
-                          <div className="text-left">
-                            <p className="text-sm font-medium">UPI</p>
-                            <p className="text-xs text-muted-foreground">Scan QR to Pay</p>
-                          </div>
-                        </Button>
-                      </div>
-                    </div>
+	                  <div className="space-y-4 w-full">
+	                    <div className="space-y-2">
+	                      <p className="text-sm font-medium">Payment Method</p>
+	                      <div className="rounded-lg border border-[#D49217]/30 bg-[#D49217]/5 p-4">
+	                        <div className="flex items-start gap-3">
+	                          <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#D49217]">
+	                            <div className="h-2.5 w-2.5 rounded-full bg-[#D49217]" />
+	                          </div>
+	                          <div>
+	                            <p className="text-sm font-semibold text-slate-900">
+	                              Online Payment
+	                            </p>
+	                            <p className="mt-1 text-xs text-muted-foreground">
+	                              Cards, UPI, Net Banking, and Wallets via Razorpay.
+	                            </p>
+	                          </div>
+	                        </div>
+	                      </div>
+	                    </div>
 
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                      <Lock className="w-3 h-3" />
-                      <span>Secured by {paymentMethod === "razorpay" ? "Razorpay" : "Your Bank"}</span>
-                    </div>
-                  </div>
-                </CardFooter>
-              </Card>
+	                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+	                      <Lock className="w-3 h-3" />
+	                      <span>Secured by Razorpay</span>
+	                    </div>
+	                  </div>
+	                </CardFooter>
+	              </Card>
 
-              {/* UPI QR Code Modal */}
-              <Dialog open={showUpiQr} onOpenChange={setShowUpiQr}>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Pay with UPI</DialogTitle>
-                    <DialogDescription>
-                      Scan the QR code or use the UPI ID below to complete your payment of ₹{cart.totalPrice.toFixed(2)}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex flex-col items-center space-y-4">
-                    <div className="p-4 border rounded-lg bg-white">
-                      <img
-                        src={QR_SRC}
-                        alt="UPI QR Code"
-                        className="w-64 h-64 object-contain"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <p className="text-sm text-muted-foreground mb-1">Or send money to UPI ID:</p>
-                      <div className="flex items-center justify-between p-2 border rounded-md bg-muted/50">
-                        <code className="font-mono text-sm">7013242312@axl</code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 px-2"
-                          onClick={copyUpiId}
-                        >
-                          {copied ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="text-xs text-muted-foreground text-center pt-2">
-                      <p>After payment, your order will be confirmed automatically.</p>
-                      <p>For any issues, contact support with your order details.</p>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* Trust Badges */}
+	              {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-lg border shadow-sm flex items-center gap-3">
                   <div className="bg-green-50 p-2 rounded-full">
@@ -1191,14 +1031,7 @@ export default function CartPage() {
             </div>
           </div>
         </div>
-
-        {/* Email Login Modal */}
-        {/* <EmailLoginModal
-          open={showLoginModal}
-          onOpenChange={setShowLoginModal}
-          redirectTo="/cart"
-        /> */}
-      </div>
+	      </div>
     </div>
   )
 }

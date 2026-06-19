@@ -1,10 +1,55 @@
 import { supabase } from "@/lib/supabaseClient"
 import type { Product } from "@/components/ProductCard"
+import { validateImageRef } from "@/lib/imageValidation"
+
+const toValidationError = (error: unknown) => ({
+  message: error instanceof Error ? error.message : "Invalid image reference",
+  details: null,
+  hint: "Use Cloudflare Image IDs for new image values. Legacy http(s) URLs are temporarily allowed during migration.",
+  code: "VALIDATION",
+  status: 400,
+})
+
+const validateImageRefArray = (
+  refs: unknown,
+  fieldName: string,
+): string[] => {
+  if (refs === null || refs === undefined || refs === "") return []
+  if (!Array.isArray(refs)) {
+    throw new Error(`${fieldName} must be an array of image references`)
+  }
+
+  const seen = new Set<string>()
+  const validated: string[] = []
+
+  refs.forEach((ref, index) => {
+    const value = validateImageRef(ref, {
+      allowLegacy: true,
+      fieldName: `${fieldName}[${index}]`,
+    })
+    if (!value || seen.has(value)) return
+    seen.add(value)
+    validated.push(value)
+  })
+
+  return validated
+}
 
 const sanitizePayload = (payload: Partial<Product>) => {
   const p: any = { ...payload }
   // remove undefined fields
   Object.keys(p).forEach((k) => p[k] === undefined && delete p[k])
+
+  if (p.image !== undefined) {
+    p.image = validateImageRef(p.image, {
+      allowLegacy: true,
+      fieldName: "image",
+    })
+  }
+
+  if (p.images !== undefined) {
+    p.images = validateImageRefArray(p.images, "images")
+  }
 
   // coerce numeric fields
   if (p.price !== undefined) p.price = p.price === "" ? null : Number(p.price)
@@ -96,6 +141,49 @@ const findInvalidIdField = (obj: Record<string, any>) => {
   return null
 }
 
+const getMissingColumn = (error: any): string | null => {
+  if (typeof error?.message !== "string") return null
+  const match = error.message.match(/Could not find the '(.+?)' column/)
+  return match?.[1] ?? null
+}
+
+const removeMissingColumn = (payload: Record<string, any>, column: string) => {
+  if (!(column in payload)) return null
+
+  const next = { ...payload }
+
+  // Older schemas sometimes used quantity before stock_quantity.
+  if (column === "stock_quantity" && next.quantity === undefined) {
+    next.quantity = next.stock_quantity
+  }
+
+  delete next[column]
+  return next
+}
+
+const withMissingColumnFallback = async (
+  payload: Record<string, any>,
+  run: (obj: Record<string, any>) => Promise<any>,
+) => {
+  let currentPayload = payload
+  let result = await run(currentPayload)
+  const removedColumns = new Set<string>()
+
+  while (result.error) {
+    const missingColumn = getMissingColumn(result.error)
+    if (!missingColumn || removedColumns.has(missingColumn)) break
+
+    const nextPayload = removeMissingColumn(currentPayload, missingColumn)
+    if (!nextPayload) break
+
+    removedColumns.add(missingColumn)
+    currentPayload = nextPayload
+    result = await run(currentPayload)
+  }
+
+  return result
+}
+
 // Keep typings simple to avoid complex generic constraints from the Supabase client
 export const getProducts = async (): Promise<{
   data: Product[] | null
@@ -133,7 +221,12 @@ export const getProductById = async (
 export const createProduct = async (
   payload: Partial<Product>,
 ): Promise<{ data: Product | null; error: any }> => {
-  const sanitized = sanitizePayload(payload)
+  let sanitized: Partial<Product>
+  try {
+    sanitized = sanitizePayload(payload)
+  } catch (error) {
+    return { data: null, error: toValidationError(error) }
+  }
   // Validate id fields before attempting insert
   const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
@@ -151,70 +244,14 @@ export const createProduct = async (
       },
     }
   }
-  // Try initial insert
   const attemptInsert = async (obj: any) =>
     await supabase.from("products").insert([obj]).select().single()
 
-  const { data, error, status } = await attemptInsert(sanitized)
+  const { data, error, status } = await withMissingColumnFallback(
+    sanitized as Record<string, any>,
+    attemptInsert,
+  )
   if (!error) return { data: (data as Product) ?? null, error: null }
-
-  // If PostgREST says a column is missing, try reasonable fallbacks (map `category` to category_id / category_name)
-  const missingMatch =
-    typeof error?.message === "string" &&
-    error.message.match(/Could not find the '(.+?)' column/)
-  if (missingMatch) {
-    const missingCol = missingMatch[1]
-
-    // Build fallback attempts
-    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = []
-
-    // If UI provided `category`, try mapping to `category_id` (numeric) and `category_name` (text)
-    if (sanitized.category !== undefined) {
-      fallbacks.push({
-        desc: "map category -> category_id",
-        mapper: (src) => {
-          const copy = { ...src }
-          const val = copy.category
-          delete copy.category
-          const coerced = Number(val)
-          copy["category_id"] = Number.isNaN(coerced) ? null : coerced
-          return copy
-        },
-      })
-
-      fallbacks.push({
-        desc: "map category -> category_name",
-        mapper: (src) => {
-          const copy = { ...src }
-          copy["category_name"] = copy.category
-          delete copy.category
-          return copy
-        },
-      })
-    }
-
-    // Generic fallback: remove the offending column if it exists in payload
-    fallbacks.push({
-      desc: `remove ${missingCol}`,
-      mapper: (src) => {
-        const copy = { ...src }
-        if (copy[missingCol] !== undefined) delete copy[missingCol]
-        return copy
-      },
-    })
-
-    for (const fb of fallbacks) {
-      try {
-        const attemptPayload = fb.mapper(sanitized)
-        const r = await attemptInsert(attemptPayload)
-        if (!r.error) {
-          return { data: (r.data as Product) ?? null, error: null }
-        }
-      } catch (err) {
-        // Ignore individual fallback failures so the loop can continue
-      }
-    }
-  }
 
   // Still failing - return structured error
   return {
@@ -233,7 +270,12 @@ export const updateProduct = async (
   id: string,
   payload: Partial<Product>,
 ): Promise<{ data: Product | null; error: any }> => {
-  const sanitized = sanitizePayload(payload)
+  let sanitized: Partial<Product>
+  try {
+    sanitized = sanitizePayload(payload)
+  } catch (error) {
+    return { data: null, error: toValidationError(error) }
+  }
   // Validate id fields before attempting update
   const invalid = findInvalidIdField(sanitized as Record<string, any>)
   if (invalid) {
@@ -259,7 +301,10 @@ export const updateProduct = async (
       .select()
       .maybeSingle()
 
-  const { data, error, status } = await attemptUpdate(sanitized)
+  const { data, error, status } = await withMissingColumnFallback(
+    sanitized as Record<string, any>,
+    attemptUpdate,
+  )
   if (!error) {
     if (!data)
       return {
@@ -267,59 +312,6 @@ export const updateProduct = async (
         error: { message: "Product not found", code: "NOT_FOUND", status: 404 },
       }
     return { data: (data as Product) ?? null, error: null }
-  }
-
-  const missingMatch =
-    typeof error?.message === "string" &&
-    error.message.match(/Could not find the '(.+?)' column/)
-  if (missingMatch) {
-    const missingCol = missingMatch[1]
-    const fallbacks: Array<{ desc: string; mapper: (src: any) => any }> = []
-
-    if (sanitized.category !== undefined) {
-      fallbacks.push({
-        desc: "map category -> category_id",
-        mapper: (src) => {
-          const copy = { ...src }
-          const val = copy.category
-          delete copy.category
-          const coerced = Number(val)
-          copy["category_id"] = Number.isNaN(coerced) ? null : coerced
-          return copy
-        },
-      })
-
-      fallbacks.push({
-        desc: "map category -> category_name",
-        mapper: (src) => {
-          const copy = { ...src }
-          copy["category_name"] = copy.category
-          delete copy.category
-          return copy
-        },
-      })
-    }
-
-    fallbacks.push({
-      desc: `remove ${missingCol}`,
-      mapper: (src) => {
-        const copy = { ...src }
-        if (copy[missingCol] !== undefined) delete copy[missingCol]
-        return copy
-      },
-    })
-
-    for (const fb of fallbacks) {
-      try {
-        const attemptPayload = fb.mapper(sanitized)
-        const r = await attemptUpdate(attemptPayload)
-        if (!r.error) {
-          return { data: (r.data as Product) ?? null, error: null }
-        }
-      } catch (err) {
-        // no-op: we only care if a fallback succeeds
-      }
-    }
   }
 
   return {
@@ -370,25 +362,12 @@ export const getSubCategories = async (): Promise<{
 export const uploadImage = async (
   file: File,
 ): Promise<{ url: string | null; error: any }> => {
-  try {
-    const fileExt = file.name.split(".").pop()
-    const fileName = `${Math.random()
-      .toString(36)
-      .substring(2)}_${Date.now()}.${fileExt}`
-    const filePath = `${fileName}`
-
-    const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(filePath, file)
-
-    if (uploadError) {
-      throw uploadError
-    }
-
-    const { data } = supabase.storage.from("products").getPublicUrl(filePath)
-    return { url: data.publicUrl, error: null }
-  } catch (error: any) {
-    return { url: null, error }
+  void file
+  return {
+    url: null,
+    error: new Error(
+      "Supabase product image uploads are disabled. Upload images to Cloudflare Images and persist the Cloudflare Image ID.",
+    ),
   }
 }
 
@@ -435,11 +414,21 @@ export const createSubCategory = async (payload: {
   category_id: number
   image_url?: string | null
 }): Promise<{ data: any | null; error: any }> => {
+  let imageUrl: string | null
+  try {
+    imageUrl = validateImageRef(payload.image_url ?? null, {
+      allowLegacy: true,
+      fieldName: "image_url",
+    })
+  } catch (error) {
+    return { data: null, error: toValidationError(error) }
+  }
+
   // Map 'name' to 'subCatName' for database
   const dbPayload = {
     subCatName: payload.name,
     category_id: payload.category_id,
-    image_url: payload.image_url ?? null,
+    image_url: imageUrl,
   }
   const { data, error } = await supabase
     .from("sub_categories")
@@ -467,7 +456,16 @@ export const updateSubCategory = async (
   const dbPayload: any = {}
   if (payload.name) dbPayload.subCatName = payload.name
   if (payload.category_id) dbPayload.category_id = payload.category_id
-  if (payload.image_url !== undefined) dbPayload.image_url = payload.image_url
+  if (payload.image_url !== undefined) {
+    try {
+      dbPayload.image_url = validateImageRef(payload.image_url, {
+        allowLegacy: true,
+        fieldName: "image_url",
+      })
+    } catch (error) {
+      return { data: null, error: toValidationError(error) }
+    }
+  }
 
   const { data, error } = await supabase
     .from("sub_categories")

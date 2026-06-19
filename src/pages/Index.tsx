@@ -20,19 +20,9 @@ import { useInventory } from "@/contexts/InventoryContext";
 import { CategoryCard } from "@/components/ui/categoryCard";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-import Heritage from "@/assets/Heritage/Heritage.jpeg";
 import Gallery from "./Gallery";
-
-const CF_HASH = "xGnXvGVZkNr8ZNcbFxAROQ";
-
-export const getCFImage = (
-  id: string | null | undefined,
-  variant: "thumb" | "medium" | "full" = "medium",
-) => {
-  if (!id) return "/placeholder.svg";
-  if (id.startsWith("http://") || id.startsWith("https://")) return id;
-  return `https://imagedelivery.net/${CF_HASH}/${id}/${variant}`;
-};
+import { CloudflareImage } from "@/components/images/CloudflareImage";
+import { useRequireLogin } from "@/hooks/useRequireLogin";
 
 // Define the shape of our fashion products from the data
 interface FashionProductCategory {
@@ -118,6 +108,7 @@ const Index = () => {
   const { categories = [], products = [] } = useInventory() || {};
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { requireLogin } = useRequireLogin();
   const { cart = { totalItems: 0 }, addToCart, isInCart } = useCart() || {};
   const {
     wishlist = [],
@@ -137,7 +128,13 @@ const Index = () => {
   );
 
   // Use dynamic products from inventory
-  const sampleProducts = Array.isArray(products) ? products : [];
+  const sampleProducts = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products.filter((product) => product.isVisible !== false)
+        : [],
+    [products]
+  );
 
   // Function to render product cards
   const renderProductCards = useCallback(
@@ -185,13 +182,15 @@ const Index = () => {
   // Handle cart and wishlist actions
   const handleAddToCart = useCallback(
     (product: Product) => {
+      if (!requireLogin("add this item to your cart", "/")) return;
       if (typeof addToCart === "function") addToCart(product);
     },
-    [addToCart]
+    [addToCart, requireLogin]
   );
 
   const handleToggleWishlist = useCallback(
     (productId: string) => {
+      if (!requireLogin("save this item to your wishlist", "/")) return;
       if (!sampleProducts || !Array.isArray(sampleProducts)) return;
       const product = sampleProducts.find((p) => p.id === productId);
 
@@ -209,7 +208,7 @@ const Index = () => {
         });
       }
     },
-    [addToWishlist, removeFromWishlist, isInWishlist, sampleProducts, toast]
+    [addToWishlist, removeFromWishlist, isInWishlist, requireLogin, sampleProducts, toast]
   );
 
   // Carousel navigation
@@ -255,7 +254,9 @@ const Index = () => {
     const subCat = cat.subCategories.find(
       (sub) => sub?.name === activeSubcategory
     );
-    return Array.isArray(subCat?.products) ? subCat.products : null;
+    return Array.isArray(subCat?.products)
+      ? subCat.products.filter((product) => product.isVisible !== false)
+      : null;
   }, [filters.selectedCategories, activeSubcategory, categories]);
 
   const filteredProducts = useMemo(() => {
@@ -623,8 +624,9 @@ const Index = () => {
                 </Button>
               </div>
               <div className="relative animate-slide-in-right">
-                <img
-                  src={getCFImage("cb1eba23-5f89-4d3d-a2a4-487e70cd0400", "thumb")}
+                <CloudflareImage
+                  imageRef="cb1eba23-5f89-4d3d-a2a4-487e70cd0400"
+                  variant="thumb"
                   alt="Kalamkari craftsmanship"
                   className="rounded-lg shadow-lg w-full h-[400px] object-cover"
                 />

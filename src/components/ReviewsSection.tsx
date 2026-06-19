@@ -1,4 +1,5 @@
 import * as React from "react";
+import { CloudflareImage } from "@/components/images/CloudflareImage";
 
 // --- Kalamkari Sarees Data (reuse as before) ---
 const kalamkariTestimonials = [
@@ -79,24 +80,24 @@ const KalamkariCard = ({
         : "h-[180px] min-h-[120px] sm:h-[210px] sm:min-h-[140px]"
     }`}
   >
-    <img
+    <CloudflareImage
       src={mainImage}
+      variant="medium"
       alt={feedback}
+      width={1200}
+      height={800}
       className="w-full h-full object-cover"
-      onError={(e) => {
-        e.currentTarget.src = "/placeholder.svg";
-      }}
     />
     <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent" />
     <div className="absolute top-0 left-0 p-4 text-white">
       <div className="flex items-center gap-3 mb-2">
-        <img
+        <CloudflareImage
           src={profileImage}
-          className="w-10 h-10 rounded-full border-2 border-white/90 shadow-md"
+          variant="thumb"
           alt={name}
-          onError={(e) => {
-            e.currentTarget.src = "/placeholder.svg";
-          }}
+          width={40}
+          height={40}
+          className="w-10 h-10 rounded-full border-2 border-white/90 shadow-md"
         />
         <span className="font-semibold text-sm drop-shadow-md">{name}</span>
       </div>

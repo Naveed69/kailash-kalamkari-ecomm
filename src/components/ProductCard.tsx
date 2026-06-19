@@ -23,6 +23,8 @@ export interface Product {
   dimensions?: string; // Added for home decor products
   material?: string; // Added for home decor products
   quantity: number;
+  barcode?: string;
+  isVisible?: boolean;
   specifications?: Record<string, string>; // Added for dynamic product details
 }
 
@@ -52,6 +54,8 @@ export const ProductCard = ({
           imageRef={primaryImageRef}
           variant="thumb"
           alt={product.name}
+          width={400}
+          height={500}
           className="w-full h-64 object-cover transition-transform hover:cursor-pointer duration-300 group-hover:scale-105"
            onClick={() => navigate(`/product/${product.id}`)}
         />

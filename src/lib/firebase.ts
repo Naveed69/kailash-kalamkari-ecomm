@@ -16,10 +16,38 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
-// Configure auth for email link authentication (development only)
+// Development: lets Firebase test phone numbers work without solving reCAPTCHA.
 if (import.meta.env.DEV) {
-  // Note: In production, you'll need to configure this properly in Firebase Console
-  // This is just for development testing
+  auth.settings.appVerificationDisabledForTesting = true;
+}
+
+let appCheckInitialized = false;
+
+export async function initAppCheckOnDemand() {
+  if (appCheckInitialized || typeof window === "undefined") return;
+
+  const siteKey = import.meta.env.VITE_FIREBASE_APPCHECK_SITE_KEY as
+    | string
+    | undefined;
+  if (!siteKey) return;
+
+  appCheckInitialized = true;
+
+  if (import.meta.env.DEV) {
+    (window as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
+  try {
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import(
+      "firebase/app-check"
+    );
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(siteKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch (error) {
+    console.warn("Firebase App Check failed to initialize:", error);
+  }
 }
 
 const db = getFirestore(app);

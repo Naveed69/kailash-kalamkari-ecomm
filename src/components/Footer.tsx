@@ -15,6 +15,7 @@ import { useRef, useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import logo from "@/assets/Logo/kklogo.png"
+import { CloudflareImage } from "@/components/images/CloudflareImage"
 const LOGO_SRC = logo
 
 const CONTACT_INFO = {
@@ -238,12 +239,14 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div>
-                <img
+                <CloudflareImage
                   src={LOGO_SRC}
+                  variant="thumb"
                   alt="Kailash Kalamkari Logo"
+                  width={110}
+                  height={80}
                   className="h-20 w-auto object-contain p-1"
                   style={{ maxWidth: "110px" }}
-                  loading="lazy"
                 />
               </div>
             </div>
