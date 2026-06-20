@@ -1,13 +1,11 @@
 import React from 'react';
-import { v5 as uuidv5 } from 'uuid';
-
-const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Package, ChevronRight, ShoppingBag, LogOut } from 'lucide-react';
 import { CloudflareImage } from "@/components/images/CloudflareImage";
+import { getDbUserId } from '@/lib/userIdentity';
 
 const MyOrdersPage: React.FC = () => {
   const { user, logout, loading } = useAuth();
@@ -32,7 +30,11 @@ const MyOrdersPage: React.FC = () => {
 
     const { supabase } = await import('@/lib/supabaseClient');
     // Use consistent UUID
-    const dbUserId = user ? uuidv5(user.uid, USER_ID_NAMESPACE) : null;
+    const dbUserId = getDbUserId(user);
+    if (!dbUserId) {
+      setLoadingOrders(false);
+      return;
+    }
 
     const { data, error } = await supabase
       .from('orders')

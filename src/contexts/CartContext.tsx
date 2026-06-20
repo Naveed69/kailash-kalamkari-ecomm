@@ -4,6 +4,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/AuthContext';
 import { cartApi } from '@/lib/cartApi';
 import { useInventory } from '@/contexts/InventoryContext';
+import { getDbUserId } from '@/lib/userIdentity';
+import { ensureSupabaseUser } from '@/lib/supabaseUser';
 
 interface CartItem extends Product {
   cartItemId: string;
@@ -161,10 +163,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!user || products.length === 0) return;
 
       try {
-        console.log(`[CartContext] Syncing cart for user ${user.uid} with ${products.length} products available.`);
+        const dbUserId = await ensureSupabaseUser(user);
+        if (!dbUserId) return;
+
+        console.log(`[CartContext] Syncing cart for user ${dbUserId} with ${products.length} products available.`);
 
         // 1. Fetch user's cart from DB
-        const dbItems = await cartApi.getUserCart(user.uid);
+        const dbItems = await cartApi.getUserCart(dbUserId);
         console.log(`[CartContext] Fetched ${dbItems?.length || 0} items from DB.`);
 
         // 2. Identify local items to sync to DB (migration - handling guest cart to user cart merge)
@@ -172,7 +177,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.log(`[CartContext] Merging ${cart.items.length} local items to DB.`);
           const syncPromises = cart.items.map(item =>
             cartApi.upsertCartItem({
-              user_id: user.uid,
+              user_id: dbUserId,
               cart_item_id: item.cartItemId,
               product_id: item.id,
               quantity: item.quantity,
@@ -190,7 +195,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         let finalDbItems = dbItems;
         if (cart.items.length > 0) {
-          finalDbItems = await cartApi.getUserCart(user.uid);
+          finalDbItems = await cartApi.getUserCart(dbUserId);
         }
 
         // 4. Merge DB items with full product details from Inventory
@@ -245,8 +250,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
 
     try {
+      const dbUserId = await ensureSupabaseUser(user);
+      if (!dbUserId) return;
+
       await cartApi.upsertCartItem({
-        user_id: user.uid,
+        user_id: dbUserId,
         cart_item_id: cartItemId,
         product_id: product.id,
         quantity: newQuantity,
@@ -267,7 +275,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (user) {
       try {
-        await cartApi.removeFromCart(user.uid, cartItemId);
+        const dbUserId = getDbUserId(user);
+        if (!dbUserId) return;
+
+        await cartApi.removeFromCart(dbUserId, cartItemId);
       } catch (error) {
         console.error("Failed to sync removal to DB:", error);
       }
@@ -284,8 +295,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (user) {
       try {
+        const dbUserId = await ensureSupabaseUser(user);
+        if (!dbUserId) return;
+
         await cartApi.upsertCartItem({
-          user_id: user.uid,
+          user_id: dbUserId,
           cart_item_id: cartItemId,
           product_id: item.id,
           quantity: quantity,
@@ -302,7 +316,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (user) {
       try {
-        await cartApi.clearCart(user.uid);
+        const dbUserId = getDbUserId(user);
+        if (!dbUserId) return;
+
+        await cartApi.clearCart(dbUserId);
       } catch (error) {
         console.error("Failed to sync clear to DB:", error);
       }

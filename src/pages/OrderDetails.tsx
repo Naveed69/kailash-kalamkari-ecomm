@@ -23,10 +23,8 @@ import {
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
-import { v5 as uuidv5 } from 'uuid';
 import { CloudflareImage } from "@/components/images/CloudflareImage";
-
-const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+import { getDbUserId } from '@/lib/userIdentity';
 
 // --- Types ---
 interface OrderItem {
@@ -81,7 +79,8 @@ const OrderDetails: React.FC = () => {
 
     try {
       // Use consistent UUID
-      const dbUserId = user ? uuidv5(user.uid, USER_ID_NAMESPACE) : null;
+      const dbUserId = getDbUserId(user);
+      if (!dbUserId) return;
 
       const { data, error } = await supabase
         .from('orders')

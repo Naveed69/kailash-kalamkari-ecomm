@@ -34,6 +34,7 @@ import LoginPage from "./pages/Login"
 import MyOrdersPage from "./pages/MyOrders"
 import OrderDetails from "./pages/OrderDetails"
 import ProfilePage from "./pages/Profile"
+import SavedAddresses from "./pages/SavedAddresses"
 import { ProtectedWishlistRoute } from "./components/ProtectedWishlistRoute"
 
 const queryClient = new QueryClient()
@@ -88,8 +89,11 @@ const AppContent = () => {
         <Route path="/login/email-link" element={<Navigate to="/login" replace />} />
         <Route path="/login/finish" element={<Navigate to="/login" replace />} />
         <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+        
+        {/* User Protected Routes */}
         <Route path="/my-orders" element={<MyOrdersPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/saved-addresses" element={<SavedAddresses />} />
         <Route path="/order/:id" element={<OrderDetails />} />
 
         <Route

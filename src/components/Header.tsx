@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +46,23 @@ export const Header = ({
   const { user, logout } = useAuth()
   const wishlistCount = wishlist.length
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScrolledDown, setIsScrolledDown] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        setIsScrolledDown(true)
+      } else {
+        setIsScrolledDown(false)
+      }
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [lastScrollY])
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -68,7 +85,7 @@ export const Header = ({
 
   return (
     <header
-      className="sticky top-0 w-full z-50  backdrop-blur"
+      className={`sticky top-0 w-full z-50 backdrop-blur transition-transform duration-300 ${isScrolledDown ? "-translate-y-full" : "translate-y-0"}`}
       style={{ background: "#f0ece3ff" }}
     >
       {/* Main header */}

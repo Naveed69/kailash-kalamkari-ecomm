@@ -11,6 +11,8 @@ import { ToastAction } from "@/components/ui/toast"
 import { useAuth } from "@/lib/AuthContext"
 import { wishlistApi } from "@/lib/wishlistApi"
 import { useInventory } from "@/contexts/InventoryContext"
+import { getDbUserId } from "@/lib/userIdentity"
+import { ensureSupabaseUser } from "@/lib/supabaseUser"
 
 interface WishlistContextType {
   wishlist: Product[]
@@ -51,8 +53,11 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
       if (!user) return
 
       try {
+        const dbUserId = await ensureSupabaseUser(user)
+        if (!dbUserId) return
+
         // 1. Get user's wishlist from DB
-        const dbProductIds = await wishlistApi.getUserWishlist(user.id)
+        const dbProductIds = await wishlistApi.getUserWishlist(dbUserId)
 
         // 2. Identify local items that need to be synced to DB
         const localProductIds = wishlist.map((p) => p.id)
@@ -63,7 +68,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         // 3. Sync local items to DB
         if (itemsToSync.length > 0) {
           await Promise.all(
-            itemsToSync.map((id) => wishlistApi.addToWishlist(user.uid, id))
+            itemsToSync.map((id) => wishlistApi.addToWishlist(dbUserId, id))
           )
         }
 
@@ -153,7 +158,10 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
     // Save to DB
     try {
-      await wishlistApi.addToWishlist(user.uid, product.id)
+      const dbUserId = await ensureSupabaseUser(user)
+      if (!dbUserId) return
+
+      await wishlistApi.addToWishlist(dbUserId, product.id)
     } catch (error) {
       console.error("Failed to save to wishlist DB:", error)
       // Optionally revert state if failed, but for now keep optimistic
@@ -171,7 +179,10 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
     if (user) {
       try {
-        await wishlistApi.removeFromWishlist(user.uid, productId)
+        const dbUserId = getDbUserId(user)
+        if (!dbUserId) return
+
+        await wishlistApi.removeFromWishlist(dbUserId, productId)
       } catch (error) {
         console.error("Failed to remove from wishlist DB:", error)
       }

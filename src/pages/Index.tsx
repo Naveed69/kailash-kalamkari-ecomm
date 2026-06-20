@@ -14,6 +14,7 @@ import carouselImage2 from "@/assets/carousel/Video/video2.mp4";
 import carouselImage3 from "@/assets/carousel/Video/video3.mp4";
 import carouselImage4 from "@/assets/carousel/Video/video4.mp4";
 import { MobileNavbar } from "../components/ui/MobileNavbar";
+import heritageImage from "@/assets/kalamkari-hero.jpg";
 
 import { useInventory } from "@/contexts/InventoryContext";
 // import { sampleProducts as defaultSampleProducts } from "@/data/products";
@@ -271,7 +272,7 @@ const Index = () => {
       filters.priceRange[1] >= 10000 &&
       !searchQuery;
 
-    let sortedProducts = [...sampleProducts];
+    const sortedProducts = [...sampleProducts];
 
     if (noFiltersApplied) {
       sortedProducts.sort((a, b) => {
@@ -288,7 +289,7 @@ const Index = () => {
       return sortedProducts;
     }
 
-    let filtered = sampleProducts.filter((product) => {
+    const filtered = sampleProducts.filter((product) => {
       if (
         searchQuery &&
         !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -479,7 +480,7 @@ const Index = () => {
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">
-                        {filteredProducts?.length ?? 0} products found
+                        {isSubcategoryActive && Array.isArray(subCategoryData) ? subCategoryData.length : (filteredProducts?.length ?? 0)} products found
                       </span>
                       {searchQuery && (
                         <Badge variant="secondary">
@@ -567,28 +568,50 @@ const Index = () => {
 
                 {/* Products in Subcategory */}
                 {isSubcategoryActive && Array.isArray(subCategoryData) && (
-                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {subCategoryData.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onAddToCart={handleAddToCart}
-                        onToggleWishlist={() =>
-                          handleToggleWishlist(product.id)
-                        }
-                        isWishlisted={
-                          typeof isInWishlist === "function" && product.id
-                            ? isInWishlist(product.id)
-                            : false
-                        }
-                        isInCart={
-                          typeof isInCart === "function" && product.id
-                            ? isInCart(product.id)
-                            : false
-                        }
-                      />
-                    ))}
-                  </div>
+                  subCategoryData.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {subCategoryData.map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onAddToCart={handleAddToCart}
+                          onToggleWishlist={() =>
+                            handleToggleWishlist(product.id)
+                          }
+                          isWishlisted={
+                            typeof isInWishlist === "function" && product.id
+                              ? isInWishlist(product.id)
+                              : false
+                          }
+                          isInCart={
+                            typeof isInCart === "function" && product.id
+                              ? isInCart(product.id)
+                              : false
+                          }
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center w-full">
+                      <div className="bg-muted/50 rounded-full p-6 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-medium text-foreground mb-2">No products found</h3>
+                      <p className="text-muted-foreground mb-6">We couldn't find any products in the "{activeSubcategory}" category.</p>
+                      <Button 
+                        onClick={() => {
+                          setSubCategoryActive(false);
+                          setActiveSubcategory(null);
+                        }}
+                        variant="outline"
+                      >
+                        Explore Other Categories
+                      </Button>
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -624,9 +647,8 @@ const Index = () => {
                 </Button>
               </div>
               <div className="relative animate-slide-in-right">
-                <CloudflareImage
-                  imageRef="cb1eba23-5f89-4d3d-a2a4-487e70cd0400"
-                  variant="thumb"
+                <img
+                  src={heritageImage}
                   alt="Kalamkari craftsmanship"
                   className="rounded-lg shadow-lg w-full h-[400px] object-cover"
                 />

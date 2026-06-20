@@ -1,45 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { v5 as uuidv5 } from 'uuid';
-
-const USER_ID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-
-// Helper to ensure user exists in DB to satisfy Foreign Key constraints
-const ensureUserExists = async (userId: string, userDetails: any) => {
-  // Try 'profiles' table first (common Supabase pattern)
-  const profileData = {
-    id: userId,
-    email: userDetails.email || null,
-    full_name: userDetails.name || null,
-    phone: userDetails.phone || null,
-    updated_at: new Date().toISOString(),
-  };
-
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .upsert(profileData, { onConflict: 'id' });
-
-  if (!profileError) return true;
-
-  // If 'profiles' fails (e.g. table doesn't exist), try 'users' table
-  console.log("Upsert to profiles failed, trying users table...", profileError.message);
-  const userData = {
-    id: userId,
-    email: userDetails.email || null,
-    name: userDetails.name || null,
-    phone_number: userDetails.phone || null,
-  };
-
-  const { error: userError } = await supabase
-    .from('users')
-    .upsert(userData, { onConflict: 'id' });
-
-  if (userError) {
-    console.error("Failed to ensure user exists in public tables:", userError);
-    // We continue anyway; if FK is to auth.users, this will still fail, but we tried.
-    return false;
-  }
-  return true;
-};
 
 import { Input } from "@/components/ui/input"
 import { CloudflareImage } from "@/components/images/CloudflareImage"
@@ -84,6 +43,12 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 
 import { supabase } from "@/lib/supabaseClient"
+import { getDbUserId } from "@/lib/userIdentity"
+import {
+  ensureSupabaseUser,
+  withMissingColumnFallback,
+} from "@/lib/supabaseUser"
+import { getSavedAddresses, saveAddress, Address } from "@/lib/addressApi"
 
 // Indian states list
 const INDIAN_STATES = [
@@ -138,6 +103,7 @@ type OrderDetails = {
   landmark: string
 }
 
+
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart()
   const { toast } = useToast()
@@ -155,13 +121,79 @@ export default function CartPage() {
     pincode: "",
     landmark: "",
   })
-  const [isProcessing, setIsProcessing] = useState(false)
+  
+  // Saved Addresses State
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [saveNewAddress, setSaveNewAddress] = useState(false)
+  const [loadingAddresses, setLoadingAddresses] = useState(false)
 
+  const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<{ [key: string]: string }>({})
+
+  // Load addresses when user logs in
+  useEffect(() => {
+    if (user) {
+      loadAddresses()
+    }
+  }, [user])
+
+  const loadAddresses = async () => {
+    setLoadingAddresses(true)
+    try {
+      const addresses = await getSavedAddresses()
+      setSavedAddresses(addresses)
+      if (addresses.length > 0) {
+        // Auto-select default address
+        const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0]
+        handleSelectSavedAddress(defaultAddr)
+      }
+    } catch (err) {
+      console.error("Failed to load saved addresses:", err)
+    } finally {
+      setLoadingAddresses(false)
+    }
+  }
+
+  const handleSelectSavedAddress = (addr: Address) => {
+    setSelectedAddressId(addr.id)
+    setOrderDetails({
+      name: addr.name || "",
+      phone: addr.phone || "",
+      email: user?.email || "",
+      addressLine1: addr.addressLine1 || "",
+      addressLine2: addr.addressLine2 || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      pincode: addr.pincode || "",
+      landmark: addr.landmark || "",
+    })
+    setError({}) // Clear any previous errors
+  }
+
+  const handleClearSelectedAddress = () => {
+    setSelectedAddressId(null)
+    setOrderDetails({
+      name: user?.user_metadata?.full_name || "",
+      phone: user?.phoneNumber || "",
+      email: user?.email || "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      pincode: "",
+      landmark: "",
+    })
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    // If user starts typing while a saved address is selected, clear selection
+    if (selectedAddressId) {
+      setSelectedAddressId(null)
+    }
+
     const { name, value } = e.target
 
     setOrderDetails((prev) => ({
@@ -412,50 +444,73 @@ export default function CartPage() {
           }
 
           // Create order with fresh item data
-          const dbUserId = uuidv5(user.uid, USER_ID_NAMESPACE);
+          const dbUserId = getDbUserId(user)
+          if (!dbUserId) {
+            throw new Error("Please sign in again before placing your order.")
+          }
 
           // Ensure user exists in DB before creating order
-          await ensureUserExists(dbUserId, {
+          await ensureSupabaseUser(user, {
             name: orderDetails.name,
             email: orderDetails.email,
             phone: normalizedPhone
           });
 
-          const { data: orderData, error: orderError } = await supabase
-            .from("orders")
-            .insert([
-              {
-                customer_name: orderDetails.name,
-                customer_phone: normalizedPhone,
-                customer_email: orderDetails.email || null,
-                // New structured address fields
-                address_line1: orderDetails.addressLine1,
-                address_line2: orderDetails.addressLine2 || null,
+          // Save new address if requested
+          if (saveNewAddress && !selectedAddressId) {
+            try {
+              await saveAddress({
+                id: Date.now().toString(),
+                name: orderDetails.name,
+                phone: normalizedPhone,
+                addressLine1: orderDetails.addressLine1,
+                addressLine2: orderDetails.addressLine2,
                 city: orderDetails.city,
                 state: orderDetails.state,
                 pincode: orderDetails.pincode,
-                landmark: orderDetails.landmark || null,
-                // Legacy fallback (concatenated address)
-                customer_address: `${orderDetails.addressLine1}, ${orderDetails.addressLine2
-                  ? orderDetails.addressLine2 + ", "
-                  : ""
-                  }${orderDetails.city}, ${orderDetails.state} - ${orderDetails.pincode
-                  }${orderDetails.landmark
-                    ? " (Near: " + orderDetails.landmark + ")"
-                    : ""
-                  }`,
-                total_amount: cart.totalPrice,
-                items: freshItems, // Use fresh items with barcodes
-                status: "paid",
-                user_id: dbUserId, // Link order to user
-                user_phone: user.phoneNumber || normalizedPhone,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id:
-                  response.razorpay_order_id || response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature || null,
-              },
-            ])
-            .select()
+                landmark: orderDetails.landmark,
+              })
+            } catch (addrErr) {
+              console.error("Failed to save new address:", addrErr)
+            }
+          }
+
+          const orderPayload = {
+            customer_name: orderDetails.name,
+            customer_phone: normalizedPhone,
+            customer_email: orderDetails.email || null,
+            // New structured address fields
+            address_line1: orderDetails.addressLine1,
+            address_line2: orderDetails.addressLine2 || null,
+            city: orderDetails.city,
+            state: orderDetails.state,
+            pincode: orderDetails.pincode,
+            landmark: orderDetails.landmark || null,
+            // Legacy fallback (concatenated address)
+            customer_address: `${orderDetails.addressLine1}, ${orderDetails.addressLine2
+              ? orderDetails.addressLine2 + ", "
+              : ""
+              }${orderDetails.city}, ${orderDetails.state} - ${orderDetails.pincode
+              }${orderDetails.landmark
+                ? " (Near: " + orderDetails.landmark + ")"
+                : ""
+              }`,
+            total_amount: cart.totalPrice,
+            items: freshItems, // Use fresh items with barcodes
+            status: "paid",
+            payment_method: "razorpay", // Fixes missing column error
+            user_id: dbUserId, // Link order to user
+            user_phone: user.phoneNumber || normalizedPhone,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id:
+              response.razorpay_order_id || response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature || null,
+          }
+
+          const { data: orderData, error: orderError } =
+            await withMissingColumnFallback(orderPayload, (payload) =>
+              supabase.from("orders").insert([payload]).select(),
+            )
 
           if (orderError) throw orderError
 
@@ -785,7 +840,68 @@ export default function CartPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <form className="space-y-6">
+                
+                {/* Saved Addresses Section */}
+                {user && savedAddresses.length > 0 && (
+                  <div className="mb-8 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+                        Saved Addresses
+                      </h3>
+                      {selectedAddressId && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={handleClearSelectedAddress}
+                          className="text-[#D49217] hover:text-[#b87d14] hover:bg-amber-50 h-8"
+                        >
+                          <Plus className="w-3 h-3 mr-1" /> Add New Address
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {savedAddresses.map((addr) => (
+                        <div 
+                          key={addr.id}
+                          onClick={() => handleSelectSavedAddress(addr)}
+                          className={`relative border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                            selectedAddressId === addr.id 
+                              ? "border-[#D49217] bg-amber-50/20 shadow-sm" 
+                              : "border-slate-200 hover:border-slate-300 bg-white"
+                          }`}
+                        >
+                          {selectedAddressId === addr.id && (
+                            <div className="absolute top-3 right-3 text-[#D49217]">
+                              <ShieldCheck className="w-5 h-5" />
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <MapPin className={`w-4 h-4 ${selectedAddressId === addr.id ? 'text-[#D49217]' : 'text-slate-400'}`} />
+                            <span className="font-semibold text-slate-900">{addr.name}</span>
+                            {addr.isDefault && <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-[10px] h-5 px-1.5 ml-1">Default</Badge>}
+                          </div>
+                          <p className="text-sm text-slate-600 line-clamp-2 pl-6">
+                            {addr.addressLine1}, {addr.city}, {addr.state} - {addr.pincode}
+                          </p>
+                          <p className="text-sm text-slate-500 mt-2 pl-6">
+                            📞 {addr.phone}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {selectedAddressId && (
+                      <div className="flex items-center mt-6">
+                        <Separator className="flex-1" />
+                        <span className="px-4 text-xs text-slate-400 uppercase font-medium">Or</span>
+                        <Separator className="flex-1" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <form className={`space-y-6 ${selectedAddressId ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
                   {/* Personal Info Group */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
@@ -930,6 +1046,21 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
+
+                  {user && !selectedAddressId && (
+                    <div className="flex items-center space-x-2 pt-2 border-t mt-6">
+                      <input 
+                        type="checkbox" 
+                        id="save-address" 
+                        className="rounded border-slate-300 text-[#D49217] focus:ring-[#D49217] w-4 h-4 cursor-pointer"
+                        checked={saveNewAddress}
+                        onChange={(e) => setSaveNewAddress(e.target.checked)}
+                      />
+                      <Label htmlFor="save-address" className="cursor-pointer font-medium text-slate-700">
+                        Save this address for future use
+                      </Label>
+                    </div>
+                  )}
                 </form>
               </CardContent>
             </Card>
@@ -970,44 +1101,44 @@ export default function CartPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-6 pt-0 flex flex-col gap-4">
-	                  <Button
-	                    onClick={handlePlaceOrder}
-	                    className="w-full h-12 text-lg font-semibold bg-[#D49217] hover:bg-[#b87d14] shadow-md hover:shadow-lg transition-all"
-	                    disabled={isProcessing || !!error.phone || !!error.pincode || !!error.email}
-	                  >
-	                    {isProcessing ? "Processing..." : user ? "Proceed to Pay" : "Login to Continue"}
-	                    <ArrowRight className="ml-2 w-5 h-5" />
-	                  </Button>
+                  <Button
+                    onClick={handlePlaceOrder}
+                    className="w-full h-12 text-lg font-semibold bg-[#D49217] hover:bg-[#b87d14] shadow-md hover:shadow-lg transition-all"
+                    disabled={isProcessing || !!error.phone || !!error.pincode || !!error.email}
+                  >
+                    {isProcessing ? "Processing..." : user ? "Proceed to Pay" : "Login to Continue"}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
 
-	                  <div className="space-y-4 w-full">
-	                    <div className="space-y-2">
-	                      <p className="text-sm font-medium">Payment Method</p>
-	                      <div className="rounded-lg border border-[#D49217]/30 bg-[#D49217]/5 p-4">
-	                        <div className="flex items-start gap-3">
-	                          <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#D49217]">
-	                            <div className="h-2.5 w-2.5 rounded-full bg-[#D49217]" />
-	                          </div>
-	                          <div>
-	                            <p className="text-sm font-semibold text-slate-900">
-	                              Online Payment
-	                            </p>
-	                            <p className="mt-1 text-xs text-muted-foreground">
-	                              Cards, UPI, Net Banking, and Wallets via Razorpay.
-	                            </p>
-	                          </div>
-	                        </div>
-	                      </div>
-	                    </div>
+                  <div className="space-y-4 w-full">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Payment Method</p>
+                      <div className="rounded-lg border border-[#D49217]/30 bg-[#D49217]/5 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#D49217]">
+                            <div className="h-2.5 w-2.5 rounded-full bg-[#D49217]" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              Online Payment
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Cards, UPI, Net Banking, and Wallets via Razorpay.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-	                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-	                      <Lock className="w-3 h-3" />
-	                      <span>Secured by Razorpay</span>
-	                    </div>
-	                  </div>
-	                </CardFooter>
-	              </Card>
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                      <Lock className="w-3 h-3" />
+                      <span>Secured by Razorpay</span>
+                    </div>
+                  </div>
+                </CardFooter>
+              </Card>
 
-	              {/* Trust Badges */}
+              {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-lg border shadow-sm flex items-center gap-3">
                   <div className="bg-green-50 p-2 rounded-full">
@@ -1031,7 +1162,7 @@ export default function CartPage() {
             </div>
           </div>
         </div>
-	      </div>
+      </div>
     </div>
   )
 }
