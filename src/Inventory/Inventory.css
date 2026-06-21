@@ -5,10 +5,14 @@
 }
 .main-content {
   flex: 1;
-  margin-left: 280px; /* Adjust based on your sidebar width */
-  transition: margin-left 0.3s ease;
+  margin-left: var(--sidebar-width, 280px);
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: #f9fafb;
   min-height: 100vh;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 72px;
 }
 
 

@@ -1,5 +1,5 @@
 // Inventory.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Routes,
   Route,
@@ -17,6 +17,9 @@ import AddProduct from "./components/AddProduct";
 import "./Inventory.css";
 import { Toaster } from "@/components/ui/toaster";
 import Categories from "./pages/Categories";
+import Coupons from "./pages/Coupons";
+import Reviews from "./pages/Reviews";
+import Inquiries from "./pages/Inquiries";
 import { useAdminAuth } from "@/contexts/AdminAuthContext.tsx";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
@@ -26,6 +29,37 @@ function Inventory() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin, loading, admin } = useAdminAuth();
+
+  // Track sidebar collapse for main-content offset
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("sidebar-collapsed") === "true"
+    } catch {
+      return false
+    }
+  });
+
+  // Listen to localStorage changes from Sidebar
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "sidebar-collapsed") {
+        setSidebarCollapsed(e.newValue === "true")
+      }
+    }
+    window.addEventListener("storage", onStorage)
+    return () => window.removeEventListener("storage", onStorage)
+  }, [])
+
+  // Poll localStorage for same-tab changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      try {
+        const val = localStorage.getItem("sidebar-collapsed") === "true"
+        setSidebarCollapsed((prev) => (prev !== val ? val : prev))
+      } catch {}
+    }, 100)
+    return () => clearInterval(interval)
+  }, [])
 
   // Debug logging (only in development)
   if (import.meta.env.DEV) {
@@ -105,7 +139,7 @@ function Inventory() {
   return (
     <div className="app min-h-screen bg-gray-50">
       <SidebarComp />
-      <main className="main-content">
+      <main className={cn("main-content", sidebarCollapsed && "sidebar-collapsed")}>
         <div className={cn(
           "p-4 md:p-6",
           location.pathname.includes('/dashboard') ? 'max-w-7xl mx-auto' : ''
@@ -178,6 +212,36 @@ function Inventory() {
               element={
                 <ProtectedRoute>
                   <Categories />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* NEW: Coupons */}
+            <Route
+              path="coupons"
+              element={
+                <ProtectedRoute>
+                  <Coupons />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* NEW: Reviews */}
+            <Route
+              path="reviews"
+              element={
+                <ProtectedRoute>
+                  <Reviews />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* NEW: Inquiries */}
+            <Route
+              path="inquiries"
+              element={
+                <ProtectedRoute>
+                  <Inquiries />
                 </ProtectedRoute>
               }
             />
